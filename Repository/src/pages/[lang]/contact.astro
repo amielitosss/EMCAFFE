@@ -340,13 +340,29 @@ const t = useTranslations(lang);
                 </div>
              </div>
 
+             <!-- message -->
 
+             <div>
+                <label class="block text-sm font-semibold mb-2 text-[#5C3F32]">{t("Contact.message")} *</label>
+                <textarea rows="5" class="w-full border border-[#5C3F32] rounded-md p-2" required></textarea>
+             </div>
 
+             <!-- Consent -->
+              <div class="flex items-center gap-2">
+                <input type="checkbox" class="border-[#5C3F32]" required>
+                <label class="text-sm text-[#5C3F32]">
+                    {t("Contact.consent")} *
+                </label>
+              </div>
 
+              <!-- Submit -->
+               <div class="flex justify-center">
+                <button type="submit" class="bg-black text-white px-8 py-3 font-bold rounded-md hover:bg-[#5C3F32] transition">
+                    {t("Contact.submit")}
+                </button> 
+      </div>
      </form>
     </section>
 </main>
-
-
   <Footer />
 </Layout>

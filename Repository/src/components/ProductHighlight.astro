@@ -1,11 +1,9 @@
 ---
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
 
-// Translation setup
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-// Two images: front and back
 const products = [
   {
     title: t("productHighlight.title"),
@@ -21,38 +19,29 @@ const products = [
 ---
 
 <section
-  class="flex flex-col items-center justify-center bg-[#ffffff] p-6 md:p-5 w-9/10 md:w-2/2 mx-auto text-center shadow-sm relative overflow-hidden"
+  class="flex flex-col items-center justify-center bg-[#FFFFFF] p-6 md:p-5 w-9/10 md:w-2/2 mx-auto text-center shadow-sm relative overflow-hidden"
 >
-
-  <!-- Carousel -->
   <div class="relative w-full flex items-center justify-center">
-
-    <!-- Product Image -->
     <img
       id="productImage"
       src={products[0].image}
       alt="Coffee product"
       class="max-h-[500px] object-contain mx-auto rounded-lg transition-opacity duration-700 opacity-100"
     />
-
   </div>
 
-     <!-- Price -->
   <div
     class="mt-6 border border-gray-300 text-black font-semibold text-lg md:text-xl px-6 py-2 rounded-full"
   >
     16,99 €
   </div>
 
-  <!-- Description -->
   <p
     id="productDesc"
     class="mt-6 text-lg md:text-xl text-primary font-medium leading-tight"
     set:html={products[0].description}
-
   ></p>
 
-  <!-- Button -->
   <button
     class="mt-6 bg-black text-white rounded-full px-8 py-3 text-sm md:text-base hover:bg-neutral-800 transition"
   >
@@ -61,46 +50,71 @@ const products = [
 </section>
 
 <script>
-  const products = [
-    {
-      image: "/img/products/200-bio-1.png",
-      description: `Grains de café torréfiés purs<br /><strong>ARABIQUE DE FORÊT D'ALTITUDE<br />100% BIO</strong>`,
-    },
-    {
-      image: "/img/products/200-bio-2.png",
-       description: `Grains de café torréfiés purs<br /><strong>ARABIQUE DE FORÊT D'ALTITUDE<br />100% BIO</strong>`,
-    },
-  ];
+  // Run after DOM load (important on iPhone)
+  window.addEventListener("DOMContentLoaded", () => {
+    const products = [
+      {
+        image: "/img/products/200-bio-1.png",
+        description: `GRAINS DE CAFÉ TORRÉFIÉS PURS<br /><strong>ARABIQUE DE FORÊT D'ALTITUDE<br />100% BIO</strong>`,
+      },
+      {
+        image: "/img/products/200-bio-2.png",
+        description: `GRAINS DE CAFÉ TORRÉFIÉS PURS<br /><strong>ARABIQUE DE FORÊT D'ALTITUDE<br />100% BIO</strong>`,
+      },
+    ];
 
-  let current = 0;
-  const img = document.getElementById("productImage") as HTMLImageElement;
-  const desc = document.getElementById("productDesc");
-  
-  function updateSlide(index: number) {
-    if (!img || !desc) return;
-    // Fade animation
-    img.style.opacity = "0";
-    setTimeout(() => {
-      img.src = products[index].image;
-      desc.innerHTML = products[index].description;
-      img.style.opacity = "1";
-    }, 300);
-  }
+    const img = document.getElementById("productImage") as HTMLImageElement;
+    const desc = document.getElementById("productDesc");
+    const section = document.querySelector("section");
 
-  function nextSlide() {
-    current = (current + 1) % products.length;
-    updateSlide(current);
-  }
+    // ✅ Reliable mobile detection (works on iPhone)
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
-  // ✅ Automatic slideshow (every 5 seconds)
-  let autoSlide = setInterval(nextSlide, 5000);
+    if (!isMobile) {
+      let current = 0;
 
-  // 🧠 Pause when hovering
-  const section = document.querySelector("section");
-  if (section) {
-    section.addEventListener("mouseenter", () => clearInterval(autoSlide));
-    section.addEventListener("mouseleave", () => {
-      autoSlide = setInterval(nextSlide, 3000);
-    });
-  }
+      function updateSlide(index: number) {
+        if (!img || !desc) return;
+        img.style.transition = "opacity 0.7s ease-in-out";
+        img.style.opacity = "0";
+        setTimeout(() => {
+          img.src = products[index].image;
+          desc.innerHTML = products[index].description;
+          img.style.opacity = "1";
+        }, 300);
+      }
+
+      function nextSlide() {
+        current = (current + 1) % products.length;
+        updateSlide(current);
+      }
+
+      // Auto slideshow (5s)
+      let autoSlide = setInterval(nextSlide, 5000);
+
+      // Pause on hover
+      if (section) {
+        section.addEventListener("mouseenter", () => clearInterval(autoSlide));
+        section.addEventListener("mouseleave", () => {
+          autoSlide = setInterval(nextSlide, 3000);
+        });
+      }
+    } else {
+      // 📴 Disable all animation & transitions on mobile
+      if (img && desc) {
+        img.style.transition = "none";
+        img.style.opacity = "1";
+      }
+
+      // Disable CSS transitions globally for safety
+      const style = document.createElement("style");
+      style.innerHTML = `
+        *, *::before, *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  });
 </script>
