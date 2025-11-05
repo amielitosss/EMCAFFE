@@ -1,0 +1,114 @@
+---
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const images = ["300-bio", "200-bio", "300-spe", "200-spe"];
+const notAvailableProducts = ["200-bio", "200-spe", "300-spe"];
+---
+
+<section class="flex flex-col items-center justify-center py-12">
+  <!-- Title -->
+  <h2 class="mb-8 text-5xl font-[Chalkduster] uppercase text-[#753E1C] text-center">
+    {t("home-carousel.title")}
+  </h2>
+
+  <!-- Outer frame -->
+  <div
+    id="carousel-container"
+    class="relative w-[100vw] sm:w-11/12 md:w-3/4 border-2 border-black rounded-2xl bg-[#FEFBED] p-6 sm:p-8 md:p-12 shadow-md overflow-hidden mx-auto"
+  >
+    <!-- Track -->
+    <div
+      id="carousel-track"
+      class="flex transition-transform duration-700 ease-in-out gap-3 sm:gap-6"
+    >
+      {images.map((image) => (
+        <a
+          href={`/${lang}/product/${image}`}
+          class="relative flex-shrink-0 flex flex-col items-center justify-between bg-[#ffffff] w-1/2 md:w-1/2 rounded-lg p-4 hover:scale-105 transition-transform"
+        >
+          {notAvailableProducts.includes(image) && (
+            <p
+              class="absolute left-1/2 top-1/2 -translate-x-1/2 -rotate-12 font-[Chalkduster] text-4xl font-bold uppercase text-red-600 opacity-90"
+            >
+              {t("home-carousel.soon")}
+            </p>
+          )}
+          <img
+            src={`/img/products/${image}-1.png`}
+            alt={t(`${image}.titlep`)}
+            class="w-full h-auto object-contain rounded-md shadow-lg"
+          />
+          <h3
+            class="mt-3 text-center text-sm md:text-base font-semibold text-black"
+          >
+            {t(`${image}.titlep`)}
+          </h3>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  const track = document.getElementById("carousel-track");
+  const container = document.getElementById("carousel-container");
+  const cards = document.querySelectorAll("#carousel-track > a");
+
+  let index = 0;
+  const visible = 2;
+  const total = cards.length;
+
+  //  Move carousel to correct position
+  function updateCarousel() {
+    if (!track || cards.length === 0) return;
+    const cardWidth = (cards[0].offsetWidth || 0) + 27;
+    const offset = -index * cardWidth * visible;
+    track.style.transform = `translateX(${offset}px)`;
+  }
+
+  function nextSlide() {
+    index = (index + 1) % Math.ceil(total / visible);
+    updateCarousel();
+  }
+
+  //  Auto-scroll every 5 seconds
+  let autoScroll = setInterval(nextSlide, 5000);
+
+  //  Pause on hover
+  container?.addEventListener("mouseenter", () => clearInterval(autoScroll));
+  container?.addEventListener("mouseleave", () => {
+    autoScroll = setInterval(nextSlide, 5000);
+  });
+
+  //  Touch/swipe support (for mobile)
+  let startX = 0;
+  let endX = 0;
+
+  container?.addEventListener("touchstart", (e) => {
+    startX = e.touches[0].clientX;
+  });
+
+  container?.addEventListener("touchmove", (e) => {
+    endX = e.touches[0].clientX;
+  });
+
+  container?.addEventListener("touchend", () => {
+    const diff = startX - endX;
+    if (Math.abs(diff) > 50) {
+      // Swipe threshold
+      if (diff > 0) {
+        // swipe left 
+        index = (index + 1) % Math.ceil(total / visible);
+      } else {
+        // swipe right 
+        index = (index - 1 + Math.ceil(total / visible)) % Math.ceil(total / visible);
+      }
+      updateCarousel();
+    }
+  });
+
+  window.addEventListener("resize", updateCarousel);
+</script>

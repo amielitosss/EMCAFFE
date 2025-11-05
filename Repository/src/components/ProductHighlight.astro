@@ -1,0 +1,106 @@
+---
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
+
+// Translation setup
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Two images: front and back
+const products = [
+  {
+    title: t("productHighlight.title"),
+    image: "/img/products/300-bio-1.png",
+    description: t("productHighlight.descriptionFront"),
+  },
+  {
+    title: t("productHighlight.title"),
+    image: "/img/products/300-bio-2.png",
+    description: t("productHighlight.descriptionFront"),
+  },
+];
+---
+
+<section
+  class="flex flex-col items-center justify-center bg-[#ffffff] p-6 md:p-5 w-9/10 md:w-2/2 mx-auto text-center shadow-sm relative overflow-hidden"
+>
+
+  <!-- Carousel -->
+  <div class="relative w-full flex items-center justify-center">
+
+    <!-- Product Image -->
+    <img
+      id="productImage"
+      src={products[0].image}
+      alt="Coffee product"
+      class="max-h-[500px] object-contain mx-auto rounded-lg transition-opacity duration-700 opacity-100"
+    />
+
+  </div>
+
+     <!-- Price -->
+  <div
+    class="mt-6 border border-gray-300 text-black font-semibold text-lg md:text-xl px-6 py-2 rounded-full"
+  >
+    16,99 €
+  </div>
+
+  <!-- Description -->
+  <p
+    id="productDesc"
+    class="mt-6 text-lg md:text-xl text-primary font-medium leading-tight"
+    set:html={products[0].description}
+
+  ></p>
+
+  <!-- Button -->
+  <button
+    class="mt-6 bg-black text-white rounded-full px-8 py-3 text-sm md:text-base hover:bg-neutral-800 transition"
+  >
+    {t("productHighlight.addToCart")}
+  </button>
+</section>
+
+<script>
+  const products = [
+    {
+      image: "/img/products/200-bio-1.png",
+      description: `Grains de café torréfiés purs<br /><strong>ARABIQUE DE FORÊT D'ALTITUDE<br />100% BIO</strong>`,
+    },
+    {
+      image: "/img/products/200-bio-2.png",
+       description: `Grains de café torréfiés purs<br /><strong>ARABIQUE DE FORÊT D'ALTITUDE<br />100% BIO</strong>`,
+    },
+  ];
+
+  let current = 0;
+  const img = document.getElementById("productImage") as HTMLImageElement;
+  const desc = document.getElementById("productDesc");
+  
+  function updateSlide(index: number) {
+    if (!img || !desc) return;
+    // Fade animation
+    img.style.opacity = "0";
+    setTimeout(() => {
+      img.src = products[index].image;
+      desc.innerHTML = products[index].description;
+      img.style.opacity = "1";
+    }, 300);
+  }
+
+  function nextSlide() {
+    current = (current + 1) % products.length;
+    updateSlide(current);
+  }
+
+  // ✅ Automatic slideshow (every 5 seconds)
+  let autoSlide = setInterval(nextSlide, 5000);
+
+  // 🧠 Pause when hovering
+  const section = document.querySelector("section");
+  if (section) {
+    section.addEventListener("mouseenter", () => clearInterval(autoSlide));
+    section.addEventListener("mouseleave", () => {
+      autoSlide = setInterval(nextSlide, 3000);
+    });
+  }
+</script>
