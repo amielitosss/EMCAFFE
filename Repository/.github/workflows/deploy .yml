@@ -22,15 +22,17 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
+        working-directory: Repository
         run: npm ci
 
       - name: Build Astro
+        working-directory: Repository
         run: npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: Repository/dist  # 👈 Astro’s output directory
 
   deploy:
     environment:
