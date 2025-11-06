@@ -22,6 +22,7 @@ jobs:
           node-version: 20
           cache: 'pnpm'
 
+      # 🟢 This step installs pnpm itself
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
