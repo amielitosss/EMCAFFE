@@ -1,11 +1,11 @@
 import { defineConfig } from 'astro/config';
-
 import tailwind from '@astrojs/tailwind';
 
-// https://astro.build/config
 export default defineConfig({
-	integrations: [tailwind()],
-	redirects: {
-		'/': '/fr',
-	},
+  site: 'https://<your-username>.github.io/EMCAFFE', 
+  base: '/EMCAFFE/',                                 
+  integrations: [tailwind()],
+  redirects: {
+    '/': '/fr',
+  },
 });
