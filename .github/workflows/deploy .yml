@@ -22,13 +22,13 @@ jobs:
         with:
           version: 9
           run_install: false
-          package_json_path: Repository/package.json
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
+          cache-dependency-path: Repository/pnpm-lock.yaml
 
       - name: Install dependencies
         working-directory: Repository
