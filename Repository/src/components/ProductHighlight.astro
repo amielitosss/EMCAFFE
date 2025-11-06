@@ -67,7 +67,7 @@ const products = [
     const desc = document.getElementById("productDesc");
     const section = document.querySelector("section");
 
-    // ✅ Reliable mobile detection (works on iPhone)
+    //  Reliable mobile detection (works on iPhone)
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
     if (!isMobile) {
@@ -100,7 +100,7 @@ const products = [
         });
       }
     } else {
-      // 📴 Disable all animation & transitions on mobile
+      //  Disable all animation & transitions on mobile
       if (img && desc) {
         img.style.transition = "none";
         img.style.opacity = "1";

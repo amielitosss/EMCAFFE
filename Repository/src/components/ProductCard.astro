@@ -7,6 +7,7 @@ interface Props {
 	preparation: string;
 	dimension: string;
 	tabTitles: { ingredient: string; preparation: string; description: string };
+	t: (key: string) => string;
 }
 
 const {
@@ -17,6 +18,7 @@ const {
 	preparation,
 	dimension,
 	tabTitles,
+	t,
 } = Astro.props as Props;
 
 function formatTextWithLineBreaks(text: string): string[] {
@@ -47,6 +49,7 @@ function formatTextWithLineBreaks(text: string): string[] {
 			data-img={`${img}`}
 		/>
 	</div>
+	
 
 	<div class="my-10 flex flex-col md:w-1/2 bg-white border-2 border-[#000000] rounded-lg p-5">
 		<h2 class="text-2xl font-bold text-[#5C3F32] md:text-4xl">
@@ -116,10 +119,14 @@ function formatTextWithLineBreaks(text: string): string[] {
 					<p class="mt-2 text-xl">{line}</p>
 				))
 			}
-		</div>
+		</div>		
 	</div>
 </div>
-
+	<div class="flex justify-center mt-8 mb-8">
+				<button class="mt-6 bg-black text-white rounded-full px-8 py-3 text-sm md:text-base hover:bg-neutral-800 transition">
+					{t("product.addtocart")}
+				</button>
+	</div>
 <script>
 	const changeImage = (srcImg: string, num: string) => {
 		const image = document.getElementById('image')! as HTMLImageElement;
