@@ -50,7 +50,6 @@ const products = [
 </section>
 
 <script>
-  // Run after DOM load (important on iPhone)
   window.addEventListener("DOMContentLoaded", () => {
     const products = [
       {
@@ -63,42 +62,45 @@ const products = [
       },
     ];
 
-    const img = document.getElementById("productImage") as HTMLImageElement;
+    const img = document.getElementById("productImage");
     const desc = document.getElementById("productDesc");
     const section = document.querySelector("section");
 
-    //  Reliable mobile detection (works on iPhone)
-    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    if (!img || !desc) return;
 
-    if (!isMobile) {
-      let current = 0;
+    let current = 0;
 
-      function updateSlide(index: number) {
+    function updateSlide(index: number) {
+      if (!img || !desc) return;
+      (img as HTMLImageElement).style.transition = "opacity 0.7s ease-in-out";
+      (img as HTMLImageElement).style.opacity = "0";
+      setTimeout(() => {
         if (!img || !desc) return;
-        img.style.transition = "opacity 0.7s ease-in-out";
-        img.style.opacity = "0";
-        setTimeout(() => {
-          img.src = products[index].image;
-          desc.innerHTML = products[index].description;
-          img.style.opacity = "1";
-        }, 300);
-      }
+        (img as HTMLImageElement).src = products[index].image;
+        desc.innerHTML = products[index].description;
+        (img as HTMLImageElement).style.opacity = "1";
+      }, 300);
+    }
 
-      function nextSlide() {
-        current = (current + 1) % products.length;
-        updateSlide(current);
-      }
+    function nextSlide() {
+      current = (current + 1) % products.length;
+      updateSlide(current);
+    }
 
-      // Auto slideshow (5s)
-      let autoSlide = setInterval(nextSlide, 5000);
+    // Auto slideshow every 5s
+    let autoSlide = setInterval(nextSlide, 5000);
 
-      // Pause on hover
-      if (section) {
-        section.addEventListener("mouseenter", () => clearInterval(autoSlide));
-        section.addEventListener("mouseleave", () => {
-          autoSlide = setInterval(nextSlide, 3000);
-        });
-      }
+    // Optional: pause when user taps/presses image (works on mobile too)
+    if (section) {
+      section.addEventListener("touchstart", () => clearInterval(autoSlide));
+      section.addEventListener("touchend", () => {
+        autoSlide = setInterval(nextSlide, 5000);
+      });
+      section.addEventListener("mouseenter", () => clearInterval(autoSlide));
+      section.addEventListener("mouseleave", () => {
+        autoSlide = setInterval(nextSlide, 5000);
+      });
     }
   });
 </script>
+
