@@ -376,6 +376,54 @@
 	"reset.invalidToken": "Invalid link",
 	"reset.invalidTokenMessage": "This link is invalid or expired.",
 
+
+    
+"popup.title": "Product added to cart!",
+"popup.totalTTC": "TOTAL (incl. tax)",
+"popup.shipping": "Shipping",
+"popup.subtotal": "Subtotal",
+"popup.continue": "Continue shopping",
+"popup.checkout": "Checkout",
+
+
+
+"destination": {
+  "title": "Destination",
+  "personalInfo": "Personal Information",
+  "email": "Email",
+  "password": "Password",
+  "forgotPassword": "Forgot password?",
+  "continue": "Continue",
+  "previous": "Previous",
+
+  "addresses": "Addresses",
+  "alias": "Alias",
+  "firstName": "First name",
+  "lastName": "Last name",
+  "company": "Company",
+  "vat": "VAT number",
+  "address": "Address",
+  "addressComplement": "Address complement",
+  "postalCode": "Postal code",
+  "city": "City",
+  "country": "Country",
+  "phone": "Phone",
+
+  "deliveryMode": "Delivery method",
+  "deliveryStandard": "Standard delivery",
+  "deliveryExpress": "Express delivery",
+
+  "payment": "Payment",
+  "payWithPaypal": "Pay with PayPal",
+  "payWithCard": "Pay with credit card",
+  "order": "Order"
+},
+
+"destination.cardHolder": "Card holder",
+"destination.cardNumber": "Card number",
+"destination.expiry": "Expiry date",
+"destination.cvc": "CVC",
+"destination.paypalInfo": "You will be redirected to PayPal to complete your payment.",
 	"productHighlight": {
 		"title": "ORGANIC COFFEES",
 		"descriptionFront": "Pure roasted coffee beans<br /><strong>HIGH-ALTITUDE FOREST ARABICA<br />100% ORGANIC</strong>",

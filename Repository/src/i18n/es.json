@@ -265,6 +265,54 @@
 	"cart.total": "Total",
 	"cart.checkout": "Proceder al pago",
 
+"popup.title": "¡Producto añadido al carrito!",
+"popup.totalTTC": "TOTAL (incl. impuestos)",
+"popup.shipping": "Envío",
+"popup.subtotal": "Subtotal",
+"popup.continue": "Seguir comprando",
+"popup.checkout": "Finalizar compra",
+
+
+
+"destination": {
+  "title": "Destino",
+  "personalInfo": "Información personal",
+  "email": "Correo electrónico",
+  "password": "Contraseña",
+  "forgotPassword": "¿Olvidó su contraseña?",
+  "continue": "Continuar",
+  "previous": "Anterior",
+
+  "addresses": "Direcciones",
+  "alias": "Alias",
+  "firstName": "Nombre",
+  "lastName": "Apellido",
+  "company": "Empresa",
+  "vat": "Número de IVA",
+  "address": "Dirección",
+  "addressComplement": "Complemento de dirección",
+  "postalCode": "Código postal",
+  "city": "Ciudad",
+  "country": "País",
+  "phone": "Teléfono",
+
+  "deliveryMode": "Modo de entrega",
+  "deliveryStandard": "Entrega estándar",
+  "deliveryExpress": "Entrega exprés",
+
+  "payment": "Pago",
+  "payWithPaypal": "Pagar con PayPal",
+  "payWithCard": "Pagar con tarjeta bancaria",
+  "order": "Ordenar"
+},
+
+"destination.cardHolder": "Titular de la tarjeta",
+"destination.cardNumber": "Número de tarjeta",
+"destination.expiry": "Fecha de caducidad",
+"destination.cvc": "CVC",
+"destination.paypalInfo": "Serás redirigido a PayPal para completar el pago.",
+
+
 	"login.title": "Iniciar sesión",
 	"login.welcome": "Bienvenido",
 	"login.subtitle": "Inicia sesión en tu cuenta",

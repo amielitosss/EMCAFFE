@@ -39,16 +39,19 @@ const translatedTitle = t(`${id}.titlep`);
 	<Header />
 
 	<main class="mt-[255px] flex h-auto w-full flex-col md:mt-[192px]">
-		<ProductCard
-			img={img}
-			productName={t(`${id}.titlep`)}
-			description={t(`${id}.description`)}
-			ingredient={t(`${id}.ingredient`)}
-			preparation={t(`${id}.preparation`)}
-			dimension={t(`${id}.dimension`)}
-			tabTitles={tabTitles}
-			t={t}
-		/>
+<ProductCard
+  img={img}
+  productName={t(`${id}.titlep`)}
+  price={16.99}     
+  id={id}           
+  description={t(`${id}.description`)}
+  ingredient={t(`${id}.ingredient`)}
+  preparation={t(`${id}.preparation`)}
+  dimension={t(`${id}.dimension`)}
+  tabTitles={tabTitles}
+  t={t}
+/>
+
 	</main>
 
 	<Footer />

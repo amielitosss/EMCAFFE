@@ -4,6 +4,7 @@ import { getLangFromUrl, useTranslations } from "../i18n/utils";
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
+
 const products = [
   {
     title: t("productHighlight.title"),
@@ -42,12 +43,17 @@ const products = [
     set:html={products[0].description}
   ></p>
 
-  <button
+<button
     id="addToCart"
-    class="mt-6 bg-black text-white rounded-full px-8 py-3 text-sm md:text-base hover:bg-neutral-800 transition"
-  >
-    {t("productHighlight.addToCart")}
-  </button>
+    class="bg-black text-white px-3 py-2 rounded-xl mt-2 hover:bg-[#5C3F32] transition"
+    data-product-id="cafe-torrefies-bio"
+    data-product-name="Grains de Café Torréfiés Bio"
+    data-product-price="16.99"
+    data-product-image="/img/products/300-bio-1.png"
+>
+    {t("product.addtocart")}
+</button>
+
 </section>
 
 <script is:inline>
@@ -59,7 +65,7 @@ const products = [
 
     //  Define product data (you can tweak these if you want dynamic)
     const product = {
-      id: "highlight-coffee", // unique ID
+      id: "highlight-coffee", 
       name: "Café Bio Amazonas",
       price: 16.99,
       image: "/img/products/300-bio-1.png",
@@ -68,14 +74,24 @@ const products = [
     };
 
     //  Add to Cart
-    addToCartBtn?.addEventListener("click", () => {
-      if (window.addToCart) {
-        window.addToCart(product);
-        alert("✅ Produit ajouté au panier !");
-      } else {
-        console.error("⚠️ addToCart not found — check Layout script import.");
-      }
-    });
+const btn = document.getElementById("addToCart");
+
+btn?.addEventListener("click", () => {
+    const product = {
+        id: btn.dataset.productId,
+        name: btn.dataset.productName,
+        price: parseFloat(btn.dataset.productPrice),
+        image: btn.dataset.productImage,
+        quantity: 1,
+        format: "250g",
+    };
+
+    window.addToCart(product);
+    window.dispatchAddToCartModal(product);
+});
+
+
+
 
     //  Slideshow logic
     const products = [
