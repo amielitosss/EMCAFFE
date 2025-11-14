@@ -3,9 +3,17 @@ import '@fontsource/inter';
 
 import CookieConsent from '@/components/CookieConsent.astro';
 
-import { getLangFromUrl } from '../i18n/utils';
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+export function getStaticPaths() {
+  const languages = ["fr", "en", "es"];
+  return languages.map((lang) => ({
+    params: { lang },
+  }));
+}
 
 const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 
 interface Props {
 	title: string;
@@ -32,11 +40,113 @@ const { title } = Astro.props;
 	<body class="min-h-[100vh] bg-[#FEFBED] text-[#5C3F32]">
 		<slot />
 
+		<!-- modal for add to cart -->
+  <div
+    id="cart-modal"
+    class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/40"
+  >
+    <div class="bg-[#FEFBED] w-full max-w-4xl rounded-lg shadow-xl border border-[#5C3F32]">
+      <!-- Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-[#E0D3C0]">
+        <div class="flex items-center gap-3">
+          <div
+            class="flex h-8 w-8 items-center justify-center rounded-full bg-green-600 text-white"
+          >
+            ✓
+          </div>
+          <p class="font-semibold text-[#5C3F32] text-sm md:text-base">
+            {t("popup.title")} 
+          </p>
+        </div>
+        <button
+          id="cart-modal-close"
+          class="text-[#5C3F32] hover:text-black text-xl"
+          aria-label="Fermer"
+        >
+          &times;
+        </button>
+      </div>
+
+      <!-- Content -->
+      <div class="flex flex-col md:flex-row gap-6 px-6 py-6">
+        <!-- Left: product -->
+        <div class="flex flex-col md:flex-row gap-4 md:w-1/2">
+          <img
+            id="popup-image"
+            src=""
+            alt=""
+            class="w-16 h-16 object-contain rounded-md border"
+          />
+          <div>
+            <p
+              id="popup-name"
+              class="font-semibold text-[#5C3F32] mb-1 text-sm md:text-base"
+            ></p>
+            <p
+              id="popup-format"
+              class="text-xs md:text-sm text-[#A47343]"
+            ></p>
+            <p
+              id="popup-qty"
+              class="text-xs md:text-sm text-[#A47343] mt-1"
+            ></p>
+            <p
+              id="popup-price"
+              class="mt-2 font-semibold text-[#5C3F32]"
+            ></p>
+          </div>
+        </div>
+
+        <!-- Right: summary -->
+        <div
+          class="md:w-1/2 border-t md:border-t-0 md:border-l border-[#E0D3C0] pt-4 md:pt-0 md:pl-6 text-sm md:text-base"
+        >
+          <p
+            id="popup-cart-count"
+            class="font-medium text-[#5C3F32] mb-4"
+          ></p>
+
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span>{t("popup.subtotal")}</span>
+              <span id="popup-subtotal"></span>
+            </div>
+            <div class="flex justify-between">
+              <span>{t("popup.shipping")}</span>
+              <span id="popup-shipping">—</span>
+            </div>
+            <div
+              class="border-t border-[#E0D3C0] pt-2 mt-2 flex justify-between font-semibold"
+            >
+              <span>{t("popup.totalTTC")}</span>
+              <span id="popup-total"></span>
+            </div>
+          </div>
+
+          <div class="flex flex-col md:flex-row gap-3 mt-6">
+            <a
+              id="popup-continue"
+              class="flex-1 text-center py-2 rounded-full border border-[#5C3F32] text-[#5C3F32] text-sm md:text-base hover:bg-[#5C3F32] hover:text-white transition"
+            >
+              {t("popup.continue")}
+            </a>
+            <a
+              href={`/${lang}/cart`}
+              id="popup-checkout"
+              class="flex-1 text-center py-2 rounded-full bg-black text-white text-sm md:text-base hover:bg-[#5C3F32] transition"
+            >
+              {t("popup.checkout")}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 		<CookieConsent />
 
+    <script type="module" src="/scripts/cartmanager.js" defer></script>
 
-
-             <script type="module" src="/src/cartManager.ts"></script>
 
 	</body>
 </html>

@@ -267,10 +267,51 @@
 "cart.total": "Total",
 "cart.checkout": "Procéder au paiement",
 
+"popup.title": "Produit ajouté au panier!",
+"popup.totalTTC": "TOTAL TTC",
+"popup.shipping": "Transport",
+"popup.subtotal": "Sous-total",
+"popup.continue": "Continuer mes achats",
+"popup.checkout": "Commander",
 
+"destination": {
+  "title": "Destination",
+  "personalInfo": "Informations personnelles",
+  "email": "E-mail",
+  "password": "Mot de passe",
+  "forgotPassword": "Mot de passe oublié ?",
+  "continue": "Continuer",
+  "previous": "Précédent",
 
+  "addresses": "Adresses",
+  "alias": "Alias",
+  "firstName": "Prénom",
+  "lastName": "Nom",
+  "company": "Société",
+  "vat": "Numéro de TVA",
+  "address": "Adresse",
+  "addressComplement": "Complément d'adresse",
+  "postalCode": "Code postal",
+  "city": "Ville",
+  "country": "Pays",
+  "phone": "Téléphone",
 
-  
+  "deliveryMode": "Mode de livraison",
+  "deliveryStandard": "Livraison standard",
+  "deliveryExpress": "Livraison express",
+
+  "payment": "Paiement",
+  "payWithPaypal": "Payer par PayPal",
+  "payWithCard": "Payer par carte bancaire",
+  "order": "Commander"
+
+},
+
+"destination.cardHolder": "Titulaire de la carte",
+"destination.cardNumber": "Numéro de carte",
+"destination.expiry": "Date d’expiration",
+"destination.cvc": "CVC",
+"destination.paypalInfo": "Vous serez redirigé vers PayPal pour finaliser le paiement.",
 
     "productHighlight": {
     "title": "CAFÉS BIO",
@@ -278,5 +319,5 @@
     "addToCart": "Ajouter au panier"
 }
 
-
 }
+

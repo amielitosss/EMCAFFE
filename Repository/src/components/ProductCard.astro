@@ -2,6 +2,8 @@
 interface Props {
 	img: string;
 	productName: string;
+	price: number;
+	id: string;
 	description: string;
 	ingredient: string;
 	preparation: string;
@@ -10,9 +12,13 @@ interface Props {
 	t: (key: string) => string;
 }
 
+
+
 const {
 	img,
 	productName,
+	price,
+	id,
 	description,
 	ingredient,
 	preparation,
@@ -110,7 +116,7 @@ function formatTextWithLineBreaks(text: string): string[] {
 	</div>
 </div>
 
-<!-- 🟫 Purchase Section OUTSIDE the white container -->
+<!-- Purchase Section OUTSIDE the white container -->
 <div class="flex flex-col items-center justify-center text-center my-8">
 	<h3 class="text-lg font-semibold text-[#5C3F32] mb-2">{t("product.format")}</h3>
 	<div class="flex gap-3 mb-3">
@@ -137,12 +143,17 @@ function formatTextWithLineBreaks(text: string): string[] {
 		<span class="text-green-600">✔ {t("product.instock")}</span>
 	</p>
 
-	<button
-	    id="addToCart"
-		class="bg-black text-white rounded-full px-8 py-3 text-sm md:text-base hover:bg-neutral-800 transition"
-	>
-		{t("product.addtocart")}
-	</button>
+<button
+    id="addToCart"
+    class="bg-black text-white px-3 py-2 rounded-lg mt-2 hover:bg-[#5C3F32] transition"
+    data-product-id={id}
+    data-product-name={productName}
+    data-product-price={price}
+    data-product-image={`${img}-1.png`}
+>
+    {t("product.addtocart")}
+</button>
+
 </div>
 
 <script is:inline>
@@ -218,26 +229,27 @@ function formatTextWithLineBreaks(text: string): string[] {
 			});
 		}
 
-		// --- Add to Cart button (calls centralized script) ---
-		addToCartBtn?.addEventListener("click", () => {
-			const quantity = parseInt(quantityInput?.value || "1");
+		// --- Add to Cart button  ---
+const btn = document.getElementById("addToCart");
 
-			const product = {
-				id: productName.toLowerCase().replace(/\s+/g, "-"),
-				name: productName,
-				price: price,
-				image: `${img}-1.png`,
-				format: selectedFormat,
-				quantity: quantity,
-			};
+btn?.addEventListener("click", () => {
+    const quantityValue = parseInt(quantityInput.value) || 1;
 
-			if (window.addToCart) {
-				window.addToCart(product);
-				alert("✅ Produit ajouté au panier !");
-			} else {
-				console.error("⚠️ addToCart not found — check Layout script import.");
-			}
-		});
+    const product = {
+        id: btn.dataset.productId,
+        name: btn.dataset.productName,
+        price: selectedFormat === "250g" ? 16.99 : 34.99, // <-- FIX HERE
+        image: btn.dataset.productImage,
+        quantity: quantityValue,
+        format: selectedFormat,
+    };
+
+    window.addToCart(product);
+    window.dispatchAddToCartModal(product);
+});
+
+
+
 	});
 </script>
 

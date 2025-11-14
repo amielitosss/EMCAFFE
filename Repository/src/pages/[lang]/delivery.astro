@@ -1,0 +1,415 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import countries from "@/data/countries.json";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+export function getStaticPaths() {
+  const languages = ["fr", "en", "es"];
+  return languages.map((lang) => ({
+    params: { lang },
+  }));
+}
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<Layout title="Destination">
+  <Header />
+
+  <!-- Banner -->
+  <section
+    class="relative w-full h-[250px] md:h-[350px] overflow-hidden z-0"
+    style="margin-top: 160px;"
+  >
+    <img
+      src="/img/grains.webp"
+      alt="Coffee beans background"
+      class="absolute inset-0 w-full h-full object-cover object-[center_40%]"
+    />
+    <div class="absolute inset-0 flex items-center justify-center bg-black/40">
+      <h1 class="text-white text-4xl md:text-6xl font-[Chalkduster] tracking-widest">
+        DESTINATION
+      </h1>
+    </div>
+  </section>
+
+  <!-- Main -->
+  <main class="bg-[#FEFBED] flex flex-col items-center justify-center px-6 md:px-12 py-12">
+    <!-- Wrapper for steps (left) + summary (right) -->
+    <div class="w-full md:w-3/4 lg:w-4/5 flex flex-col md:flex-row gap-8 items-start">
+
+      <!-- LEFT: Steps -->
+      <section
+        class="w-full md:flex-1 bg-[#FEFBED] border border-[#5C3F32] rounded-md p-8 space-y-8"
+      >
+        <!-- Step 1 -->
+        <div id="stepOne" class="space-y-6">
+          <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
+            {t("destination.personalInfo")}
+          </h2>
+
+          <form class="space-y-4">
+            <div>
+              <label class="block font-semibold mb-1 text-[#5C3F32]">
+                {t("destination.email")} *
+              </label>
+              <input
+                type="email"
+                class="w-full border border-[#5C3F32] p-2"
+                placeholder="abcd@gmail.com"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="block font-semibold mb-1 text-[#5C3F32]">
+                {t("destination.password")} *
+              </label>
+              <input
+                type="password"
+                class="w-full border border-[#5C3F32] p-2"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+
+            <div>
+              <a
+                href={`/${lang}/log`}
+                class="text-sm text-[#A47343] hover:underline flex justify-center mt-2"
+              >
+                {t("destination.forgotPassword")}
+              </a>
+            </div>
+
+            <div class="flex justify-center">
+              <button
+                type="button"
+                id="toStep2"
+                class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition"
+              >
+                {t("destination.continue")}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Step 2 -->
+        <div id="stepTwo" class="space-y-6 hidden">
+          <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
+            {t("destination.addresses")}
+          </h2>
+
+          <form class="space-y-4">
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label class="block font-semibold mb-1 text-[#5C3F32]">
+                  {t("destination.firstName")} *
+                </label>
+                <input
+                  type="text"
+                  class="w-full border border-[#5C3F32] rounded-md p-2"
+                  required
+                />
+              </div>
+              <div>
+                <label class="block font-semibold mb-1 text-[#5C3F32]">
+                  {t("destination.lastName")} *
+                </label>
+                <input
+                  type="text"
+                  class="w-full border border-[#5C3F32] rounded-md p-2"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-semibold mb-1 text-[#5C3F32]">
+                {t("destination.postalCode")} *
+              </label>
+              <input
+                type="text"
+                class="w-full border border-[#5C3F32] rounded-md p-2"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="block font-semibold mb-1 text-[#5C3F32]">
+                {t("destination.city")} *
+              </label>
+              <input
+                type="text"
+                class="w-full border border-[#5C3F32] rounded-md p-2"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="block font-semibold mb-1 text-[#5C3F32]">
+                {t("destination.country")} *
+              </label>
+              <select class="w-full border border-[#5C3F32] rounded-md p-2" required>
+                {countries.map(country => (
+                    <option value={country}>{country}</option>
+                ))}  
+              </select>
+            </div>
+
+            <div class="flex justify-between gap-2">
+              <button
+                type="button"
+                id="backToStep1"
+                class="border border-[#5C3F32] text-[#5C3F32] px-6 py-2 rounded-md hover:bg-[#f9f4ee] transition"
+              >
+                ← {t("destination.previous")}
+              </button>
+              <button
+                type="button"
+                id="toStep3"
+                class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition"
+              >
+                {t("destination.continue")}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Step 3 -->
+        <div id="stepThree" class="space-y-6 hidden">
+          <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
+            {t("destination.deliveryMode")}
+          </h2>
+
+          <form id="deliveryForm" class="space-y-4">
+            <label
+              class="flex items-center justify-between border border-[#A47343] rounded-md p-4 cursor-pointer hover:bg-[#f9f4ee] transition"
+            >
+              <div class="flex items-center gap-3 text-[#5C3F32]">
+                <input
+                  type="radio"
+                  name="delivery"
+                  value="standard"
+                  checked
+                />
+                <span>{t("destination.deliveryStandard")}</span>
+              </div>
+              <span class="font-semibold text-[#5C3F32]">5 €</span>
+            </label>
+
+            <label
+              class="flex items-center justify-between border border-[#A47343] rounded-md p-4 cursor-pointer hover:bg-[#f9f4ee] transition"
+            >
+              <div class="flex items-center gap-3 text-[#5C3F32]">
+                <input type="radio" name="delivery" value="express" />
+                <span>{t("destination.deliveryExpress")}</span>
+              </div>
+              <span class="font-semibold text-[#5C3F32]">10 €</span>
+            </label>
+
+            <div class="flex justify-between gap-2">
+              <button
+                type="button"
+                id="backToStep2"
+                class="border border-[#5C3F32] text-[#5C3F32] px-6 py-2 rounded-md hover:bg-[#f9f4ee] transition"
+              >
+                ← {t("destination.previous")}
+              </button>
+              <button
+                type="button"
+                id="toStep4"
+                class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition"
+              >
+                {t("destination.continue")}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Step 4 -->
+        <div id="stepFour" class="space-y-6 hidden">
+          <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
+            {t("destination.payment")}
+          </h2>
+
+          <form class="space-y-6">
+            <!-- PayPal Option -->
+            <label
+              class="flex items-center justify-between border border-[#A47343] rounded-md p-4 hover:bg-[#f9f4ee] transition cursor-pointer"
+            >
+              <div class="flex items-center gap-3 text-[#5C3F32]">
+                <input type="radio" name="payment" value="paypal" checked />
+                <span>{t("destination.payWithPaypal")}</span>
+              </div>
+              <div class="text-xs mr-2 text-[#A47343] md:mr-4">
+                {t("destination.paypalInfo")} 
+              </div>
+              <div class="flex items-center justify-center w-[100px] h-[40px]">
+                <img
+                  src="/img/paypal.png"
+                  alt="PayPal"
+                  class="max-h-full max-w-full object-contain"
+                />
+              </div>
+            </label>
+
+            <!-- Card Option -->
+            <label
+              class="flex items-center justify-between border border-[#A47343] rounded-md p-4 hover:bg-[#f9f4ee] transition cursor-pointer"
+            >
+              <div class="flex items-center gap-3 text-[#5C3F32]">
+                <input type="radio" name="payment" value="card" />
+                <span>{t("destination.payWithCard")}</span>
+              </div>
+              <div class="flex items-center justify-center gap-3">
+                <div class="w-[50px] h-[30px] flex items-center justify-center">
+                  <img
+                    src="/img/visa.webp"
+                    alt="Visa"
+                    class="max-h-full max-w-full object-contain"
+                  />
+                </div>
+                <div
+                  class="w-[50px] h-[30px] flex items-center justify-center"
+                >
+                  <img
+                    src="/img/mastercard.png"
+                    alt="Mastercard"
+                    class="max-h-full max-w-full object-contain"
+                  />
+                </div>
+                <div
+                  class="w-[50px] h-[30px] flex items-center justify-center"
+                >
+                  <img
+                    src="/img/cb.webp"
+                    alt="Carte Bancaire"
+                    class="max-h-full max-w-full object-contain"
+                  />
+                </div>
+              </div>
+            </label>
+
+            <!-- Card visuals when clicked -->
+             <div id="cardFormSection" class="space-y-4 mt-4 hidden "> 
+              <div class="bg-gradient-to-br from-[#003366] to-[#0055AA] text-white rounded-xl p-4 md:p-6 shadow-md max-w-sm">
+                <div class="flex justify-between items-center mb-4">
+                  <span class="text-xs uppercase tracking-wide opacity-80">EMCAFFÉ</span>
+                  <div class="w-10 h-7 rounded-md bg-white/30"></div>
+              </div>
+
+              <div id="cardNumberDisplay" class="text-lg md:text-xl tracking-[0.2em] font-mono mn-4">
+                •••• •••• •••• ••••
+              </div>
+
+              <div class="flex justify-between text-xs md:text-sm">
+                <div>
+                  <p class="opacity-70">EXP</p>
+                  <p id="cardNameDisplay" class="font-semibold">NOM PRÉNOM</p>
+                </div>
+                <div>
+                  <p class="opacity-70">EXP</p>
+                  <p id="cardExpiryDisplay" class="font-semibold">MM/AA</p>
+                </div>
+                <div>
+                  <p class="opacity-70">EXP</p>
+                  <p id="cardCvcDisplay" class="font-semibold">•••</p>
+                </div>
+              </div>
+             </div>
+
+             <!-- Card form Inputs -->
+              <div class="space-y-3 max-w-md">
+
+                <div>
+                  <label class="block text-sm font-medium text-[#5C3F32] mb-1">
+                    {t("destination.cardNumber")}
+                  </label>
+                  <input type="text" id="cardNumberInput" inputmode="numeric" maxlength="19" class="w-full border border-[#5C3F32] rounded-md p-2" placeholder="•••• •••• •••• ••••">
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-[#5C3F32] mb-1">
+                    {t("destination.cardHolder")}
+                  </label>
+                  <input type="text" id="cardNameInput" class="w-full border border-[#5C3F32] rounded-md p-2" placeholder="John Doe">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-sm font-medium mb-1 text-[#5C3F32]">
+                      {t("destination.expiry")}
+                    </label>
+                    <input type="text" id="cardExpiryInput" inputmode="numeric" maxlength="5" class="w-full border border-[#5C3F32] mb-1" placeholder="MM/YY">
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-medium mb-1 text-[#5C3F32]">
+                      {t("destination.expiry")}
+                    </label>
+                    <input type="text" id="cardCvcInput" inputmode="numeric" maxlength="4" class="w-full border border-[#5C3F32] mb-1" placeholder="CVC">
+                  </div>
+                </div>
+              </div>
+             </div>
+
+
+            <div class="flex justify-between gap-2">
+              <button
+                type="button"
+                id="backToStep3"
+                class="border border-[#5C3F32] text-[#5C3F32] px-6 py-2 rounded-md hover:bg-[#f9f4ee] transition"
+              >
+                ← {t("destination.previous")}
+              </button>
+              <button
+                type="button"
+                id="placeOrder"
+                class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition"
+              >
+                {t("destination.order")}
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- RIGHT: Summary Card -->
+      <aside id="summaryCard" class="bg-[#FEFBED] border border-[#5C3F32] rounded-lg p-6 shadow-md text-[#5C3F32] h-fit w-full md:w-[40%]">
+        <h3 class="text-lg font-semibold text-center mb-4">🛒 Your Order</h3>
+
+        <!-- Product list -->
+        <div id="summaryItems" class="space-y-4 mb-4"></div>
+
+        <div
+          class="w-full space-y-2 border-t border-[#A47343]/40 pt-2 text-sm md:text-base"
+        >
+          <div class="flex justify-between">
+            <span>Delivery:</span>
+            <span id="summaryDelivery">0.00€</span>
+          </div>
+
+          <hr class="my-1 border-[#5C3F32]/40" />
+
+          <div class="flex justify-between font-semibold text-lg">
+            <span>TTC:</span>
+            <span id="summaryTotal">0.00€</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<!-- Script -->
+<script src="/public/scripts/destination.js" defer></script>
+
+
+
+
