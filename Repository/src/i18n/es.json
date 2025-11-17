@@ -265,6 +265,12 @@
 	"cart.total": "Total",
 	"cart.checkout": "Proceder al pago",
 
+"cart.whatsapp.button": "Enviar pedido por WhatsApp",
+"cart.whatsapp.empty": "Tu carrito está vacío.",
+"cart.whatsapp.greeting": "¡Hola! Me gustaría hacer un pedido:",
+"cart.whatsapp.total": "Total",
+
+
 "popup.title": "¡Producto añadido al carrito!",
 "popup.totalTTC": "TOTAL (incl. impuestos)",
 "popup.shipping": "Envío",

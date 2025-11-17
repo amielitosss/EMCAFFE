@@ -52,6 +52,10 @@ const t = useTranslations(lang);
               <span id="cartTotal">0€</span>
             </div>
 
+            <button id="whatsappOrderBtn" class="bg-green-600 text-white rounded-full px-10 py-3 text-sm md:text-base hover:bg-green-800 transition ">
+            {t("cart.whatsapp.button")}
+              </button>
+
             <button id="checkout" class="bg-black text-white rounded-full px-10 py-3 text-sm md:text-base hover:bg-neutral-800 transition">
               {t("cart.checkout")}
 
@@ -162,6 +166,58 @@ checkoutButton.addEventListener("click", () => {
   const lang = window.location.pathname.split("/")[1] || "fr";
   window.location.href = `/${lang}/delivery`;
 });
+
+const whatsappBtn = document.getElementById("whatsappOrderBtn");
+
+if (whatsappBtn) {
+  whatsappBtn.addEventListener("click", () => {
+    const lang = window.location.pathname.split("/")[1] || "fr";
+
+    // translations from your i18n
+    const messages: any = {
+      fr: {
+        empty: "Votre panier est vide.",
+        greeting: "Bonjour ! Je souhaite passer une commande :",
+        total: "Total"
+      },
+      en: {
+        empty: "Your cart is empty.",
+        greeting: "Hello! I would like to place an order:",
+        total: "Total"
+      },
+      es: {
+        empty: "Tu carrito está vacío.",
+        greeting: "¡Hola! Me gustaría hacer un pedido:",
+        total: "Total"
+      }
+    };
+
+    const t = messages[lang] || messages.fr;
+
+    if (cart.length === 0) {
+      alert(t.empty);
+      return;
+    }
+
+    let message = t.greeting + "\n\n";
+
+    cart.forEach(item => {
+      message += `• ${item.name} (x${item.quantity}) — ${item.price}€\n`;
+    });
+
+    const total = cart.reduce((sum, item) => {
+      return sum + parseFloat(item.price) * (item.quantity || 1);
+    }, 0);
+
+    message += `\n${t.total}: ${total.toFixed(2)}€`;
+
+    const encoded = encodeURIComponent(message);
+
+    const phone = "33699425634"; 
+
+    window.open(`https://wa.me/${phone}?text=${encoded}`, "_blank");
+  });
+}
 
   });
    

@@ -422,6 +422,12 @@
 	"reset.invalidToken": "Lien invalide",
 	"reset.invalidTokenMessage": "Ce lien est invalide ou a expiré.",
 
+"cart.whatsapp.button": "Commander via WhatsApp",
+"cart.whatsapp.empty": "Votre panier est vide.",
+"cart.whatsapp.greeting": "Bonjour ! Je souhaite passer une commande :",
+"cart.whatsapp.total": "Total",
+
+
 	"productHighlight": {
 		"title": "CAFÉS BIO",
 		"descriptionFront": "GRAINS DE CAFÉ TORRÉFIÉS PURS<br /><strong>ARABIQUE DE FORÊT D'ALTITUDE<br />100% BIO</strong>",

@@ -419,6 +419,12 @@
   "order": "Order"
 },
 
+"cart.whatsapp.button": "Send Order via WhatsApp",
+"cart.whatsapp.empty": "Your cart is empty.",
+"cart.whatsapp.greeting": "Hello! I would like to place an order:",
+"cart.whatsapp.total": "Total",
+
+
 "destination.cardHolder": "Card holder",
 "destination.cardNumber": "Card number",
 "destination.expiry": "Expiry date",
