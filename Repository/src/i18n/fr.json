@@ -299,7 +299,7 @@
   "deliveryExpress": "Livraison express",
 
   "payment": "Paiement",
-  "payWithPaypal": "Payer par PayPal",
+  "payWithVirement": "Payer par Virement bancaire",
   "payWithCard": "Payer par carte bancaire",
   "order": "Commander"
 
@@ -309,7 +309,12 @@
 "destination.cardNumber": "Numéro de carte",
 "destination.expiry": "Date d’expiration",
 "destination.cvc": "CVC",
-"destination.paypalInfo": "Vous serez redirigé vers PayPal pour finaliser le paiement.",
+"destination.virement": "Vous recevrez nos informations bancaires pour finaliser le paiement.",
+"destination.bankTransferInfo": "Veuillez effectuer votre virement en utilisant les informations ci-dessous.",
+"destination.reference": "Référence du paiement",
+"destination.bankTransferConfirmed": "Votre commande a été enregistrée",
+"destination.bankTransferInstructions": "Veuillez procéder au virement en utilisant les informations ci-dessous.",
+"destination.amount": "Montant",
 
 	"login.title": "Connexion",
 	"login.welcome": "Bienvenue",

@@ -307,7 +307,7 @@
   "deliveryExpress": "Entrega exprés",
 
   "payment": "Pago",
-  "payWithPaypal": "Pagar con PayPal",
+  "payWithVirement": "Pagar con Transferencia bancaria",
   "payWithCard": "Pagar con tarjeta bancaria",
   "order": "Ordenar"
 },
@@ -316,7 +316,12 @@
 "destination.cardNumber": "Número de tarjeta",
 "destination.expiry": "Fecha de caducidad",
 "destination.cvc": "CVC",
-"destination.paypalInfo": "Serás redirigido a PayPal para completar el pago.",
+"destination.virement": "Recibirá nuestros datos bancarios para completar el pago.",
+"destination.bankTransferInfo": "Por favor realice su transferencia bancaria utilizando la información siguiente.",
+"destination.reference": "Referencia de pago",
+"destination.bankTransferConfirmed": "Tu pedido ha sido registrado",
+"destination.bankTransferInstructions": "Por favor realiza la transferencia bancaria usando la información a continuación.",
+"destination.amount": "Monto",
 
 
 	"login.title": "Iniciar sesión",

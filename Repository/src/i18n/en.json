@@ -414,7 +414,7 @@
   "deliveryExpress": "Express delivery",
 
   "payment": "Payment",
-  "payWithPaypal": "Pay with PayPal",
+  "payWithVirement": "Pay with Bank transfer",
   "payWithCard": "Pay with credit card",
   "order": "Order"
 },
@@ -429,7 +429,14 @@
 "destination.cardNumber": "Card number",
 "destination.expiry": "Expiry date",
 "destination.cvc": "CVC",
-"destination.paypalInfo": "You will be redirected to PayPal to complete your payment.",
+"destination.virement": "You will receive our bank details to complete the payment.",
+"destination.bankTransferInfo": "Please make your bank transfer using the information below.",
+"destination.reference": "Payment reference",
+"destination.bankTransferConfirmed": "Your order has been registered",
+"destination.bankTransferInstructions": "Please complete the bank transfer using the information below.",
+"destination.amount": "Amount",
+
+
 	"productHighlight": {
 		"title": "ORGANIC COFFEES",
 		"descriptionFront": "Pure roasted coffee beans<br /><strong>HIGH-ALTITUDE FOREST ARABICA<br />100% ORGANIC</strong>",

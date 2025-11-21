@@ -82,11 +82,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ----------------------------------------------------------
-      STEP 3 → STEP 4 (same)
+      STEP 3 → STEP 4
   ---------------------------------------------------------- */
   btnToStep4?.addEventListener("click", () => {
     showStep(stepThree, stepFour);
     renderSummaryCard();
+    generateBankReference();
   });
 
   // Back navigation
@@ -161,20 +162,42 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ----------------------------------------------------------
       PAYMENT LOGIC
   ---------------------------------------------------------- */
-  const paypalRadio = document.querySelector('input[name="payment"][value="paypal"]');
+
   const cardRadio = document.querySelector('input[name="payment"][value="card"]');
+  const bankRadio = document.querySelector(
+    'input[name="payment"][value="bank_transfer"]'
+  );
+
   const cardFormSection = document.getElementById("cardFormSection");
+  const bankInfoSection = document.getElementById("bankInfoSection");
 
   function updatePaymentView() {
-    if (cardRadio?.checked) cardFormSection?.classList.remove("hidden");
-    else cardFormSection?.classList.add("hidden");
+    if (cardRadio?.checked) {
+      cardFormSection?.classList.remove("hidden");
+      bankInfoSection?.classList.add("hidden");
+    } else {
+      bankInfoSection?.classList.remove("hidden");
+      cardFormSection?.classList.add("hidden");
+    }
   }
 
-  paypalRadio?.addEventListener("change", updatePaymentView);
   cardRadio?.addEventListener("change", updatePaymentView);
+  bankRadio?.addEventListener("change", updatePaymentView);
   updatePaymentView();
 
-  /* CARD PREVIEW */
+  /* ----------------------------------------------------------
+      AUTO-GENERATE BANK REFERENCE
+  ---------------------------------------------------------- */
+  function generateBankReference() {
+    const ref = "EMC-" + Math.floor(100000 + Math.random() * 900000);
+    const refSpan = document.getElementById("bankReference");
+    if (refSpan) refSpan.textContent = ref;
+  }
+
+  /* ----------------------------------------------------------
+      CARD PREVIEW
+  ---------------------------------------------------------- */
+
   const cardNumberInput = document.getElementById("cardNumberInput");
   const cardNameInput = document.getElementById("cardNameInput");
   const cardExpiryInput = document.getElementById("cardExpiryInput");
@@ -215,31 +238,93 @@ document.addEventListener("DOMContentLoaded", () => {
     cardCvcDisplay.textContent = value || "•••";
   });
 
-  /* PLACE ORDER */
-  const placeOrderBtn = document.getElementById("placeOrder");
+    /* ----------------------------------------------------------
+     BANK TRANSFER AND THE BACKEND
+  ---------------------------------------------------------- */
+    async function createBankTransferOrder(totalAmount) {
+        try {
+          const userId = localStorage.getItem("userId");
 
-  placeOrderBtn?.addEventListener("click", () => {
-    const selectedPayment = document.querySelector('input[name="payment"]:checked');
+          const response = await fetch("http://localhost:3000/api/payments/bank-transfer", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              userId: userId,
+              amount: totalAmount
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error("Erreur lors de la creation du virement.");
+          }
+
+          const data = await response.json();
+          return data;
+        }catch(err) {
+          console.error(err);
+          alert("une erreur est survenue lors de la creation du virement.")
+        }
+    }
+
+
+  /* ----------------------------------------------------------
+      PLACE ORDER
+  ---------------------------------------------------------- */
+ const placeOrderBtn = document.getElementById("placeOrder");
+
+  placeOrderBtn?.addEventListener("click", async () => {
+    const selectedPayment = document.querySelector(
+      'input[name="payment"]:checked'
+    );
 
     if (!selectedPayment) {
-      alert("Please choose a payment method.");
+      alert("Veuillez choisir un mode de paiement.");
       return;
     }
 
-    if (selectedPayment.value === "paypal") {
-      alert("Simulation: redirecting to PayPal...");
-    } else {
-      if (
-        !cardNumberInput.value.trim() ||
-        !cardNameInput.value.trim() ||
-        !cardExpiryInput.value.trim() ||
-        !cardCvcInput.value.trim()
-      ) {
-        alert("Please fill in all card fields.");
-        return;
+    /* ---------------- BANK TRANSFER ---------------- */
+    if (selectedPayment.value === "bank_transfer") {
+      const totalAmount = parseFloat(
+        document.getElementById("summaryTotal").textContent.replace("€", "")
+      );
+
+      const result = await createBankTransferOrder(totalAmount);
+
+      if (result && result.orderId) {
+        // update bank info box
+        const refSpan = document.getElementById("bankReference");
+        if (refSpan) refSpan.textContent = `ORDER-${result.orderId}`;
+
+        // show confirmation block
+        const confirmBox = document.getElementById("bankConfirmation");
+        if (confirmBox) confirmBox.classList.remove("hidden");
+
+        // fill confirmation fields
+        const ref2 = document.getElementById("bankReference2");
+        if (ref2) ref2.textContent = `ORDER-${result.orderId}`;
+
+        const amountSpan = document.getElementById("bankAmount");
+        if (amountSpan) amountSpan.textContent = totalAmount.toFixed(2);
+
+        window.scrollTo({ top: stepFour.offsetTop, behavior: "smooth" });
       }
 
-      alert("Simulation: Card payment complete!");
+      return;
     }
+
+    // Card validation
+    if (
+      !cardNumberInput.value.trim() ||
+      !cardNameInput.value.trim() ||
+      !cardExpiryInput.value.trim() ||
+      !cardCvcInput.value.trim()
+    ) {
+      alert("Veuillez remplir tous les champs de la carte.");
+      return;
+    }
+
+    alert("Simulation: Paiement par carte validé !");
   });
 });

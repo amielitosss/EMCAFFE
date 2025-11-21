@@ -237,25 +237,60 @@ const t = useTranslations(lang);
           </h2>
 
           <form class="space-y-6">
-            <!-- PayPal Option -->
-            <label
-              class="flex items-center justify-between border border-[#A47343] rounded-md p-4 hover:bg-[#f9f4ee] transition cursor-pointer"
-            >
-              <div class="flex items-center gap-3 text-[#5C3F32]">
-                <input type="radio" name="payment" value="paypal" checked />
-                <span>{t("destination.payWithPaypal")}</span>
-              </div>
-              <div class="text-xs mr-2 text-[#A47343] md:mr-4">
-                {t("destination.paypalInfo")} 
-              </div>
-              <div class="flex items-center justify-center w-[100px] h-[40px]">
-                <img
-                  src="/img/paypal.png"
-                  alt="PayPal"
-                  class="max-h-full max-w-full object-contain"
-                />
-              </div>
-            </label>
+<!-- Virement Bancaire Option -->
+<label
+  class="payment-option flex items-center justify-between border border-[#A47343] rounded-md p-4 hover:bg-[#f9f4ee] transition cursor-pointer"
+>
+  <div class="flex items-center gap-3 text-[#5C3F32]">
+    <input type="radio" name="payment" value="bank_transfer" />
+    <span>{ t("payWithVirement") }</span>
+  </div>
+
+  <div class="text-xs mr-2 text-[#A47343] md:mr-4">
+  { t("destination.virement") }
+  </div>
+
+  <div class="flex items-center justify-center w-[100px] h-[40px] opacity-80">
+    <img
+      src="/img/virement.png"
+      alt="Virement bancaire"
+      class="max-h-full max-w-full object-contain"
+    />
+  </div>
+</label>
+
+<!-- Bank Transfer Details (hidden at first) -->
+<div id="bankInfoSection" class="hidden bg-[#faf5ef] border border-[#A47343] rounded-md p-4 mt-3">
+  <p class="text-sm text-[#5C3F32] mb-3">
+    { t("destination.bankTransferInfo") }
+  </p>
+
+  <div class="text-sm text-[#5C3F32] space-y-1">
+    <p><strong>IBAN:</strong> FR76 3000 4000 1234 5678 9012 345</p>
+    <p><strong>BIC:</strong> BNPAFRPP</p>
+    <p><strong>Bank:</strong> BNP Paribas</p>
+    <p><strong>{ t("destination.reference") }:</strong> <span id="bankReference">ORDER-XXXXXX</span></p>
+  </div>
+</div>
+
+<!-- Bank Transfer Confirmation (shown after order is created) -->
+ <div id="bankConfirmation" class="hidden bg-[#5C3F32] border border-green-600 rounded-md p-4 mt-4">
+  <h3 class="text-lg font-semibold text-green-800 mb-2">
+    {t("destination.bankTransferConfirmed")}
+  </h3>
+
+  <p class="text-sm text-green-700 mb-3">
+    <strong>{t("destination.bankTransferInstructions")} :</strong>
+    <span id="bankReferenceTwo"></span>
+  </p>
+
+  <p class="text-sm">
+    <strong>{t("destination.amount")} :</strong>
+    <span id="bankAmount"></span> €
+  </p>
+
+ </div>
+
 
             <!-- Card Option -->
             <label
