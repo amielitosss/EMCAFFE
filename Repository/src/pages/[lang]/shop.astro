@@ -1,43 +1,83 @@
 ---
-import Footer from '@/components/Footer.astro';
-import Header from '@/components/Header.astro';
-import ShopArticle from '@/components/ShopArticle.astro';
 import Layout from '@/layouts/Layout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import ShopArticle from '@/components/ShopArticle.astro';
 
-import { getLangFromUrl, getStaticPaths, useTranslations } from '@/i18n/utils';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+import { productService } from '@/lib/api/productService';
+import type { Product } from '@/lib/api/types/product.types';
 
+// 🔹 getStaticPaths pour générer les pages par langue
+export async function getStaticPaths() {
+  const languages = ['en', 'fr', 'es'];
+  return languages.map((lang) => ({
+    params: { lang },
+  }));
+}
+
+// ===========================================================
+// 🔹 Récupération des produits depuis l'API
+// ===========================================================
 const lang = getLangFromUrl(Astro.url);
-const t = useTranslations(lang);
+const t = useTranslations(lang as 'en' | 'fr' | 'es');
 
-export { getStaticPaths };
+let products: Product[] = [];
+
+try {
+  const result = await productService.getAllProducts();
+  console.log('API getAllProducts result:', result);
+
+  if (Array.isArray(result)) {
+    // Si c'est déjà un tableau
+    products = result;
+  } else if ('data' in result && Array.isArray(result.data)) {
+    // Si c'est un objet ProductListResponse
+    products = result.data;
+  }
+} catch (err) {
+  console.error('❌ Impossible de récupérer les produits :', err);
+}
+
+// Fonction utilitaire pour découper un tableau en sous-tableaux
+function chunkArray<T>(arr: T[], chunkSize: number): T[][] {
+  const result: T[][] = [];
+  for (let i = 0; i < arr.length; i += chunkSize) {
+    result.push(arr.slice(i, i + chunkSize));
+  }
+  return result;
+}
+
+// On crée des lignes de 2 produits
+const productRows = chunkArray(products, 2);
 ---
 
-<Layout title=`EMCAFFE - ${t('nav.products')}`>
-	<Header />
-
-	<main
-		class="mb-8 mt-[255px] flex h-auto w-full flex-col gap-y-8 md:mt-[192px]"
-	>
-		<div
-			class="flex w-full flex-col justify-around gap-y-8 md:flex-row md:gap-y-0"
-		>
-		
-			<ShopArticle
-				title=`${t('200-bio.title')}`
-				img="/img/products/200-bio"
-				details=`/${lang}/product/200-bio`
-
-			/>
-
-			<ShopArticle
-				title=`${t('300-bio.title')}`
-				img="/img/products/300-bio"
-				details=`/${lang}/product/300-bio`
-			/>
-		</div>
 
 
-	</main>
+<Layout title={`EMCAFFE - ${t('shop.title')}`}>
+  <Header />
 
-	<Footer />
+  <main class="mb-8 mt-[255px] flex h-auto w-full flex-col gap-y-8 md:mt-[192px]">
+    {products.length > 0 ? (
+      <>
+        {productRows.map((row) => (
+          <div class="flex w-full flex-col justify-around gap-y-8 md:flex-row md:gap-y-0">
+            {row.map((product) => (
+              <ShopArticle
+                title={product.name ?? ''}
+                img={product.image_url ?? `/img/products/${product.id_product}`}
+                details={`/${lang}/product/${product.id_product}`}
+              />
+            ))}
+          </div>
+        ))}
+      </>
+    ) : (
+      <p class="mt-8 text-center text-gray-500">
+        {t('shop.noProducts') || 'Aucun produit disponible.'}
+      </p>
+    )}
+  </main>
+
+  <Footer />
 </Layout>

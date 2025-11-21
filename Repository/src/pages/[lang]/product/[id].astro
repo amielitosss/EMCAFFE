@@ -5,54 +5,67 @@ import Footer from '@/components/Footer.astro';
 import ProductCard from '@/components/ProductCard.astro';
 
 import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+import { productService } from '@/lib/api/productService';
+import type { Product } from '@/lib/api/types/product.types';
 
-interface Params {
-	id: string;
-	lang: string;
-}
-
-export function getStaticPaths() {
-	const productList = ['200-bio', '300-bio', '200-spe', '300-spe'];
-	const languages = ['en', 'fr', 'es'];
-	return productList.flatMap((id) =>
-		languages.map((lang) => ({
-			params: { id, lang },
-		})),
-	);
-}
-
-const { id } = Astro.params as Params;
+// ⚡ Astro params
+const { id } = Astro.params as { id: string; lang: string };
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang as 'en' | 'fr' | 'es');
 
+// Définir l'interface de la réponse
+interface ProductResponse {
+  success: boolean;
+  data: Product;
+}
+
+// Récupération produit via l'API
+let product: Product | null = null;
+
+try {
+  const result: ProductResponse = await productService.getProductById(id);
+  product = result.data; // maintenant product est de type Product
+  console.log('Produit récupéré:', product);
+} catch (err) {
+  console.error('❌ Impossible de récupérer le produit :', err);
+}
+
+// ⚡ Tabs et contenus
 const tabTitles = {
-	ingredient: t('tab.ingredient'),
-	preparation: t('tab.preparation'),
-	description: t('tab.description'),
+  ingredient: t('tab.ingredient'),
+  preparation: t('tab.preparation'),
+  description: t('tab.description'),
 };
 
-const img = `/img/products/${id}`;
-const translatedTitle = t(`${id}.titlep`);
+const translatedTitle = product?.name || 'Produit inconnu';
+const price = product?.price || 0;
+const img = product?.image_url || '/img/default-product.png';
+const description = product?.description || '';
+const ingredient = product?.ingredient || '';
+const preparation = product?.preparation || '';
+const dimension = product?.size || '';
 ---
-
 <Layout title={`EMCAFFE - ${translatedTitle}`}>
-	<Header />
+  <Header />
 
-	<main class="mt-[255px] flex h-auto w-full flex-col md:mt-[192px]">
-<ProductCard
-  img={img}
-  productName={t(`${id}.titlep`)}
-  price={16.99}     
-  id={id}           
-  description={t(`${id}.description`)}
-  ingredient={t(`${id}.ingredient`)}
-  preparation={t(`${id}.preparation`)}
-  dimension={t(`${id}.dimension`)}
-  tabTitles={tabTitles}
-  t={t}
-/>
+  <main class="mt-[255px] flex h-auto w-full flex-col md:mt-[192px]">
+    {product ? (
+      <ProductCard
+        img={img}
+        productName={translatedTitle}
+        price={price}
+        id={id}
+        description={description}
+        ingredient={ingredient}
+        preparation={preparation}
+        dimension={dimension}
+        tabTitles={tabTitles}
+        t={t}
+      />
+    ) : (
+      <p class="text-center text-gray-500 mt-8">Produit introuvable.</p>
+    )}
+  </main>
 
-	</main>
-
-	<Footer />
+  <Footer />
 </Layout>
