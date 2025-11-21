@@ -30,17 +30,19 @@ const products = [
     />
   </div>
 
-  <div
+ 
+
+  <p
+    id="productDesc"
+    class="mt-6 text-lg md:text-xl text-primary font-bold leading-tight"
+    set:html={products[0].description}
+  ></p>
+
+   <div
     class="mt-6 border border-gray-300 text-black font-semibold text-lg md:text-xl px-6 py-2 rounded-full"
   >
     16,99 €
   </div>
-
-  <p
-    id="productDesc"
-    class="mt-6 text-lg md:text-xl text-primary font-medium leading-tight"
-    set:html={products[0].description}
-  ></p>
 
   <button
     id="addToCart"
@@ -70,7 +72,7 @@ const products = [
           price: parseFloat(addToCartBtn.dataset.productPrice),
           image: addToCartBtn.dataset.productImage,
           quantity: 1,
-          format: "250g",
+          format: "500g",
         };
 
         console.log("Product being added:", product);
@@ -86,11 +88,11 @@ const products = [
     const productsData = [
       {
         image: "/img/products/300-bio-1.png",
-        description: `GRAINS DE CAFÉ TORRÉFIÉS PURS<br /><strong>ARABIQUE DE FORÊT D'ALTITUDE<br />100% BIO</strong>`,
+        description: `GRAINS DE CAFÉ TORRÉFIÉS PUR<br /><strong>ARABICA DE FORÊT D'ALTITUDE<br />100% BIO</strong>`,
       },
       {
         image: "/img/products/300-bio-2.png",
-        description: `GRAINS DE CAFÉ TORRÉFIÉS PURS<br /><strong>ARABIQUE DE FORÊT D'ALTITUDE<br />100% BIO</strong>`,
+        description: `GRAINS DE CAFÉ TORRÉFIÉS PUR<br /><strong>ARABICA DE FORÊT D'ALTITUDE<br />100% BIO</strong>`,
       },
     ];
 

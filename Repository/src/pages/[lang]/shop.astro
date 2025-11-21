@@ -1,57 +1,143 @@
 ---
+// src/pages/[lang]/shop.astro
 import Footer from '@/components/Footer.astro';
 import Header from '@/components/Header.astro';
 import ShopArticle from '@/components/ShopArticle.astro';
 import Layout from '@/layouts/Layout.astro';
-
 import { getLangFromUrl, getStaticPaths, useTranslations } from '@/i18n/utils';
+import { productService } from '@/lib/api/productService';
+import type { Product } from '@/lib/api/types/product.types';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
 export { getStaticPaths };
+
+// Récupération des produits depuis la BDD
+let allProducts: Product[] = [];
+let error: string | null = null;
+
+try {
+  allProducts = await productService.getAllProducts();
+} catch (e) {
+  error = e instanceof Error ? e.message : 'Erreur lors du chargement des produits';
+  console.error('❌ Erreur shop.astro:', error);
+}
+
+/**
+ * Groupe les produits par nom et conserve celui avec le prix le plus bas
+ * Calcule le stock total pour tous les variants
+ */
+function groupProductsByName(products: Product[]): Product[] {
+  const grouped = new Map<string, Product[]>();
+
+  // Regrouper par nom
+  products.forEach(product => {
+    const name = product.name.trim();
+    if (!grouped.has(name)) {
+      grouped.set(name, []);
+    }
+    grouped.get(name)!.push(product);
+  });
+
+  const result: Product[] = [];
+
+  grouped.forEach((variants, name) => {
+    // Trier par prix croissant
+    const sortedVariants = variants.sort((a, b) => 
+      Number(a.price) - Number(b.price)
+    );
+
+    const cheapestVariant = sortedVariants[0];
+    const totalStock = variants.reduce((sum, v) => 
+      sum + (v.stock_quantity || 0), 0
+    );
+
+    // ✅ IMPORTANT : On prend l'ID du PREMIER variant (ordre alphabétique ou BDD)
+    // pour garantir une URL stable
+    const firstVariant = variants.sort((a, b) => 
+      (a.id_product ?? 0) - (b.id_product ?? 0)
+    )[0];
+
+    result.push({
+      ...cheapestVariant,
+      id_product: firstVariant.id_product,  // ✅ ID stable du premier variant
+      stock_quantity: totalStock
+    } as Product);
+
+    if (import.meta.env.DEV) {
+      console.log(`\n📦 ${name}:`);
+      console.log(`   - Variants trouvés: ${variants.length}`);
+      console.log(`   - IDs disponibles: ${variants.map(v => v.id_product).join(', ')}`);
+      console.log(`   ✅ ID utilisé pour l'URL: ${firstVariant.id_product}`);
+      console.log(`   ✅ Prix affiché: ${cheapestVariant.price}€`);
+      console.log(`   ✅ Stock total: ${totalStock}`);
+    }
+  });
+
+  return result;
+}
+
+// Grouper les produits
+const products = groupProductsByName(allProducts);
+
+/**
+ * Génère le chemin de l'image pour un produit
+ */
+function getProductImagePath(product: Product): string {
+  if (product.image_url) {
+    return product.image_url
+      .replace(/^\/public\//, '/')
+      .replace(/^public\//, '/')
+      .replace(/-1\.png$/, '');
+  }
+
+  const slug = product.slug || product.name.toLowerCase().replace(/\s+/g, '-');
+  return `/img/products/${slug}`;
+}
 ---
 
 <Layout title=`EMCAFFE - ${t('nav.products')}`>
-	<Header />
+  <Header />
 
-	<main
-		class="mb-8 mt-[255px] flex h-auto w-full flex-col gap-y-8 md:mt-[192px]"
-	>
-		<div
-			class="flex w-full flex-col justify-around gap-y-8 md:flex-row md:gap-y-0"
-		>
-		
-			<ShopArticle
-				title=`${t('200-bio.title')}`
-				img="/img/products/200-bio"
-				details=`/${lang}/product/200-bio`
+  <main class="mb-8 mt-[255px] flex h-auto w-full flex-col gap-y-8 md:mt-[192px]">
 
-			/>
+    {error ? (
+      <!-- Message d'erreur -->
+      <div class="max-w-2xl mx-auto text-center py-12">
+        <p class="text-red-600 text-lg font-semibold mb-4">
+          {t('shop.error') || 'Erreur de chargement'}
+        </p>
+        <p class="text-gray-600">{error}</p>
+      </div>
+    ) : products.length === 0 ? (
+      <!-- Aucun produit -->
+      <div class="max-w-2xl mx-auto text-center py-12">
+        <p class="text-gray-600 text-lg">
+          {t('shop.no_products') || 'Aucun produit disponible'}
+        </p>
+      </div>
+    ) : (
+      <!-- Grille de produits -->
+      <div class="flex w-full flex-col justify-around gap-y-8 md:flex-row md:gap-y-0 md:flex-wrap">
+        {products.map((product) => {
+          const imagePath = getProductImagePath(product);
 
-			<ShopArticle
-				title=`${t('300-bio.title')}`
-				img="/img/products/300-bio"
-				details=`/${lang}/product/300-bio`
-			/>
-		</div>
+          return (
+            <ShopArticle
+              id={product.id_product ?? 0}
+              title={product.name}
+              img={imagePath}
+              price={Number(product.price)}
+              isInStock={productService.isInStock(product)}
+              stockLabel={productService.getStockLabel(product)}
+            />
+          );
+        })}
+      </div>
+    )}
 
-		<div
-			class="flex w-full flex-col justify-around gap-y-8 md:flex-row md:gap-y-0"
-		>
-			<ShopArticle
-				title=`${t('300-spe.title')}`
-				img="/img/products/300-spe"
-				details=`/${lang}/product/300-spe`
-			/>
+  </main>
 
-			<ShopArticle
-				title=`${t('200-spe.title')}`
-				img="/img/products/200-spe"
-				details=`/${lang}/product/200-spe`
-			/>
-		</div>
-	</main>
-
-	<Footer />
+  <Footer />
 </Layout>
