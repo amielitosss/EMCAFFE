@@ -1,24 +1,23 @@
+// src/lib/api/userService.ts
+
+import type {
+  User,
+  RegisterData,
+  LoginData,
+  UpdateUserData,
+  AuthResponse,
+  UserRole
+} from './types/user.types';
+
 const API_BASE_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api';
 
-interface User {
-  id_user_account?: string; 
-  id?: string; 
-  email: string;
-  first_name: string;
-  last_name: string;
-  role: string;
-  phone?: string;
-  address?: string;
-  created_at?: string;
-}
-
-interface LoginResponse {
-  token: string;
-  user: User;
-}
-
 export const userService = {
-  async login(credentials: { email: string; password: string }) {
+  // ==================== AUTHENTIFICATION ====================
+
+  /**
+   * Connexion utilisateur
+   */
+  async login(credentials: LoginData): Promise<AuthResponse> {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
@@ -32,14 +31,13 @@ export const userService = {
       }
 
       const result = await response.json();
-
-      const loginData = result.data || result;
+      const loginData: AuthResponse = result.data || result;
 
       if (!loginData.token) {
         throw new Error('Aucun token reçu de l\'API');
       }
 
-      // Sauvegarder
+      // Sauvegarder le token et les infos utilisateur
       localStorage.setItem('token', loginData.token);
       if (loginData.user) {
         localStorage.setItem('user', JSON.stringify(loginData.user));
@@ -53,7 +51,10 @@ export const userService = {
     }
   },
 
-  async register(userData: any) {
+  /**
+   * Inscription utilisateur
+   */
+  async register(userData: RegisterData): Promise<AuthResponse> {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
@@ -67,9 +68,9 @@ export const userService = {
       }
 
       const result = await response.json();
+      const registerData: AuthResponse = result.data || result;
 
-      const registerData = result.data || result;
-
+      // Si un token est retourné, sauvegarder la session
       if (registerData.token) {
         localStorage.setItem('token', registerData.token);
         if (registerData.user) {
@@ -77,16 +78,32 @@ export const userService = {
         }
       }
 
+      console.log('✅ Inscription réussie');
       return registerData;
     } catch (error) {
-      console.error('Erreur inscription:', error);
+      console.error('❌ Erreur register:', error);
       throw error;
     }
   },
 
+  /**
+   * Déconnexion
+   */
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    sessionStorage.removeItem('isRedirecting');
+    console.log('✅ Déconnexion');
+  },
+
+  // ==================== PROFIL UTILISATEUR ====================
+
+  /**
+   * Récupérer le profil de l'utilisateur connecté
+   */
   async getProfile(): Promise<User> {
     const token = localStorage.getItem('token');
-    
+
     if (!token) {
       throw new Error('Non authentifié');
     }
@@ -100,7 +117,6 @@ export const userService = {
         },
       });
 
-
       if (!response.ok) {
         if (response.status === 401) {
           this.logout();
@@ -111,34 +127,27 @@ export const userService = {
       }
 
       const result = await response.json();
+      
+      // Normaliser la réponse API
       let userData: User | null = null;
 
       if (result.data) {
         userData = result.data;
-      }
-      else if (result.user) {
+      } else if (result.user) {
         userData = result.user;
-      }
-      else if (result.id_user_account && result.email) {
-        userData = result;
-      }
-      else if (result.id && result.email) {
+      } else if (result.id_user_account && result.email) {
         userData = result;
       }
 
       if (!userData) {
-        console.error('❌ Structure non reconnue:', result);
+        console.error('❌ Structure de réponse non reconnue:', result);
         throw new Error('Format de réponse invalide');
-      }
-
-      if (userData.id_user_account && !userData.id) {
-        userData.id = userData.id_user_account;
       }
 
       // Mise en cache
       localStorage.setItem('user', JSON.stringify(userData));
-      console.log('✅ Profil récupéré et mis en cache:', userData);
-      
+      console.log('✅ Profil récupéré et mis en cache');
+
       return userData;
     } catch (error) {
       console.error('❌ Erreur getProfile:', error);
@@ -146,9 +155,12 @@ export const userService = {
     }
   },
 
-  async updateProfile(userId: string, userData: Partial<User>): Promise<User> {
+  /**
+   * Mettre à jour le profil utilisateur
+   */
+  async updateProfile(userId: string, userData: UpdateUserData): Promise<User> {
     const token = localStorage.getItem('token');
-    
+
     if (!token) {
       throw new Error('Non authentifié');
     }
@@ -173,15 +185,12 @@ export const userService = {
       }
 
       const result = await response.json();
-      const updatedUser = result.data || result.user || result;
+      const updatedUser: User = result.data || result.user || result;
 
-      // Normaliser l'id
-      if (updatedUser.id_user_account && !updatedUser.id) {
-        updatedUser.id = updatedUser.id_user_account;
-      }
-
+      // Mettre à jour le cache
       if (updatedUser) {
         localStorage.setItem('user', JSON.stringify(updatedUser));
+        console.log('✅ Profil mis à jour');
       }
 
       return updatedUser;
@@ -191,37 +200,87 @@ export const userService = {
     }
   },
 
+  // ==================== UTILITAIRES ====================
+
+  /**
+   * Récupérer l'utilisateur courant depuis le cache
+   */
   getCurrentUser(): User | null {
     const userStr = localStorage.getItem('user');
     if (!userStr) return null;
-    
+
     try {
-      const user = JSON.parse(userStr);
-      // Normaliser l'id si nécessaire
-      if (user.id_user_account && !user.id) {
-        user.id = user.id_user_account;
-      }
-      return user;
+      return JSON.parse(userStr) as User;
     } catch {
       return null;
     }
   },
 
+  /**
+   * Vérifier si l'utilisateur est authentifié
+   */
   isAuthenticated(): boolean {
     return !!(localStorage.getItem('token') && localStorage.getItem('user'));
   },
 
+  /**
+   * Vérifier si l'utilisateur est admin
+   */
   isAdmin(): boolean {
     const user = this.getCurrentUser();
     return user?.role === 'ADMIN';
   },
 
-  logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    sessionStorage.removeItem('isRedirecting');
-    console.log('Déconnexion');
+  /**
+   * Vérifier si l'utilisateur est client
+   */
+  isClient(): boolean {
+    const user = this.getCurrentUser();
+    return user?.role === 'CLIENT';
   },
+
+  /**
+   * Obtenir le token d'authentification
+   */
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  },
+
+  /**
+   * Obtenir le nom complet de l'utilisateur
+   */
+  getFullName(user?: User): string {
+    const currentUser = user || this.getCurrentUser();
+    if (!currentUser) return 'Utilisateur';
+    return `${currentUser.first_name} ${currentUser.last_name}`;
+  },
+
+  /**
+   * Obtenir l'adresse complète formatée
+   */
+  getFormattedAddress(user?: User): string {
+    const currentUser = user || this.getCurrentUser();
+    if (!currentUser) return '';
+
+    const parts = [
+      currentUser.address_line1,
+      currentUser.address_line2,
+      currentUser.postal_code && currentUser.city 
+        ? `${currentUser.postal_code} ${currentUser.city}` 
+        : currentUser.city,
+      currentUser.country
+    ].filter(Boolean);
+
+    return parts.join(', ');
+  }
 };
 
-export type { User, LoginResponse };
+// Export des types
+export type {
+  User,
+  RegisterData,
+  LoginData,
+  UpdateUserData,
+  AuthResponse,
+  UserRole
+};
