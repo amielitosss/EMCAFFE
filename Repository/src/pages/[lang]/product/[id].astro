@@ -1,0 +1,70 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import ProductCard from '@/components/ProductCard.astro';
+
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+import { productService } from '@/lib/api/productService';
+import type { Product } from '@/lib/api/types/product.types';
+
+// Astro params
+const { id } = Astro.params as { id: string; lang: string };
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang as 'en' | 'fr' | 'es');
+
+interface ProductResponse {
+  success: boolean;
+  data: Product;
+}
+
+let product: Product | null = null;
+
+try {
+  const result: ProductResponse = await productService.getProductWithVariants(id);
+  product = result.data; // maintenant product est de type Product
+  console.log('Produit récupéré:', product);
+} catch (err) {
+  console.error('❌ Impossible de récupérer le produit :', err);
+}
+
+// Tabs et contenus
+const tabTitles = {
+  ingredient: t('tab.ingredient'),
+  preparation: t('tab.preparation'),
+  description: t('tab.description'),
+};
+
+const translatedTitle = product?.name || 'Produit inconnu';
+const price = product?.price || 0;
+const img = product?.image_url || '/img/default-product.png';
+const description = product?.description || '';
+const ingredient = product?.ingredient || '';
+const preparation = product?.preparation || '';
+const dimension = product?.size || '';
+---
+<Layout title={`EMCAFFE - ${translatedTitle}`}>
+  <Header />
+
+  <main class="mt-[255px] flex h-auto w-full flex-col md:mt-[192px]">
+    {product ? (
+      <ProductCard
+        img={img}
+        productName={translatedTitle}
+        price={price}
+        id={id}
+        description={description}
+        ingredient={ingredient}
+        preparation={preparation}
+        dimension={dimension}
+        tabTitles={tabTitles}
+        t={t}
+        variants={product?.variants || []}
+      />
+    ) : (
+      <p class="text-center text-gray-500 mt-8">Produit introuvable.</p>
+    )}
+  </main>
+
+  <Footer />
+</Layout>

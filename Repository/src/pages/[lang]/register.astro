@@ -476,15 +476,10 @@ export { getStaticPaths };
     try {
       console.log('📤 Envoi des données à l\'API...');
       
-      // Assurer que 'gender' correspond à l'union attendue par RegisterData
-      const genderValue: 'M' | 'F' | 'OTHER' = ['M', 'F', 'OTHER'].includes(gender)
-        ? (gender as 'M' | 'F' | 'OTHER')
-        : 'OTHER';
-
       const registerData = {
         first_name: firstName,
         last_name: lastName,
-        gender: genderValue, // ✅ Sera 'M', 'F' ou 'OTHER' typé correctement
+        gender: gender, // ✅ Sera M, F ou OTHER
         email: email,
         phone: phone || undefined,
         password: password,

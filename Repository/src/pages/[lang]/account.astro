@@ -314,7 +314,8 @@ export { getStaticPaths };
                         </p>
                         <a
                             href={`/${lang}/products`}
-                            class="inline-block rounded-lg bg-[#5C3F32] px-6 py-3 text-white transition-colors hover:bg-[#8B4513]">
+                            class="inline-block rounded-lg bg-[#5C3F32] px-6 py-3 text-white transition-colors hover:bg-[#8B4513]"
+                        >
                             {t('account.startShopping') || 'Commencer mes achats'}
                         </a>
                     </div>
@@ -406,8 +407,9 @@ export { getStaticPaths };
     <Footer />
 </Layout>
 
-<script type="module">
-  import { userService } from '@/lib/api/userService';
+<script>
+  import type { Gender } from '@/lib/api/types/user.types';
+import { userService } from '@/lib/api/userService';
   
   const lang = document.documentElement.lang || 'fr';
   
@@ -427,7 +429,7 @@ export { getStaticPaths };
     }
   }
   
-  function showError(message) {
+  function showError(message: string) {
     console.log('❌ Affichage erreur:', message);
     const loadingScreen = document.getElementById('loading-screen');
     if (loadingScreen) {
@@ -445,12 +447,11 @@ export { getStaticPaths };
     }
   }
     
-  function updateUserInterface(user) {
-    if (!user) return;
+  function updateUserInterface(user: any) {
     
     const initialsEl = document.getElementById('user-initials');
     if (initialsEl && user.first_name && user.last_name) {
-      const initials = (user.first_name.charAt(0) + user.last_name.charAt(0)).toUpperCase();
+      const initials = `${user.first_name.charAt(0)}${user.last_name.charAt(0)}`.toUpperCase();
       initialsEl.textContent = initials;
       console.log('✅ Initiales:', initials);
     }
@@ -463,146 +464,208 @@ export { getStaticPaths };
     
     const emailEl = document.getElementById('user-email');
     if (emailEl) {
-      emailEl.textContent = user.email || '';
+      emailEl.textContent = user.email;
       console.log('✅ Email affiché');
     }
     
-    const form = document.getElementById('profile-form');
+    const form = document.getElementById('profile-form') as HTMLFormElement;
     if (form) {
-      const firstNameInput = form.querySelector('[name="firstName"]');
-      const lastNameInput = form.querySelector('[name="lastName"]');
-      const emailInput = form.querySelector('[name="email"]');
-      const phoneInput = form.querySelector('[name="phone"]');
-      // Préremplir les champs du formulaire si disponibles
-      if (firstNameInput) firstNameInput.value = user.first_name || '';
-      if (lastNameInput) lastNameInput.value = user.last_name || '';
-      if (emailInput) emailInput.value = user.email || '';
-      if (phoneInput) phoneInput.value = user.phone || '';
+      const firstNameInput = form.querySelector('[name="firstName"]') as HTMLInputElement;
+      const lastNameInput = form.querySelector('[name="lastName"]') as HTMLInputElement;
+      const emailInput = form.querySelector('[name="email"]') as HTMLInputElement;
+      const phoneInput = form.querySelector('[name="phone"]') as HTMLInputElement;
+      const addressInput = form.querySelector('[name="address"]') as HTMLTextAreaElement;
+      const genderInput = form.querySelector('[name="gender"]') as HTMLSelectElement;
+      
+      if (firstNameInput) {
+        firstNameInput.value = user.first_name || '';
+        console.log('✅ Prénom rempli:', user.first_name);
+      }
+      if (lastNameInput) {
+        lastNameInput.value = user.last_name || '';
+        console.log('✅ Nom rempli:', user.last_name);
+      }
+      if (emailInput) {
+        emailInput.value = user.email || '';
+        console.log('✅ Email rempli:', user.email);
+      }
+      if (phoneInput) {
+        phoneInput.value = user.phone || '';
+        console.log('✅ Téléphone rempli:', user.phone);
+      }
+      if (addressInput) {
+        addressInput.value = user.address || '';
+        console.log('✅ Adresse remplie:', user.address);
+      }
+      if (genderInput && user.gender) {
+        genderInput.value = user.gender;
+        console.log('✅ Genre rempli:', user.gender);
+      }
+    }
+    
+    console.log('✅ Interface mise à jour');
+  }
+  
+  async function initAccount() {
+    
+    // Vérifier l'authentification
+    const isAuth = userService.isAuthenticated();
+    console.log('Authentifié:', isAuth);
+    
+    if (!isAuth) {
+      console.log('Non authentifié, redirection...');
+      showError('Vous devez être connecté pour accéder à cette page');
+      setTimeout(() => {
+        window.location.href = `/${lang}/log`;
+      }, 2000);
+      return;
+    }
+
+    try {
+      const user = await userService.getProfile();
+      console.log('✅ Profil reçu:', user);
+      
+      // Mettre à jour l'interface
+      updateUserInterface(user);
+      
+      // Masquer le loading et afficher le contenu
+      hideLoadingScreen();
+      
+    } catch (error) {
+      console.error('Erreur lors du chargement:', error);
+      
+      if (error instanceof Error && (error.message.includes('401') || error.message.includes('Session'))) {
+        console.log('Token invalide, déconnexion...');
+        userService.logout();
+        showError('Votre session a expiré');
+        setTimeout(() => {
+          window.location.href = `/${lang}/log`;
+        }, 2000);
+      } else {
+        showError('Erreur lors du chargement de votre profil');
+      }
     }
   }
   
   function setupProfileEditing() {
-    const profileForm = document.getElementById('profile-form');
+    const profileForm = document.getElementById('profile-form') as HTMLFormElement;
     const editBtn = document.getElementById('edit-profile-btn');
     const cancelBtn = document.getElementById('cancel-edit-btn');
     const editButtons = document.getElementById('edit-buttons');
     
     if (!profileForm || !editBtn) return;
     
-    // Conserver les valeurs initiales pour annulation
-    let initialValues = {};
-    const cacheInitialValues = () => {
-      const inputs = profileForm.querySelectorAll('input, select, textarea');
-      inputs.forEach(input => {
-        initialValues[input.name || input.tagName] = input.value;
-      });
-    };
-    const restoreInitialValues = () => {
-      const inputs = profileForm.querySelectorAll('input, select, textarea');
-      inputs.forEach(input => {
-        const key = input.name || input.tagName;
-        if (initialValues[key] !== undefined) input.value = initialValues[key];
-      });
-    };
-    
     // Bouton "Modifier"
     editBtn.addEventListener('click', () => {
-      cacheInitialValues();
+      
       // Activer tous les champs
       const inputs = profileForm.querySelectorAll('input, select, textarea');
       inputs.forEach(input => {
-        input.disabled = false;
+        (input as HTMLInputElement).disabled = false;
         input.classList.remove('bg-gray-50', 'cursor-not-allowed');
         input.classList.add('bg-white');
       });
       
       // Afficher les boutons de sauvegarde
-      if (editButtons) editButtons.classList.remove('hidden');
+      editButtons?.classList.remove('hidden');
       editBtn.classList.add('hidden');
     });
     
     // Bouton "Annuler"
-    if (cancelBtn) {
-      cancelBtn.addEventListener('click', () => {
-        // Désactiver tous les champs et restaurer valeurs
-        restoreInitialValues();
-        const inputs = profileForm.querySelectorAll('input, select, textarea');
-        inputs.forEach(input => {
-          input.disabled = true;
-          input.classList.remove('bg-white');
-          input.classList.add('bg-gray-50', 'cursor-not-allowed');
-        });
-        // Cacher les boutons de sauvegarde et réafficher "Modifier"
-        if (editButtons) editButtons.classList.add('hidden');
-        editBtn.classList.remove('hidden');
+    cancelBtn?.addEventListener('click', () => {
+      
+      // Désactiver tous les champs
+      const inputs = profileForm.querySelectorAll('input, select, textarea');
+      inputs.forEach(input => {
+        (input as HTMLInputElement).disabled = true;
+        input.classList.add('bg-gray-50', 'cursor-not-allowed');
+        input.classList.remove('bg-white');
       });
-    }
+      
+      // Restaurer les valeurs d'origine
+      const user = userService.getCurrentUser();
+      if (user) {
+        updateUserInterface(user);
+      }
+      
+      // Masquer les boutons de sauvegarde
+      editButtons?.classList.add('hidden');
+      editBtn.classList.remove('hidden');
+    });
     
-    // Soumission du formulaire de profil
+    // Soumission du formulaire
     profileForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      console.log('Sauvegarde du profil...');
+      
+      const user = userService.getCurrentUser();
+      if (!user) {
+        alert('Session expirée');
+        window.location.href = `/${lang}/log`;
+        return;
+      }
+
+      const userId = user.id_user_account;
+      
       const formData = new FormData(profileForm);
-      const payload = {
-        first_name: formData.get('firstName') || '',
-        last_name: formData.get('lastName') || '',
-        email: formData.get('email') || '',
-        phone: formData.get('phone') || '',
-        gender: formData.get('gender') || '',
-        address: formData.get('address') || '',
+      const updateData = {
+        first_name: formData.get('firstName') as string,
+        last_name: formData.get('lastName') as string,
+        email: formData.get('email') as string,
+        phone: formData.get('phone') as string,
+        address: formData.get('address') as string,
+        gender: formData.get('gender') as Gender,
       };
+
       try {
-        await userService.updateProfile(payload);
-        // Après succès, désactiver champs et cacher boutons
+        console.log('📤 Données à envoyer:', updateData);
+        const updatedUser = await userService.updateProfile(userId, updateData);
+        console.log('✅ Profil mis à jour:', updatedUser);
+        
+        // Mettre à jour l'interface
+        updateUserInterface(updatedUser);
+        
+        // Désactiver les champs
         const inputs = profileForm.querySelectorAll('input, select, textarea');
         inputs.forEach(input => {
-          input.disabled = true;
-          input.classList.remove('bg-white');
+          (input as HTMLInputElement).disabled = true;
           input.classList.add('bg-gray-50', 'cursor-not-allowed');
+          input.classList.remove('bg-white');
         });
-        if (editButtons) editButtons.classList.add('hidden');
+        
+        // Masquer les boutons de sauvegarde
+        editButtons?.classList.add('hidden');
         editBtn.classList.remove('hidden');
-        // Mettre à jour l'interface (nom, email, initiales)
-        updateUserInterface(payload);
-      } catch (err) {
-        console.error(err);
-        alert('Erreur lors de la mise à jour du profil.');
+        
+        alert('✅ Profil mis à jour avec succès !');
+      } catch (error) {
+        console.error('❌ Erreur mise à jour:', error);
+        alert(error instanceof Error ? error.message : 'Erreur lors de la mise à jour');
       }
     });
   }
   
-  // Initialisation : chargement du profil et mise en place des événements
-  async function init() {
-    try {
-      const user = await userService.getProfile();
-      if (!user || !user.email) {
-        showError('Veuillez vous connecter pour accéder à votre compte.');
-        return;
-      }
-      updateUserInterface(user);
-      setupProfileEditing();
-      hideLoadingScreen();
+  
+  function setupLogout() {
+    const logoutBtn = document.getElementById('logout-btn');
+    logoutBtn?.addEventListener('click', () => {
+      console.log(' Déconnexion...');
       
-      // Logout
-      const logoutBtn = document.getElementById('logout-btn');
-      if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-          try {
-            await userService.logout();
-          } catch (err) {
-            console.warn('Logout failed:', err);
-          } finally {
-            window.location.href = `/${lang}/log`;
-          }
-        });
+      if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+        userService.logout();
+        window.location.href = `/${lang}/log`;
       }
-    } catch (err) {
-      console.error(err);
-      showError("Une erreur est survenue lors du chargement du profil.");
-    }
+    });
   }
   
-  init();
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('✅ DOM chargé, démarrage...');
+    initAccount();
+    setupProfileEditing();
+    setupLogout();
+  });
 </script>
+
 
 <style>
     /* Animation de chargement */

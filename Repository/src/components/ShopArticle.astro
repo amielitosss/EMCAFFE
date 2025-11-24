@@ -1,28 +1,16 @@
 ---
-// src/components/ShopArticle.astro
 import { useTranslations, getLangFromUrl } from '@/i18n/utils';
 
-export interface Props {
-  id: number;  // ✅ Ajout de l'ID
-  title: string;
-  img: string;
-  price?: number | string;
-  isInStock?: boolean;
-  stockLabel?: string;
+interface Props {
+	title: string;
+	img: string;
+	details: string;
 }
 
-const { id, title, img, price, isInStock = true, stockLabel } = Astro.props;
+const { title, img, details } = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
-
-// ✅ Construction de l'URL du produit avec l'ID
-const productUrl = `/${lang}/product/${id}`;
-
-// Formatage du prix
-const formattedPrice = price 
-  ? `${parseFloat(String(price)).toFixed(2)} €` 
-  : null;
 ---
 
 <style>
@@ -40,83 +28,28 @@ const formattedPrice = price
   .animate-fadeUp {
     animation: fadeUp 0.7s ease-out forwards;
   }
-
-  @keyframes pulse {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.7;
-    }
-  }
-
-  .animate-pulse {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
 </style>
 
-<div class="flex flex-col gap-y-8 md:w-2/5 relative group">
-  <!-- Container de l'image avec badges -->
-  <div class="flex w-full items-center justify-center relative">
-    <a href={productUrl} class="w-1/2 relative">
-      <img
-        class="h-auto w-full rounded-lg border-2 border-[#5C3F32] bg-white transition-transform group-hover:scale-105"
-        src={`${img}-1.png`}
-        alt={title}
-      />
 
-      <!-- Badge de stock en rupture -->
-      {!isInStock && (
-        <div class="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
-          {t('shop.out_of_stock') || 'Rupture'}
-        </div>
-      )}
+<div class="flex flex-col gap-y-8 md:w-2/5">
+	<div class="flex w-full items-center justify-center">
+		<a href={details} class="w-1/2">
+			<img
+				class="h-auto w-full rounded-lg border-2 border-[#5C3F32] bg-white"
+				src={`${img}-1.png`}
+			/>
+		</a>
+	</div>
+    <p
+     class="text-center font-sans text-xl font-semibold text-[#5C3F32] md:text-2xl opacity-0 translate-y-3 animate-fadeUp"
+    >
+       {title}
+    </p>
 
-      <!-- Badge stock limité -->
-      {isInStock && stockLabel === 'Stock limité' && (
-        <div class="absolute top-2 right-2 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse">
-          {t('shop.limited_stock') || 'Stock limité'}
-        </div>
-      )}
-    </a>
-  </div>
-
-  <!-- Titre du produit -->
-  <p
-    class="text-center font-sans text-xl font-semibold text-[#5C3F32] md:text-2xl opacity-0 translate-y-3 animate-fadeUp"
-  >
-    {title}
-  </p>
-
-  <!-- Prix -->
-  {formattedPrice && (
-    <div class="text-center">
-      <p class="text-2xl font-bold text-[#8B4513]">
-        {formattedPrice}
-      </p>
-    </div>
-  )}
-
-  <!-- Bouton Détails avec état de stock -->
-  <a
-    href={productUrl}
-    class:list={[
-      "self-center rounded-lg px-4 py-2 text-center text-sm md:text-base font-medium transition-all",
-      isInStock
-        ? "bg-[#5C3F32] text-white hover:bg-[#A47343] hover:shadow-lg"
-        : "bg-gray-400 text-gray-200 cursor-not-allowed pointer-events-none"
-    ]}
-    tabindex={isInStock ? 0 : -1}
-    aria-disabled={!isInStock}
-  >
-    {isInStock ? (t('shop.details') || 'Détails') : (t('shop.unavailable') || 'Indisponible')}
-  </a>
-
-  {isInStock && stockLabel && stockLabel !== 'Stock limité' && (
-    <div class="text-center">
-      <p class="text-xs text-gray-500">
-        {stockLabel}
-      </p>
-    </div>
-  )}
+	<a
+		href={details}
+		class="self-center rounded-lg bg-[#5C3F32] px-4 py-2 text-center text-sm text-white hover:bg-[#A47343] md:text-base"
+	>
+		{t('shop.details')}
+	</a>
 </div>

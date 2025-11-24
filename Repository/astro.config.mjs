@@ -8,4 +8,5 @@ export default defineConfig({
 	redirects: {
 		'/': '/fr',
 	},
+    	output: 'server', 
 });
