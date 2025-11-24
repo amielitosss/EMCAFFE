@@ -32,6 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const email = document.querySelector('input[type="email"]');
     const password = document.querySelector('input[type="password"]');
 
+    if (!email || !password) return;
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!email.value.trim() || !emailRegex.test(email.value)) {
@@ -51,6 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
       STEP 2 VALIDATION
   ---------------------------------------------------------- */
   btnToStep3?.addEventListener("click", () => {
+    if (!stepTwo) return;
     const inputs = stepTwo.querySelectorAll("input");
 
     const firstName = inputs[0];
@@ -98,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /* DELIVERY COST */
   deliveryForm?.addEventListener("change", (e) => {
     const target = e.target;
-    if (target.name === "delivery") {
+    if (target && target.name === "delivery") {
       deliveryCost = target.value === "express" ? 10 : 5;
       localStorage.setItem("deliveryCost", deliveryCost.toString());
       renderSummaryCard();
@@ -114,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const summaryDelivery = document.getElementById("summaryDelivery");
     const summaryTotal = document.getElementById("summaryTotal");
 
-    if (!summaryItems) return;
+    if (!summaryItems || !summaryDelivery || !summaryTotal) return;
 
     summaryItems.innerHTML = "";
     let totalPrice = 0;
@@ -160,7 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderSummaryCard();
 
   /* ----------------------------------------------------------
-      PAYMENT LOGIC
+      PAYMENT LOGIC TOGGLE (Card / Bank)
   ---------------------------------------------------------- */
 
   const cardRadio = document.querySelector('input[name="payment"][value="card"]');
@@ -175,6 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cardRadio?.checked) {
       cardFormSection?.classList.remove("hidden");
       bankInfoSection?.classList.add("hidden");
+      initStripe(); // initialize Stripe when card is selected
     } else {
       bankInfoSection?.classList.remove("hidden");
       cardFormSection?.classList.add("hidden");
@@ -195,84 +199,68 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ----------------------------------------------------------
-      CARD PREVIEW
+      BANK TRANSFER BACKEND CALL
   ---------------------------------------------------------- */
+  async function createBankTransferOrder(totalAmount) {
+    try {
+      const userId = localStorage.getItem("userId");
 
-  const cardNumberInput = document.getElementById("cardNumberInput");
-  const cardNameInput = document.getElementById("cardNameInput");
-  const cardExpiryInput = document.getElementById("cardExpiryInput");
-  const cardCvcInput = document.getElementById("cardCvcInput");
+      const response = await fetch("http://localhost:3000/api/payments/bank-transfer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: userId,
+          amount: totalAmount,
+        }),
+      });
 
-  const cardNumberDisplay = document.getElementById("cardNumberDisplay");
-  const cardNameDisplay = document.getElementById("cardNameDisplay");
-  const cardExpiryDisplay = document.getElementById("cardExpiryDisplay");
-  const cardCvcDisplay = document.getElementById("cardCvcDisplay");
+      if (!response.ok) {
+        throw new Error("Erreur lors de la creation du virement.");
+      }
 
-  function formatCardNumber(value) {
-    return value.replace(/\D/g, "").replace(/(.{4})/g, "$1 ").trim();
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.error(err);
+      alert("Une erreur est survenue lors de la creation du virement.");
+    }
   }
 
-  cardNumberInput?.addEventListener("input", () => {
-    const formatted = formatCardNumber(cardNumberInput.value);
-    cardNumberInput.value = formatted;
-    cardNumberDisplay.textContent = formatted || "•••• •••• •••• ••••";
-  });
-
-  cardNameInput?.addEventListener("input", () => {
-    const value = cardNameInput.value.trim();
-    cardNameDisplay.textContent = value ? value.toUpperCase() : "NOM PRÉNOM";
-  });
-
-  cardExpiryInput?.addEventListener("input", () => {
-    let value = cardExpiryInput.value.replace(/\D/g, "");
-    if (value.length > 4) value = value.slice(0, 4);
-    if (value.length >= 3) value = value.slice(0, 2) + "/" + value.slice(2);
-    cardExpiryInput.value = value;
-    cardExpiryDisplay.textContent = value || "MM/AA";
-  });
-
-  cardCvcInput?.addEventListener("input", () => {
-    let value = cardCvcInput.value.replace(/\D/g, "");
-    if (value.length > 4) value = value.slice(0, 4);
-    cardCvcInput.value = value;
-    cardCvcDisplay.textContent = value || "•••";
-  });
-
-    /* ----------------------------------------------------------
-     BANK TRANSFER AND THE BACKEND
+  /* ----------------------------------------------------------
+      STRIPE ELEMENTS INITIALISATION
   ---------------------------------------------------------- */
-    async function createBankTransferOrder(totalAmount) {
-        try {
-          const userId = localStorage.getItem("userId");
+  let stripe = null;
+  let elements = null;
+  let cardElement = null;
 
-          const response = await fetch("http://localhost:3000/api/payments/bank-transfer", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              userId: userId,
-              amount: totalAmount
-            })
-          });
+  function initStripe() {
+    if (stripe) return; // already initialized
 
-          if (!response.ok) {
-            throw new Error("Erreur lors de la creation du virement.");
-          }
-
-          const data = await response.json();
-          return data;
-        }catch(err) {
-          console.error(err);
-          alert("une erreur est survenue lors de la creation du virement.")
-        }
+    if (!window.Stripe) {
+      console.error("Stripe.js is not loaded");
+      return;
     }
 
+    
+    stripe = window.Stripe("pk_live_51SVYsz0ACSKi9caRRtdl5X8HZFKW6A1kIeHrChu1LRKTsukIDsWmrdu3sKLQxAGJz8AWUfiGH5YjwsGwvZ6dUHpW00lG4upFGX");
+
+    elements = stripe.elements();
+    cardElement = elements.create("card", {
+      hidePostalCode: true,
+    });
+
+    const cardElementDiv = document.getElementById("card-element");
+    if (cardElementDiv) {
+      cardElement.mount("#card-element");
+    }
+  }
 
   /* ----------------------------------------------------------
-      PLACE ORDER
+      PLACE ORDER (BANK OR CARD)
   ---------------------------------------------------------- */
- const placeOrderBtn = document.getElementById("placeOrder");
+  const placeOrderBtn = document.getElementById("placeOrder");
 
   placeOrderBtn?.addEventListener("click", async () => {
     const selectedPayment = document.querySelector(
@@ -284,47 +272,100 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    /* ---------------- BANK TRANSFER ---------------- */
-    if (selectedPayment.value === "bank_transfer") {
-      const totalAmount = parseFloat(
-        document.getElementById("summaryTotal").textContent.replace("€", "")
-      );
+    const summaryTotalEl = document.getElementById("summaryTotal");
+    if (!summaryTotalEl) {
+      alert("Montant introuvable.");
+      return;
+    }
 
+    const totalAmount = parseFloat(
+      summaryTotalEl.textContent.replace("€", "").trim()
+    );
+
+    // ---------------------------
+    // BANK TRANSFER FLOW
+    // ---------------------------
+    if (selectedPayment.value === "bank_transfer") {
       const result = await createBankTransferOrder(totalAmount);
 
       if (result && result.orderId) {
-        // update bank info box
         const refSpan = document.getElementById("bankReference");
-        if (refSpan) refSpan.textContent = `ORDER-${result.orderId}`;
+        if (refSpan) {
+          refSpan.textContent = `ORDER-${result.orderId}`;
+        }
 
-        // show confirmation block
-        const confirmBox = document.getElementById("bankConfirmation");
-        if (confirmBox) confirmBox.classList.remove("hidden");
+        alert(
+          "Votre commande a été enregistrée.\nVeuillez procéder au virement bancaire en utilisant la référence affichée."
+        );
+      }
+      return;
+    }
 
-        // fill confirmation fields
-        const ref2 = document.getElementById("bankReference2");
-        if (ref2) ref2.textContent = `ORDER-${result.orderId}`;
-
-        const amountSpan = document.getElementById("bankAmount");
-        if (amountSpan) amountSpan.textContent = totalAmount.toFixed(2);
-
-        window.scrollTo({ top: stepFour.offsetTop, behavior: "smooth" });
+    // ---------------------------
+    // CARD PAYMENT FLOW (STRIPE)
+    // ---------------------------
+    if (selectedPayment.value === "card") {
+      if (!stripe || !cardElement) {
+        alert(
+          "Le paiement par carte n'est pas prêt. Veuillez sélectionner le mode carte pour initialiser le paiement, puis réessayer."
+        );
+        return;
       }
 
-      return;
-    }
+      try {
+        // 1) Call backend to create PaymentIntent
+        const res = await fetch("http://localhost:3000/api/payments/card", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ amount: totalAmount }),
+        });
 
-    // Card validation
-    if (
-      !cardNumberInput.value.trim() ||
-      !cardNameInput.value.trim() ||
-      !cardExpiryInput.value.trim() ||
-      !cardCvcInput.value.trim()
-    ) {
-      alert("Veuillez remplir tous les champs de la carte.");
-      return;
-    }
+        if (!res.ok) {
+          console.error("Erreur API /payments/card", await res.text());
+          alert("Erreur lors de la création du paiement.");
+          return;
+        }
 
-    alert("Simulation: Paiement par carte validé !");
+        const { clientSecret } = await res.json();
+        if (!clientSecret) {
+          alert("Erreur: clientSecret manquant.");
+          return;
+        }
+
+        // 2) Confirm card payment with Stripe.js
+        const result = await stripe.confirmCardPayment(clientSecret, {
+          payment_method: {
+            card: cardElement,
+          },
+        });
+
+        if (result.error) {
+          console.error(result.error);
+          const cardErrors = document.getElementById("card-errors");
+          if (cardErrors) {
+            cardErrors.textContent =
+              result.error.message || "Erreur de paiement.";
+          } else {
+            alert(result.error.message || "Erreur de paiement.");
+          }
+          return;
+        }
+
+        if (
+          result.paymentIntent &&
+          result.paymentIntent.status === "succeeded"
+        ) {
+          alert("Paiement par carte réussi ! Merci pour votre commande.");
+          // TODO: redirect to a confirmation page if desired
+        } else {
+          alert("Le paiement n'a pas pu être confirmé.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Une erreur est survenue lors du paiement.");
+      }
+    }
   });
 });
