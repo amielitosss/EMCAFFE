@@ -325,7 +325,8 @@ export { getStaticPaths };
 </Layout>
 
 <script>
-  import { userService } from '@/lib/api/userService';
+  import type { Gender } from '@/lib/api/types/user.types';
+import { userService } from '@/lib/api/userService';
   
   const lang = document.documentElement.lang || 'fr';
   
@@ -428,7 +429,7 @@ export { getStaticPaths };
     // Récupération des données
     const firstName = (formData.get('firstName') as string).trim();
     const lastName = (formData.get('lastName') as string).trim();
-    const gender = formData.get('gender') as string;
+    const gender = formData.get('gender') as Gender;
     const email = (formData.get('email') as string).trim();
     const phone = (formData.get('phone') as string).trim();
     const password = formData.get('password') as string;
