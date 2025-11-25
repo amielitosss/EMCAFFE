@@ -403,13 +403,24 @@ export { getStaticPaths };
     return emailRegex.test(email);
   }
   
-  function validatePhone(phone: string): boolean {
-    if (!phone) return true; // Optionnel
-    
-    // Format français: +33 ou 0, puis 9 chiffres
-    const phoneRegex = /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
-    return phoneRegex.test(phone.replace(/\s/g, ''));
-  }
+function validatePhone(phone: string): boolean {
+  if (!phone) return true;
+
+  // Enlève tous les caractères inutiles
+  const cleaned = phone.replace(/[\s.-]/g, '');
+
+  // 06XXXXXXXX
+  if (/^0[1-9]\d{8}$/.test(cleaned)) return true;
+
+  // +336XXXXXXXX ou +337XXXXXXXX
+  if (/^\+33[1-9]\d{8}$/.test(cleaned)) return true;
+
+  // 00336XXXXXXXX
+  if (/^0033[1-9]\d{8}$/.test(cleaned)) return true;
+
+  return false;
+}
+
   
   // ============================================
   // SOUMISSION DU FORMULAIRE
@@ -550,6 +561,22 @@ export { getStaticPaths };
       form.addEventListener('submit', handleRegister);
       console.log('✅ Gestionnaire de formulaire attaché');
     }
+
+    // Empêcher les espaces dans le numéro
+const phoneInput = document.getElementById('phone') as HTMLInputElement;
+
+if (phoneInput) {
+  // Bloque la touche espace au clavier
+  phoneInput.addEventListener('keydown', (e) => {
+    if (e.key === " ") e.preventDefault();
+  });
+
+  // Nettoie les espaces si collés via copier/coller
+  phoneInput.addEventListener('input', (e) => {
+    phoneInput.value = phoneInput.value.replace(/\s+/g, '');
+  });
+}
+
     
     // Validation en temps réel du mot de passe
     const passwordInput = document.getElementById('password') as HTMLInputElement;
