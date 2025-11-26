@@ -1,370 +1,241 @@
+// === CONFIG ===
+const STRIPE_PUBLIC_KEY =
+  "pk_test_51SVYto14tHXOJjU15ghHpxe0AP3n8abWKIuwHbRX3oQ55wVLmiHsdZNMVsDeAFuPJEVmknhbHLMLu6Ky0HEEHnRp00gKixVHNi";
+
+const API_BASE_URL = "http://localhost:3000/api";
+
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("✅ destination.js loaded");
+
+  // === STEPS ===
   const stepOne = document.getElementById("stepOne");
   const stepTwo = document.getElementById("stepTwo");
   const stepThree = document.getElementById("stepThree");
   const stepFour = document.getElementById("stepFour");
 
-  // Next buttons
   const btnToStep2 = document.getElementById("toStep2");
   const btnToStep3 = document.getElementById("toStep3");
   const btnToStep4 = document.getElementById("toStep4");
 
-  // Back buttons
   const btnBackToStep1 = document.getElementById("backToStep1");
   const btnBackToStep2 = document.getElementById("backToStep2");
   const btnBackToStep3 = document.getElementById("backToStep3");
 
-  // Delivery form
   const deliveryForm = document.getElementById("deliveryForm");
-  let deliveryCost = null;
+
+  const emailInput = document.getElementById("emailInput");
+  const passwordInput = document.getElementById("passwordInput");
+
+  let deliveryCost = 5;
 
   function showStep(hideEl, showEl) {
-    if (!hideEl || !showEl) return;
     hideEl.classList.add("hidden");
     showEl.classList.remove("hidden");
     window.scrollTo({ top: 200, behavior: "smooth" });
   }
 
-  /* ----------------------------------------------------------
-      STEP 1 VALIDATION
-  ---------------------------------------------------------- */
+  /* ---------------- STEP 1 ---------------- */
   btnToStep2?.addEventListener("click", () => {
-    const email = document.querySelector('input[type="email"]');
-    const password = document.querySelector('input[type="password"]');
+    const email = emailInput.value.trim();
+    const pass = passwordInput.value.trim();
 
-    if (!email || !password) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return alert("Email invalide");
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!email.value.trim() || !emailRegex.test(email.value)) {
-      alert("Please enter a valid email.");
-      return;
-    }
-
-    if (password.value.trim().length < 6) {
-      alert("Password must be at least 6 characters.");
-      return;
-    }
+    if (pass.length < 6) return alert("Mot de passe : 6 caractères minimum");
 
     showStep(stepOne, stepTwo);
   });
 
-  /* ----------------------------------------------------------
-      STEP 2 VALIDATION
-  ---------------------------------------------------------- */
+  /* ---------------- STEP 2 ---------------- */
   btnToStep3?.addEventListener("click", () => {
-    if (!stepTwo) return;
-    const inputs = stepTwo.querySelectorAll("input");
+    const required = stepTwo.querySelectorAll("input[required], select[required]");
 
-    const firstName = inputs[0];
-    const lastName = inputs[1];
-    const postalCode = inputs[2];
-    const city = inputs[3];
-
-    if (!firstName.value.trim()) {
-      alert("Please enter your first name.");
-      return;
-    }
-
-    if (!lastName.value.trim()) {
-      alert("Please enter your last name.");
-      return;
-    }
-
-    if (!/^\d{4,6}$/.test(postalCode.value.trim())) {
-      alert("Please enter a valid postal code.");
-      return;
-    }
-
-    if (!city.value.trim()) {
-      alert("Please enter your city.");
-      return;
+    for (const field of required) {
+      if (!field.value.trim()) return alert("Veuillez remplir tous les champs");
     }
 
     showStep(stepTwo, stepThree);
   });
 
-  /* ----------------------------------------------------------
-      STEP 3 → STEP 4
-  ---------------------------------------------------------- */
+  btnBackToStep1?.addEventListener("click", () => showStep(stepTwo, stepOne));
+
+  /* ---------------- STEP 3 ---------------- */
   btnToStep4?.addEventListener("click", () => {
     showStep(stepThree, stepFour);
     renderSummaryCard();
-    generateBankReference();
   });
 
-  // Back navigation
-  btnBackToStep1?.addEventListener("click", () => showStep(stepTwo, stepOne));
   btnBackToStep2?.addEventListener("click", () => showStep(stepThree, stepTwo));
-  btnBackToStep3?.addEventListener("click", () => showStep(stepFour, stepThree));
 
-  /* DELIVERY COST */
   deliveryForm?.addEventListener("change", (e) => {
-    const target = e.target;
-    if (target && target.name === "delivery") {
-      deliveryCost = target.value === "express" ? 10 : 5;
-      localStorage.setItem("deliveryCost", deliveryCost.toString());
-      renderSummaryCard();
-    }
+    deliveryCost = e.target.value === "express" ? 10 : 5;
+    localStorage.setItem("deliveryCost", deliveryCost);
+    renderSummaryCard();
   });
 
-  /* ----------------------------------------------------------
-      SUMMARY CARD
-  ---------------------------------------------------------- */
   function renderSummaryCard() {
+    const itemsEl = document.getElementById("summaryItems");
+    const delEl = document.getElementById("summaryDelivery");
+    const totEl = document.getElementById("summaryTotal");
+
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const summaryItems = document.getElementById("summaryItems");
-    const summaryDelivery = document.getElementById("summaryDelivery");
-    const summaryTotal = document.getElementById("summaryTotal");
 
-    if (!summaryItems || !summaryDelivery || !summaryTotal) return;
-
-    summaryItems.innerHTML = "";
-    let totalPrice = 0;
+    itemsEl.innerHTML = "";
+    let total = 0;
 
     cart.forEach((item) => {
-      const itemPrice = parseFloat(item.price) * (item.quantity || 1);
-      totalPrice += itemPrice;
+      const subtotal = item.price * item.quantity;
+      total += subtotal;
 
-      const div = document.createElement("div");
-      div.className =
-        "flex items-center justify-between border-b border-[#A47343]/30 pb-2";
-
-      div.innerHTML = `
-        <div class="flex items-center gap-3">
-          <img src="${item.image}" 
-               alt="${item.name}" 
-               class="w-16 h-16 object-contain rounded-md border border-[#A47343]/20 bg-white" />
-          <div>
-            <p class="font-medium text-sm">${item.name}</p>
-            <p class="text-xs text-[#A47343]">x${item.quantity}</p>
-          </div>
+      itemsEl.innerHTML += `
+        <div class="flex justify-between border-b pb-1">
+          <span>${item.name} x${item.quantity}</span>
+          <span>${subtotal.toFixed(2)}€</span>
         </div>
-        <span class="text-sm font-semibold">${itemPrice.toFixed(2)}€</span>
       `;
-
-      summaryItems.appendChild(div);
     });
 
-    const savedDelivery = localStorage.getItem("deliveryCost");
-
-    if (!savedDelivery) {
-      summaryDelivery.textContent = "—";
-      summaryTotal.textContent = totalPrice.toFixed(2) + "€";
-    } else {
-      const deliveryValue = parseFloat(savedDelivery);
-      summaryDelivery.textContent = deliveryValue.toFixed(2) + "€";
-      summaryTotal.textContent = (totalPrice + deliveryValue).toFixed(2) + "€";
-    }
+    delEl.textContent = deliveryCost.toFixed(2) + "€";
+    totEl.textContent = (total + deliveryCost).toFixed(2) + "€";
   }
 
-  const savedDelivery2 = localStorage.getItem("deliveryCost");
-  if (savedDelivery2) deliveryCost = parseFloat(savedDelivery2);
   renderSummaryCard();
 
-  /* ----------------------------------------------------------
-      PAYMENT LOGIC TOGGLE (Card / Bank)
-  ---------------------------------------------------------- */
+  /* ---------------- PAYMENT UI ---------------- */
+  const cardRadio = document.querySelector('input[value="card"]');
+  const bankRadio = document.querySelector('input[value="bank_transfer"]');
 
-  const cardRadio = document.querySelector('input[name="payment"][value="card"]');
-  const bankRadio = document.querySelector(
-    'input[name="payment"][value="bank_transfer"]'
-  );
+  const bankInfo = document.getElementById("bankInfoSection");
+  const cardSection = document.getElementById("cardFormSection");
 
-  const cardFormSection = document.getElementById("cardFormSection");
-  const bankInfoSection = document.getElementById("bankInfoSection");
-
-  function updatePaymentView() {
-    if (cardRadio?.checked) {
-      cardFormSection?.classList.remove("hidden");
-      bankInfoSection?.classList.add("hidden");
-      initStripe(); // initialize Stripe when card is selected
+  function updatePaymentUI() {
+    if (bankRadio.checked) {
+      bankInfo.classList.remove("hidden");
+      cardSection.classList.add("hidden");
     } else {
-      bankInfoSection?.classList.remove("hidden");
-      cardFormSection?.classList.add("hidden");
+      cardSection.classList.remove("hidden");
+      bankInfo.classList.add("hidden");
+      initStripe();
     }
   }
 
-  cardRadio?.addEventListener("change", updatePaymentView);
-  bankRadio?.addEventListener("change", updatePaymentView);
-  updatePaymentView();
+  cardRadio?.addEventListener("change", updatePaymentUI);
+  bankRadio?.addEventListener("change", updatePaymentUI);
 
-  /* ----------------------------------------------------------
-      AUTO-GENERATE BANK REFERENCE
-  ---------------------------------------------------------- */
-  function generateBankReference() {
-    const ref = "EMC-" + Math.floor(100000 + Math.random() * 900000);
-    const refSpan = document.getElementById("bankReference");
-    if (refSpan) refSpan.textContent = ref;
-  }
+  bankRadio.checked = true;
+  updatePaymentUI();
 
-  /* ----------------------------------------------------------
-      BANK TRANSFER BACKEND CALL
-  ---------------------------------------------------------- */
-  async function createBankTransferOrder(totalAmount) {
-    try {
-      const userId = localStorage.getItem("userId");
-
-      const response = await fetch("http://localhost:3000/api/payments/bank-transfer", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: userId,
-          amount: totalAmount,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de la creation du virement.");
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (err) {
-      console.error(err);
-      alert("Une erreur est survenue lors de la creation du virement.");
-    }
-  }
-
-  /* ----------------------------------------------------------
-      STRIPE ELEMENTS INITIALISATION
-  ---------------------------------------------------------- */
+  /* ---------------- STRIPE ---------------- */
   let stripe = null;
   let elements = null;
   let cardElement = null;
 
   function initStripe() {
-    if (stripe) return; // already initialized
+    if (stripe) return;
 
-    if (!window.Stripe) {
-      console.error("Stripe.js is not loaded");
-      return;
-    }
-
-    
-    stripe = window.Stripe("pk_live_51SVYsz0ACSKi9caRRtdl5X8HZFKW6A1kIeHrChu1LRKTsukIDsWmrdu3sKLQxAGJz8AWUfiGH5YjwsGwvZ6dUHpW00lG4upFGX");
-
+    stripe = Stripe(STRIPE_PUBLIC_KEY);
     elements = stripe.elements();
-    cardElement = elements.create("card", {
-      hidePostalCode: true,
-    });
-
-    const cardElementDiv = document.getElementById("card-element");
-    if (cardElementDiv) {
-      cardElement.mount("#card-element");
-    }
+    cardElement = elements.create("card");
+    cardElement.mount("#card-element");
   }
 
-  /* ----------------------------------------------------------
-      PLACE ORDER (BANK OR CARD)
-  ---------------------------------------------------------- */
-  const placeOrderBtn = document.getElementById("placeOrder");
+  /* ---------------- PLACE ORDER ---------------- */
+  document.getElementById("placeOrder")?.addEventListener("click", async () => {
 
-  placeOrderBtn?.addEventListener("click", async () => {
-    const selectedPayment = document.querySelector(
+    const total = parseFloat(
+      document.getElementById("summaryTotal").textContent.replace("€", "")
+    );
+
+    const paymentMethod = document.querySelector(
       'input[name="payment"]:checked'
-    );
+    )?.value;
 
-    if (!selectedPayment) {
-      alert("Veuillez choisir un mode de paiement.");
-      return;
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!token || !user?.id_user_account) {
+      return alert("Vous devez être connecté.");
     }
 
-    const summaryTotalEl = document.getElementById("summaryTotal");
-    if (!summaryTotalEl) {
-      alert("Montant introuvable.");
-      return;
-    }
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
 
-    const totalAmount = parseFloat(
-      summaryTotalEl.textContent.replace("€", "").trim()
-    );
+    // ---------------- DELIVERY INPUTS ----------------
+const delivery_address = document.getElementById("deliveryAddress").value;
+const delivery_city = document.getElementById("deliveryCity").value;
+const delivery_postal_code = document.getElementById("deliveryPostal").value;
+const delivery_country = document.getElementById("deliveryCountry").value;
+const delivery_phone = document.getElementById("deliveryPhone").value;
 
-    // ---------------------------
-    // BANK TRANSFER FLOW
-    // ---------------------------
-    if (selectedPayment.value === "bank_transfer") {
-      const result = await createBankTransferOrder(totalAmount);
 
-      if (result && result.orderId) {
-        const refSpan = document.getElementById("bankReference");
-        if (refSpan) {
-          refSpan.textContent = `ORDER-${result.orderId}`;
-        }
 
-        alert(
-          "Votre commande a été enregistrée.\nVeuillez procéder au virement bancaire en utilisant la référence affichée."
-        );
-      }
-      return;
-    }
-
-    // ---------------------------
-    // CARD PAYMENT FLOW (STRIPE)
-    // ---------------------------
-    if (selectedPayment.value === "card") {
-      if (!stripe || !cardElement) {
-        alert(
-          "Le paiement par carte n'est pas prêt. Veuillez sélectionner le mode carte pour initialiser le paiement, puis réessayer."
-        );
-        return;
-      }
-
+    /* ---------------- BANK TRANSFER ---------------- */
+    if (paymentMethod === "bank_transfer") {
       try {
-        // 1) Call backend to create PaymentIntent
-        const res = await fetch("http://localhost:3000/api/payments/card", {
+        const res = await fetch(`${API_BASE_URL}/payments/bank-transfer`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ amount: totalAmount }),
+          headers,
+          body: JSON.stringify({
+            userId: user.id_user_account,
+            amount: total,
+            delivery_address,
+            delivery_city,
+            delivery_postal_code,
+            delivery_country,
+            delivery_phone,
+          }),
         });
 
-        if (!res.ok) {
-          console.error("Erreur API /payments/card", await res.text());
-          alert("Erreur lors de la création du paiement.");
-          return;
-        }
+        if (!res.ok) throw new Error();
+
+        const data = await res.json();
+
+        document.getElementById("bankReference").textContent = `ORDER-${data.orderId}`;
+        document.getElementById("bankReferenceTwo").textContent = `ORDER-${data.orderId}`;
+        document.getElementById("bankAmount").textContent = total.toFixed(2);
+        document.getElementById("bankConfirmation").classList.remove("hidden");
+
+        alert("Commande enregistrée. Veuillez effectuer le virement bancaire.");
+      } catch (err) {
+        alert("Erreur pendant le paiement par virement.");
+      }
+
+      return;
+    }
+
+    /* ---------------- CARD PAYMENT ---------------- */
+    if (paymentMethod === "card") {
+      try {
+        const res = await fetch(`${API_BASE_URL}/payments/card`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            userId: user.id_user_account,
+            amount: total,
+            delivery_address,
+            delivery_city,
+            delivery_postal_code,
+            delivery_country,
+            delivery_phone,
+          }),
+        });
+
+        if (!res.ok) throw new Error();
 
         const { clientSecret } = await res.json();
-        if (!clientSecret) {
-          alert("Erreur: clientSecret manquant.");
-          return;
-        }
 
-        // 2) Confirm card payment with Stripe.js
-        const result = await stripe.confirmCardPayment(clientSecret, {
-          payment_method: {
-            card: cardElement,
-          },
+        const confirm = await stripe.confirmCardPayment(clientSecret, {
+          payment_method: { card: cardElement },
         });
 
-        if (result.error) {
-          console.error(result.error);
-          const cardErrors = document.getElementById("card-errors");
-          if (cardErrors) {
-            cardErrors.textContent =
-              result.error.message || "Erreur de paiement.";
-          } else {
-            alert(result.error.message || "Erreur de paiement.");
-          }
-          return;
-        }
+        if (confirm.error) return alert(confirm.error.message);
 
-        if (
-          result.paymentIntent &&
-          result.paymentIntent.status === "succeeded"
-        ) {
-          alert("Paiement par carte réussi ! Merci pour votre commande.");
-          // TODO: redirect to a confirmation page if desired
-        } else {
-          alert("Le paiement n'a pas pu être confirmé.");
-        }
+        alert("Paiement par carte réussi !");
       } catch (err) {
-        console.error(err);
-        alert("Une erreur est survenue lors du paiement.");
+        alert("Erreur Stripe.");
       }
     }
   });

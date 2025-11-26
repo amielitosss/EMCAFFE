@@ -38,14 +38,12 @@ const t = useTranslations(lang);
 
   <!-- Main -->
   <main class="bg-[#FEFBED] flex flex-col items-center justify-center px-6 md:px-12 py-12">
-    <!-- Wrapper for steps (left) + summary (right) -->
     <div class="w-full md:w-3/4 lg:w-4/5 flex flex-col md:flex-row gap-8 items-start">
 
       <!-- LEFT: Steps -->
-      <section
-        class="w-full md:flex-1 bg-[#FEFBED] border border-[#5C3F32] rounded-md p-8 space-y-8"
-      >
-        <!-- Step 1 -->
+      <section class="w-full md:flex-1 bg-[#FEFBED] border border-[#5C3F32] rounded-md p-8 space-y-8">
+
+        <!-- STEP ONE -->
         <div id="stepOne" class="space-y-6">
           <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
             {t("destination.personalInfo")}
@@ -57,6 +55,7 @@ const t = useTranslations(lang);
                 {t("destination.email")} *
               </label>
               <input
+                id="emailInput"
                 type="email"
                 class="w-full border border-[#5C3F32] p-2"
                 placeholder="abcd@gmail.com"
@@ -69,6 +68,7 @@ const t = useTranslations(lang);
                 {t("destination.password")} *
               </label>
               <input
+                id="passwordInput"
                 type="password"
                 class="w-full border border-[#5C3F32] p-2"
                 placeholder="••••••••"
@@ -87,8 +87,8 @@ const t = useTranslations(lang);
 
             <div class="flex justify-center">
               <button
-                type="button"
                 id="toStep2"
+                type="button"
                 class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition"
               >
                 {t("destination.continue")}
@@ -97,7 +97,7 @@ const t = useTranslations(lang);
           </form>
         </div>
 
-        <!-- Step 2 -->
+        <!-- STEP TWO -->
         <div id="stepTwo" class="space-y-6 hidden">
           <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
             {t("destination.addresses")}
@@ -127,11 +127,41 @@ const t = useTranslations(lang);
               </div>
             </div>
 
+         
+<div>
+  <label class="block font-semibold mb-1 text-[#5C3F32]">
+    {t("destination.addressComplement")} *
+  </label>
+  <input
+    id="deliveryAddress"
+    type="text"
+    class="w-full border border-[#5C3F32] rounded-md p-2"
+    placeholder="12 Rue du Marché, Appartement B"
+    required
+  />
+</div>
+
+
+<div>
+  <label class="block font-semibold mb-1 text-[#5C3F32]">
+    {t("destination.phone")} *
+  </label>
+  <input
+    id="deliveryPhone"
+    type="text"
+    class="w-full border border-[#5C3F32] rounded-md p-2"
+    placeholder="+33 6 12 34 56 78"
+    required
+  />
+</div>
+
+
             <div>
               <label class="block font-semibold mb-1 text-[#5C3F32]">
                 {t("destination.postalCode")} *
               </label>
               <input
+                id="deliveryPostal"
                 type="text"
                 class="w-full border border-[#5C3F32] rounded-md p-2"
                 required
@@ -143,6 +173,7 @@ const t = useTranslations(lang);
                 {t("destination.city")} *
               </label>
               <input
+                id="deliveryCity"
                 type="text"
                 class="w-full border border-[#5C3F32] rounded-md p-2"
                 required
@@ -153,24 +184,26 @@ const t = useTranslations(lang);
               <label class="block font-semibold mb-1 text-[#5C3F32]">
                 {t("destination.country")} *
               </label>
-              <select class="w-full border border-[#5C3F32] rounded-md p-2" required>
-                {countries.map(country => (
-                    <option value={country}>{country}</option>
-                ))}  
+              <select
+                class="w-full border border-[#5C3F32] rounded-md p-2"
+                id="deliveryCountry"
+                required
+              >
+                {countries.map((c) => <option value={c}>{c}</option>)}
               </select>
             </div>
 
             <div class="flex justify-between gap-2">
               <button
-                type="button"
                 id="backToStep1"
+                type="button"
                 class="border border-[#5C3F32] text-[#5C3F32] px-6 py-2 rounded-md hover:bg-[#f9f4ee] transition"
               >
                 ← {t("destination.previous")}
               </button>
               <button
-                type="button"
                 id="toStep3"
+                type="button"
                 class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition"
               >
                 {t("destination.continue")}
@@ -179,49 +212,40 @@ const t = useTranslations(lang);
           </form>
         </div>
 
-        <!-- Step 3 -->
+        <!-- STEP THREE -->
         <div id="stepThree" class="space-y-6 hidden">
           <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
             {t("destination.deliveryMode")}
           </h2>
 
           <form id="deliveryForm" class="space-y-4">
-            <label
-              class="flex items-center justify-between border border-[#A47343] rounded-md p-4 cursor-pointer hover:bg-[#f9f4ee] transition"
-            >
-              <div class="flex items-center gap-3 text-[#5C3F32]">
-                <input
-                  type="radio"
-                  name="delivery"
-                  value="standard"
-                  checked
-                />
+            <label class="flex items-center justify-between border border-[#A47343] rounded-md p-4 cursor-pointer hover:bg-[#f9f4ee] transition">
+              <div class="flex items-center gap-3">
+                <input type="radio" name="delivery" value="standard" checked />
                 <span>{t("destination.deliveryStandard")}</span>
               </div>
-              <span class="font-semibold text-[#5C3F32]">5 €</span>
+              <span class="font-semibold">5 €</span>
             </label>
 
-            <label
-              class="flex items-center justify-between border border-[#A47343] rounded-md p-4 cursor-pointer hover:bg-[#f9f4ee] transition"
-            >
-              <div class="flex items-center gap-3 text-[#5C3F32]">
+            <label class="flex items-center justify-between border border-[#A47343] rounded-md p-4 cursor-pointer hover:bg-[#f9f4ee] transition">
+              <div class="flex items-center gap-3">
                 <input type="radio" name="delivery" value="express" />
                 <span>{t("destination.deliveryExpress")}</span>
               </div>
-              <span class="font-semibold text-[#5C3F32]">10 €</span>
+              <span class="font-semibold">10 €</span>
             </label>
 
             <div class="flex justify-between gap-2">
               <button
-                type="button"
                 id="backToStep2"
+                type="button"
                 class="border border-[#5C3F32] text-[#5C3F32] px-6 py-2 rounded-md hover:bg-[#f9f4ee] transition"
               >
                 ← {t("destination.previous")}
               </button>
               <button
-                type="button"
                 id="toStep4"
+                type="button"
                 class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition"
               >
                 {t("destination.continue")}
@@ -230,208 +254,185 @@ const t = useTranslations(lang);
           </form>
         </div>
 
-        <!-- Step 4 -->
+        <!-- STEP FOUR -->
         <div id="stepFour" class="space-y-6 hidden">
           <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
             {t("destination.payment")}
           </h2>
 
           <form class="space-y-6">
-<!-- Virement Bancaire Option -->
-<label
-  class="payment-option flex items-center justify-between border border-[#A47343] rounded-md p-4 hover:bg-[#f9f4ee] transition cursor-pointer"
->
-  <div class="flex items-center gap-3 text-[#5C3F32]">
-    <input type="radio" name="payment" value="bank_transfer" />
-    <span>{ t("payWithVirement") }</span>
-  </div>
 
-  <div class="text-xs mr-2 text-[#A47343] md:mr-4">
-  { t("destination.virement") }
-  </div>
+            <!-- BANK TRANSFER -->
+            <label class="payment-option flex items-center justify-between border border-[#A47343] rounded-md p-4 hover:bg-[#f9f4ee] transition cursor-pointer">
+              <div class="flex items-center gap-3">
+                <input type="radio" name="payment" value="bank_transfer" />
+                <span>{t("destination.payWithVirement")}</span>
+              </div>
+              <div class="text-xs text-[#A47343]">
+                {t("destination.virement")}
+              </div>
+              <img
+                src="/img/virement.png"
+                class="w-[100px] h-[40px] object-contain opacity-80"
+                alt="Virement bancaire"
+              />
+            </label>
 
-  <div class="flex items-center justify-center w-[100px] h-[40px] opacity-80">
-    <img
-      src="/img/virement.png"
-      alt="Virement bancaire"
-      class="max-h-full max-w-full object-contain"
-    />
-  </div>
-</label>
-
-<!-- Bank Transfer Details (hidden at first) -->
-<div id="bankInfoSection" class="hidden bg-[#faf5ef] border border-[#A47343] rounded-md p-4 mt-3">
-  <p class="text-sm text-[#5C3F32] mb-3">
-    { t("destination.bankTransferInfo") }
-  </p>
-
-  <div class="text-sm text-[#5C3F32] space-y-1">
-    <p><strong>IBAN:</strong> FR76 3000 4000 1234 5678 9012 345</p>
-    <p><strong>BIC:</strong> BNPAFRPP</p>
-    <p><strong>Bank:</strong> BNP Paribas</p>
-    <p><strong>{ t("destination.reference") }:</strong> <span id="bankReference">ORDER-XXXXXX</span></p>
-  </div>
-</div>
-
-<!-- Bank Transfer Confirmation (shown after order is created) -->
- <div id="bankConfirmation" class="hidden bg-[#5C3F32] border border-green-600 rounded-md p-4 mt-4">
-  <h3 class="text-lg font-semibold text-green-800 mb-2">
-    {t("destination.bankTransferConfirmed")}
-  </h3>
-
-  <p class="text-sm text-green-700 mb-3">
-    <strong>{t("destination.bankTransferInstructions")} :</strong>
-    <span id="bankReferenceTwo"></span>
-  </p>
-
-  <p class="text-sm">
-    <strong>{t("destination.amount")} :</strong>
-    <span id="bankAmount"></span> €
-  </p>
-
- </div>
-
-
-            <!-- Card Option -->
-            <label
-              class="flex items-center justify-between border border-[#A47343] rounded-md p-4 hover:bg-[#f9f4ee] transition cursor-pointer"
+            <div
+              id="bankInfoSection"
+              class="hidden bg-[#faf5ef] border border-[#A47343] rounded-md p-4 mt-3"
             >
-              <div class="flex items-center gap-3 text-[#5C3F32]">
+              <p class="text-sm mb-3">
+                {t("destination.bankTransferInfo")}
+              </p>
+              <div class="text-sm space-y-1">
+                <p><strong>IBAN:</strong> FR76 3000 4000 1234 5678 9012 345</p>
+                <p><strong>BIC:</strong> BNPAFRPP</p>
+                <p><strong>Bank:</strong> BNP Paribas</p>
+                <p>
+                  <strong>{t("destination.reference")}:</strong>
+                  <span id="bankReference">ORDER-XXXXXX</span>
+                </p>
+              </div>
+            </div>
+
+            <!-- CONFIRMATION -->
+            <div
+              id="bankConfirmation"
+              class="hidden bg-[#5C3F32] rounded-md p-4 mt-4 text-white"
+            >
+              <h3 class="text-lg font-semibold">
+                {t("destination.bankTransferConfirmed")}
+              </h3>
+              <p class="text-sm mb-2">
+                <strong>{t("destination.bankTransferInstructions")}:</strong>
+                <span id="bankReferenceTwo"></span>
+              </p>
+              <p class="text-sm">
+                <strong>{t("destination.amount")}:</strong>
+                <span id="bankAmount"></span> €
+              </p>
+            </div>
+
+            <!-- CARD -->
+            <label class="flex items-center justify-between border border-[#A47343] rounded-md p-4 hover:bg-[#f9f4ee] cursor-pointer">
+              <div class="flex items-center gap-3">
                 <input type="radio" name="payment" value="card" />
                 <span>{t("destination.payWithCard")}</span>
               </div>
-              <div class="flex items-center justify-center gap-3">
-                <div class="w-[50px] h-[30px] flex items-center justify-center">
-                  <img
-                    src="/img/visa.webp"
-                    alt="Visa"
-                    class="max-h-full max-w-full object-contain"
-                  />
-                </div>
-                <div
-                  class="w-[50px] h-[30px] flex items-center justify-center"
-                >
-                  <img
-                    src="/img/mastercard.png"
-                    alt="Mastercard"
-                    class="max-h-full max-w-full object-contain"
-                  />
-                </div>
-                <div
-                  class="w-[50px] h-[30px] flex items-center justify-center"
-                >
-                  <img
-                    src="/img/cb.webp"
-                    alt="Carte Bancaire"
-                    class="max-h-full max-w-full object-contain"
-                  />
-                </div>
+              <div class="flex gap-3">
+                <img src="/img/visa.webp" class="w-[40px]" alt="Visa" />
+                <img src="/img/mastercard.png" class="w-[40px]" alt="Mastercard" />
+                <img src="/img/cb.webp" class="w-[40px]" alt="CB" />
               </div>
             </label>
 
-            <!-- Card visuals when clicked -->
-             <div id="cardFormSection" class="space-y-4 mt-4 hidden "> 
+            <!-- CARD FORM SECTION WITH BLUE UI -->
+            <div id="cardFormSection" class="hidden space-y-4 mt-4 max-w-md">
+              <!-- Blue Card Preview -->
               <div class="bg-gradient-to-br from-[#003366] to-[#0055AA] text-white rounded-xl p-4 md:p-6 shadow-md max-w-sm">
                 <div class="flex justify-between items-center mb-4">
-                  <span class="text-xs uppercase tracking-wide opacity-80">EMCAFFÉ</span>
+                  <span class="text-xs uppercase tracking-wide opacity-80">
+                    EMCAFFÉ
+                  </span>
                   <div class="w-10 h-7 rounded-md bg-white/30"></div>
+                </div>
+
+                <div
+                  id="cardNumberDisplay"
+                  class="text-lg md:text-xl tracking-[0.2em] font-mono mb-4"
+                >
+                  •••• •••• •••• ••••
+                </div>
+
+                <div class="flex justify-between text-xs md:text-sm">
+                  <div>
+                    <p class="opacity-70">NOM</p>
+                    <p id="cardNameDisplay" class="font-semibold">
+                      NOM PRÉNOM
+                    </p>
+                  </div>
+                  <div>
+                    <p class="opacity-70">EXP</p>
+                    <p id="cardExpiryDisplay" class="font-semibold">
+                      MM/AA
+                    </p>
+                  </div>
+                  <div>
+                    <p class="opacity-70">CVC</p>
+                    <p id="cardCvcDisplay" class="font-semibold">
+                      •••
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              <div id="cardNumberDisplay" class="text-lg md:text-xl tracking-[0.2em] font-mono mn-4">
-                •••• •••• •••• ••••
+              <!-- Stripe Card Element -->
+              <div class="space-y-3 max-w-md">
+                <label class="block text-sm font-medium text-[#5C3F32] mb-1">
+                  {t("destination.cardNumber")}
+                </label>
+                <div
+                  id="card-element"
+                  class="w-full border border-[#5C3F32] rounded-md p-3 bg-white"
+                ></div>
+                <p
+                  id="card-errors"
+                  class="mt-1 text-xs text-red-600"
+                ></p>
               </div>
+            </div>
 
-              <div class="flex justify-between text-xs md:text-sm">
-                <div>
-                  <p class="opacity-70">EXP</p>
-                  <p id="cardNameDisplay" class="font-semibold">NOM PRÉNOM</p>
-                </div>
-                <div>
-                  <p class="opacity-70">EXP</p>
-                  <p id="cardExpiryDisplay" class="font-semibold">MM/AA</p>
-                </div>
-                <div>
-                  <p class="opacity-70">EXP</p>
-                  <p id="cardCvcDisplay" class="font-semibold">•••</p>
-                </div>
-              </div>
-             </div>
-
-             <!-- Card form Inputs (Stripe Elements) -->
-<div class="space-y-3 max-w-md">
-
-  <div>
-    <label class="block text-sm font-medium text-[#5C3F32] mb-1">
-      {t("destination.cardNumber")}
-    </label>
-    <div
-      id="card-element"
-      class="w-full border border-[#5C3F32] rounded-md p-3 bg-white"
-    ></div>
-    <p id="card-errors" class="mt-1 text-xs text-red-600"></p>
-  </div>
-
-</div>
-
-
-
+            <!-- BUTTONS -->
             <div class="flex justify-between gap-2">
               <button
-                type="button"
                 id="backToStep3"
-                class="border border-[#5C3F32] text-[#5C3F32] px-6 py-2 rounded-md hover:bg-[#f9f4ee] transition"
+                type="button"
+                class="border border-[#5C3F32] text-[#5C3F32] px-6 py-2 rounded-md"
               >
                 ← {t("destination.previous")}
               </button>
               <button
-                type="button"
                 id="placeOrder"
-                class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition"
+                type="button"
+                class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32]"
               >
                 {t("destination.order")}
               </button>
             </div>
+
           </form>
         </div>
+
       </section>
 
-      <!-- RIGHT: Summary Card -->
-      <aside id="summaryCard" class="bg-[#FEFBED] border border-[#5C3F32] rounded-lg p-6 shadow-md text-[#5C3F32] h-fit w-full md:w-[40%]">
+      <!-- SUMMARY CARD -->
+      <aside
+        id="summaryCard"
+        class="bg-[#FEFBED] border border-[#5C3F32] rounded-lg p-6 shadow-md text-[#5C3F32] h-fit w-full md:w-[40%]"
+      >
         <h3 class="text-lg font-semibold text-center mb-4">🛒 Your Order</h3>
-
-        <!-- Product list -->
         <div id="summaryItems" class="space-y-4 mb-4"></div>
 
-        <div
-          class="w-full space-y-2 border-t border-[#A47343]/40 pt-2 text-sm md:text-base"
-        >
+        <div class="w-full space-y-2 border-t border-[#A47343]/40 pt-2 text-sm">
           <div class="flex justify-between">
             <span>Delivery:</span>
             <span id="summaryDelivery">0.00€</span>
           </div>
-
           <hr class="my-1 border-[#5C3F32]/40" />
-
           <div class="flex justify-between font-semibold text-lg">
             <span>TTC:</span>
             <span id="summaryTotal">0.00€</span>
           </div>
         </div>
       </aside>
+
     </div>
   </main>
 
   <Footer />
 </Layout>
 
-<!-- Script -->
 <!-- Scripts -->
 <script src="https://js.stripe.com/v3/"></script>
 <script src="/scripts/destination.js" defer></script>
-
-
-
-
-
-
- 

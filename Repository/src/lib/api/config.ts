@@ -1,4 +1,5 @@
 export const API_BASE_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api';
+export const STRIPE_PUBLIC_KEY = import.meta.env.PUBLIC_STRIPE_KEY;
 
 export const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
