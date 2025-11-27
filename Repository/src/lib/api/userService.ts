@@ -9,7 +9,7 @@ import type {
   UserRole
 } from './types/user.types';
 
-const API_BASE_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.PUBLIC_API_URL || 'https://api-emcafe-3.onrender.com/api';
 
 export const userService = {
   // ==================== AUTHENTIFICATION ====================

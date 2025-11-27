@@ -421,7 +421,7 @@ import { userService } from '@/lib/api/userService';
 
   return false;
 }
-
+  
   // ============================================
   // SOUMISSION DU FORMULAIRE
   // ============================================
@@ -561,18 +561,22 @@ import { userService } from '@/lib/api/userService';
       form.addEventListener('submit', handleRegister);
       console.log('✅ Gestionnaire de formulaire attaché');
     }
-     // Empêcher les espaces dans le numéro
-  const phoneInput = document.getElementById('phone') as HTMLInputElement;
 
-  if (phoneInput) {
-    phoneInput.addEventListener('keydown', (e) => {
-      if (e.key === " ") e.preventDefault();
-    });
+    // Empêcher les espaces dans le numéro
+const phoneInput = document.getElementById('phone') as HTMLInputElement;
 
-    phoneInput.addEventListener('input', () => {
-      phoneInput.value = phoneInput.value.replace(/\s+/g, '');
-    });
-  }
+if (phoneInput) {
+  // Bloque la touche espace au clavier
+  phoneInput.addEventListener('keydown', (e) => {
+    if (e.key === " ") e.preventDefault();
+  });
+
+  // Nettoie les espaces si collés via copier/coller
+  phoneInput.addEventListener('input', (e) => {
+    phoneInput.value = phoneInput.value.replace(/\s+/g, '');
+  });
+}
+
     
     // Validation en temps réel du mot de passe
     const passwordInput = document.getElementById('password') as HTMLInputElement;

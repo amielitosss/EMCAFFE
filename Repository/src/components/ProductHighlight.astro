@@ -61,6 +61,55 @@ const products = [
     const img = document.getElementById("productImage");
     const desc = document.getElementById("productDesc");
 
+    // ===== LOGIQUE PANIER =====
+    function getCart() {
+      try {
+        const cart = localStorage.getItem('cart');
+        return cart ? JSON.parse(cart) : [];
+      } catch (error) {
+        console.error('Error reading cart:', error);
+        return [];
+      }
+    }
+
+    function saveCart(cart) {
+      try {
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount(cart);
+      } catch (error) {
+        console.error('Error saving cart:', error);
+      }
+    }
+
+    function updateCartCount(cart) {
+      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const cartCountElements = document.querySelectorAll('.cart-count, #cart-count');
+      
+      cartCountElements.forEach(el => {
+        if (el) {
+          el.textContent = totalItems.toString();
+          el.style.display = totalItems > 0 ? 'flex' : 'none';
+        }
+      });
+    }
+
+    window.addToCart = function(product) {
+      const cart = getCart();
+      
+      const existingIndex = cart.findIndex(
+        item => item.id === product.id && item.format === product.format
+      );
+
+      if (existingIndex > -1) {
+        cart[existingIndex].quantity += product.quantity;
+      } else {
+        cart.push(product);
+      }
+
+      saveCart(cart);
+      console.log('Cart updated:', cart);
+    };
+
     // Add to Cart functionality
     if (addToCartBtn) {
       addToCartBtn.addEventListener("click", () => {
@@ -74,6 +123,9 @@ const products = [
         };
 
         console.log("Product being added:", product);
+
+        // Ajouter au panier
+        window.addToCart(product);
 
         // Dispatch modal if available
         if (window.dispatchAddToCartModal) {
@@ -122,5 +174,9 @@ const products = [
         autoSlide = setInterval(nextSlide, 5000);
       });
     }
+
+    // Initialiser le compteur au chargement
+    const initialCart = getCart();
+    updateCartCount(initialCart);
   });
 </script>
