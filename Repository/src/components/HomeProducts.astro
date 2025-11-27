@@ -77,58 +77,66 @@ const preparedProducts = products.map(product => {
 </section>
 
 <script is:inline>
-const track = document.getElementById("carousel-track");
-const container = document.getElementById("carousel-container");
-const cards = document.querySelectorAll("#carousel-track > div");
+window.addEventListener("DOMContentLoaded", () => {
+  const track = document.getElementById("carousel-track");
+  const container = document.getElementById("carousel-container");
+  const cards = document.querySelectorAll("#carousel-track > div");
 
-let index = 0;
-let visible = window.innerWidth < 768 ? 1 : 2;
-const total = cards.length;
+  let index = 0;
+  let visible = window.innerWidth < 768 ? 1 : 2;
+  const total = cards.length;
 
-function updateVisible() { visible = window.innerWidth < 768 ? 1 : 2; }
-function updateCarousel() {
-  if (!track || cards.length === 0) return;
-  updateVisible();
-  const cardWidth = (cards[0].offsetWidth || 0) + (window.innerWidth < 640 ? 12 : 24);
-  const offset = -index * cardWidth;
-  track.style.transform = `translateX(${offset}px)`;
-}
-function nextSlide() {
-  index = (index + 1) % Math.ceil(total / visible);
-  updateCarousel();
-}
+  function updateVisible() { visible = window.innerWidth < 768 ? 1 : 2; }
+  function updateCarousel() {
+    if (!track || cards.length === 0) return;
+    updateVisible();
+    const cardWidth = (cards[0].offsetWidth || 0) + (window.innerWidth < 640 ? 12 : 24);
+    const offset = -index * cardWidth;
+    track.style.transform = `translateX(${offset}px)`;
+  }
+  function nextSlide() {
+    index = (index + 1) % Math.ceil(total / visible);
+    updateCarousel();
+  }
 
-let autoScroll = setInterval(nextSlide, 5000);
-container?.addEventListener("mouseenter", () => clearInterval(autoScroll));
-container?.addEventListener("mouseleave", () => { autoScroll = setInterval(nextSlide, 5000); });
+  let autoScroll = setInterval(nextSlide, 5000);
+  container?.addEventListener("mouseenter", () => clearInterval(autoScroll));
+  container?.addEventListener("mouseleave", () => { autoScroll = setInterval(nextSlide, 5000); });
 
-window.addEventListener("resize", updateCarousel);
+  window.addEventListener("resize", updateCarousel);
 
-// Ajouter au panier
-document.querySelectorAll(".add-to-cart").forEach(btn => {
-  btn.addEventListener("click", (e) => {
-    const target = e.currentTarget;
-    const priceMap = JSON.parse(target.dataset.priceMap || '{}');
-    const format = target.dataset.defaultFormat || 'default';
-    const price = priceMap[format] ?? 0;
+  // ===== AJOUTER AU PANIER =====
+  document.querySelectorAll(".add-to-cart").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const target = e.currentTarget;
+      const priceMap = JSON.parse(target.dataset.priceMap || '{}');
+      const format = target.dataset.defaultFormat || 'default';
+      const price = priceMap[format] ?? 0;
 
-    const product = {
-      id: target.dataset.productId,
-      name: target.dataset.productName,
-      price,
-      image: target.dataset.productImage,
-      format,
-      quantity: 1
-    };
+      const product = {
+        id: target.dataset.productId,
+        name: target.dataset.productName,
+        price,
+        image: target.dataset.productImage,
+        format,
+        quantity: 1
+      };
 
-    console.log("🛒 Add to cart:", product);
+      console.log("🛒 Add to cart:", product);
 
-    if (typeof window.addToCart === 'function') {
-      window.addToCart(product);
-    }
-    if (typeof window.dispatchAddToCartModal === 'function') {
-      window.dispatchAddToCartModal(product);
-    }
+      // Ajouter au panier
+      if (typeof window.addToCart === 'function') {
+        window.addToCart(product);
+      }
+
+      // Ouvrir la popup
+      if (typeof window.dispatchAddToCartModal === 'function') {
+        window.dispatchAddToCartModal(product);
+      }
+    });
   });
+
+  // Initialiser le carousel
+  updateCarousel();
 });
 </script>

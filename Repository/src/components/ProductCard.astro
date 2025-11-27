@@ -18,22 +18,37 @@ function formatTextWithLineBreaks(text: string): string[] {
 ---
 
 <div class="m-5 -mt-24 md:m-10 md:mt-0">
-  <h2 class="mb-8 text-center text-2xl font-bold text-[#5C3F32] sm:text-3xl lg:text-4xl">
-    {productName}
-  </h2>
-
   <div class="flex flex-col lg:flex-row lg:items-start lg:gap-8">
-    <!-- COLONNE GAUCHE - Images -->
+    <!-- COLONNE GAUCHE - Images avec titre -->
     <div class="flex flex-col items-center lg:sticky lg:top-24 lg:w-1/2 lg:self-start">
-      <div class="mb-6 w-full max-w-2xl lg:max-w-none">
-        <img
-          id="image"
-          class="h-auto w-full rounded-lg bg-white object-cover shadow-lg"
-          src={`${img}-1.png`}
-          data-img={`${img}`}
-          alt={productName}
-        />
-      </div>
+      
+      <!-- Titre au-dessus de l'image (visible uniquement sur desktop) -->
+      <h2 class="hidden lg:block mb-6 text-center text-2xl font-bold text-[#5C3F32] leading-tight lg:text-3xl xl:text-4xl px-4">
+        {productName}
+      </h2>
+
+      <!-- Titre centré pour mobile -->
+      <h2 class="lg:hidden mb-6 mx-auto max-w-[950px] text-center text-2xl font-bold text-[#5C3F32] leading-tight sm:text-3xl px-4">
+        {productName}
+      </h2>
+
+      <!-- Container avec position relative pour le logo -->
+     <div class="mb-6 w-full max-w-xl lg:max-w-lg relative">
+  <img
+    id="image"
+    class="h-auto w-full rounded-lg bg-white object-cover shadow-lg"
+    src={`${img}-1.png`}
+    data-img={`${img}`}
+    alt={productName}
+  />
+
+  <!-- Logo AB positionné en haut à droite -->
+  <img 
+    src="https://www.leslegumesbiodesaison.fr/wp-content/uploads/2024/02/logo_AB_Colour.png" 
+    alt="Logo Agriculture Biologique"
+    class="absolute top-2 right-2 h-12 w-12 sm:h-16 sm:w-16 lg:h-20 lg:w-20 object-contain drop-shadow-lg"
+  />
+</div>
 
       <div class="mb-8 flex flex-row justify-center gap-3 lg:mb-0">
         <button data-img-num="1" class="format-thumb w-20 rounded-lg border-2 border-[#5C3F32] p-2 sm:w-24 lg:w-28">
@@ -44,7 +59,6 @@ function formatTextWithLineBreaks(text: string): string[] {
         </button>
       </div>
     </div>
-
     <!-- COLONNE DROITE -->
     <div class="flex flex-col items-center lg:w-1/2">
       <div class="flex w-full max-w-xl flex-col items-center px-4 text-center lg:px-0">
