@@ -213,46 +213,116 @@ const t = useTranslations(lang);
         </div>
 
         <!-- STEP THREE -->
-        <div id="stepThree" class="space-y-6 hidden">
-          <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
-            {t("destination.deliveryMode")}
-          </h2>
+<div id="stepThree" class="space-y-6 hidden">
+  <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
+    {t("destination.deliveryMode")}
+  </h2>
 
-          <form id="deliveryForm" class="space-y-4">
-            <label class="flex items-center justify-between border border-[#A47343] rounded-md p-4 cursor-pointer hover:bg-[#f9f4ee] transition">
-              <div class="flex items-center gap-3">
-                <input type="radio" name="delivery" value="standard" checked />
-                <span>{t("destination.deliveryStandard")}</span>
-              </div>
-              <span class="font-semibold">5 €</span>
-            </label>
-
-            <label class="flex items-center justify-between border border-[#A47343] rounded-md p-4 cursor-pointer hover:bg-[#f9f4ee] transition">
-              <div class="flex items-center gap-3">
-                <input type="radio" name="delivery" value="express" />
-                <span>{t("destination.deliveryExpress")}</span>
-              </div>
-              <span class="font-semibold">10 €</span>
-            </label>
-
-            <div class="flex justify-between gap-2">
-              <button
-                id="backToStep2"
-                type="button"
-                class="border border-[#5C3F32] text-[#5C3F32] px-6 py-2 rounded-md hover:bg-[#f9f4ee] transition"
-              >
-                ← {t("destination.previous")}
-              </button>
-              <button
-                id="toStep4"
-                type="button"
-                class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition"
-              >
-                {t("destination.continue")}
-              </button>
-            </div>
-          </form>
+  <form id="deliveryForm" class="space-y-4">
+    <!-- Livraison à domicile -->
+    <label class="flex items-center justify-between border border-[#A47343] rounded-md p-4 cursor-pointer hover:bg-[#f9f4ee] transition delivery-option">
+      <div class="flex items-center gap-3">
+        <input type="radio" name="delivery" value="standard" checked />
+        <div>
+          <div class="font-semibold">{t("destination.deliveryStandard")}</div>
+          <div class="text-sm text-gray-600">Livraison à domicile - 3 à 5 jours</div>
         </div>
+      </div>
+      <span class="font-semibold">5,90 €</span>
+    </label>
+
+    <!-- Livraison Express -->
+    <label class="flex items-center justify-between border border-[#A47343] rounded-md p-4 cursor-pointer hover:bg-[#f9f4ee] transition delivery-option">
+      <div class="flex items-center gap-3">
+        <input type="radio" name="delivery" value="express" />
+        <div>
+          <div class="font-semibold">{t("destination.deliveryExpress")}</div>
+          <div class="text-sm text-gray-600">Livraison express - 24-48h</div>
+        </div>
+      </div>
+      <span class="font-semibold">12,90 €</span>
+    </label>
+
+    <!-- Mondial Relay Point Relais -->
+    <label class="flex items-center justify-between border border-[#A47343] rounded-md p-4 cursor-pointer hover:bg-[#f9f4ee] transition delivery-option">
+      <div class="flex items-center gap-3">
+        <input type="radio" name="delivery" value="mondialrelay" />
+        <div>
+          <div class="font-semibold flex items-center gap-2">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+            Point Relais Mondial Relay
+          </div>
+          <div class="text-sm text-gray-600">Retrait en point relais - 2 à 4 jours</div>
+        </div>
+      </div>
+      <span class="font-semibold">3,90 €</span>
+    </label>
+
+    <!-- Widget Mondial Relay -->
+    <div id="mondialRelayWidget" class="hidden border-2 border-[#e2001a] rounded-lg p-4 bg-white">
+      <h3 class="font-semibold mb-3 text-[#5C3F32] flex items-center gap-2">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+        </svg>
+        Sélectionnez votre Point Relais
+      </h3>
+      
+      <div class="search-bar mb-4">
+        <div class="flex gap-2">
+          <input 
+            type="text" 
+            id="cp-search" 
+            placeholder="Code postal (ex: 75001)"
+            class="flex-1 border border-[#5C3F32] rounded-md p-3 text-base"
+            maxlength="5"
+          />
+          <button 
+            type="button" 
+            id="btn-search-relay"
+            class="bg-[#e2001a] text-white px-6 py-3 rounded-md font-semibold hover:bg-[#c00016] transition whitespace-nowrap"
+          >
+            Rechercher
+          </button>
+        </div>
+      </div>
+      
+      <div id="Zone_Widget" class="min-h-[450px]"></div>
+      
+      <!-- Point Relais sélectionné -->
+      <div id="relay-selected" class="hidden mt-4 p-4 bg-[#ecfdf5] border-2 border-[#10b981] rounded-lg">
+        <h4 class="font-semibold text-[#059669] mb-2 flex items-center gap-2">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          Point Relais sélectionné
+        </h4>
+        <div id="relay-details" class="text-sm text-[#1f2937]"></div>
+      </div>
+      
+      <input type="hidden" id="relay-data" name="relayData" />
+      <input type="hidden" id="relay-id" name="relayId" />
+    </div>
+
+    <div class="flex justify-between gap-2 pt-4">
+      <button
+        id="backToStep2"
+        type="button"
+        class="border border-[#5C3F32] text-[#5C3F32] px-6 py-2 rounded-md hover:bg-[#f9f4ee] transition"
+      >
+        ← {t("destination.previous")}
+      </button>
+      <button
+        id="toStep4"
+        type="button"
+        class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {t("destination.continue")}
+      </button>
+    </div>
+  </form>
+</div>
 
         <!-- STEP FOUR -->
         <div id="stepFour" class="space-y-6 hidden">
@@ -434,5 +504,36 @@ const t = useTranslations(lang);
 </Layout>
 
 <!-- Scripts -->
+ <script src="../../../public/scripts/checkoutstep3.ts"></script>
 <script src="https://js.stripe.com/v3/"></script>
 <script src="/scripts/destination.js" defer></script>
+
+
+
+<style>
+  .delivery-option input[type="radio"]:checked {
+    accent-color: #5C3F32;
+  }
+
+  .delivery-option:has(input:checked) {
+    border-color: #5C3F32;
+    background-color: #f9f4ee;
+  }
+
+  #Zone_Widget {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 15px;
+    background: white;
+  }
+
+  .search-bar input:focus {
+    outline: none;
+    border-color: #e2001a;
+    box-shadow: 0 0 0 3px rgba(226, 0, 26, 0.1);
+  }
+
+  #relay-selected p {
+    margin: 3px 0;
+  }
+</style>

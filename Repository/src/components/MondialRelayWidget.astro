@@ -1,0 +1,265 @@
+---
+
+import { MONDIAL_RELAY_CONFIG } from '../lib/api/livraison/config/mondialRelay';
+const { postalCode = '' } = Astro.props;
+---
+
+<div class="mondial-relay-widget">
+  <div class="search-bar">
+    <input 
+      type="text" 
+      id="cp-search" 
+      placeholder="Code postal (ex: 75001)"
+      value={postalCode}
+      maxlength="5"
+    />
+    <button type="button" id="btn-search">Rechercher un Point Relais</button>
+  </div>
+  
+  <div id="Zone_Widget"></div>
+  
+  <div id="relay-selected" class="relay-info hidden">
+    <h3>✓ Point Relais sélectionné</h3>
+    <div id="relay-details"></div>
+  </div>
+  
+  <input type="hidden" id="relay-data" name="relayData" />
+  <input type="hidden" id="relay-id" name="relayId" />
+</div>
+
+<script define:vars={{ config: MONDIAL_RELAY_CONFIG }}>
+  let widgetLoaded = false;
+
+  // Charger les scripts nécessaires
+  async function loadScripts() {
+    // jQuery
+    if (!window.jQuery) {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    }
+
+    // Widget Mondial Relay
+    await new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = config.widgetUrl;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+
+    widgetLoaded = true;
+  }
+
+  // Initialiser le widget
+  function initWidget(postalCode) {
+    if (!widgetLoaded) {
+      alert('Widget en cours de chargement...');
+      return;
+    }
+
+    jQuery("#Zone_Widget").MR_ParcelShopPicker({
+      //
+      // Paramètres obligatoires
+      //
+      Target: "#Zone_Widget",
+      Brand: config.codeBrand,
+      Country: "FR",
+      PostCode: postalCode,
+      
+      //
+      // Mode de livraison
+      //
+      ColLivMod: "24R", // 24R = Point Relais
+      
+      //
+      // Options d'affichage
+      //
+      NbResults: "7",
+      ShowResultsOnMap: true,
+      EnableGeolocalisatedSearch: true,
+      AllowedCountries: config.allowedCountries,
+      
+      //
+      // Personnalisation
+      //
+      CSS: true,
+      
+      //
+      // Callback de sélection
+      //
+      OnParcelShopSelected: function(data) {
+        console.log('Point Relais sélectionné:', data);
+        
+        const relay = {
+          id: data.ID,
+          nom: data.Nom,
+          adresse1: data.Adresse1,
+          adresse2: data.Adresse2 || '',
+          codePostal: data.CP,
+          ville: data.Ville,
+          pays: data.Pays,
+          latitude: data.Latitude,
+          longitude: data.Longitude,
+          horaires: {
+            lundi: data.Horaires_Lundi || '',
+            mardi: data.Horaires_Mardi || '',
+            mercredi: data.Horaires_Mercredi || '',
+            jeudi: data.Horaires_Jeudi || '',
+            vendredi: data.Horaires_Vendredi || '',
+            samedi: data.Horaires_Samedi || '',
+            dimanche: data.Horaires_Dimanche || '',
+          }
+        };
+        
+        // Afficher les détails
+        displayRelay(relay);
+        
+        // Stocker les données
+        document.getElementById('relay-data').value = JSON.stringify(relay);
+        document.getElementById('relay-id').value = relay.id;
+        localStorage.setItem('mondialRelay', JSON.stringify(relay));
+        
+        // Émettre un événement
+        window.dispatchEvent(new CustomEvent('relay-selected', { detail: relay }));
+      }
+    });
+  }
+
+  // Afficher le relais sélectionné
+  function displayRelay(relay) {
+    const container = document.getElementById('relay-selected');
+    const details = document.getElementById('relay-details');
+    
+    details.innerHTML = `
+      <p class="relay-name"><strong>${relay.nom}</strong></p>
+      <p>${relay.adresse1}</p>
+      ${relay.adresse2 ? `<p>${relay.adresse2}</p>` : ''}
+      <p>${relay.codePostal} ${relay.ville}</p>
+      <p class="relay-id">Code: ${relay.id}</p>
+    `;
+    
+    container.classList.remove('hidden');
+  }
+
+  // Au chargement de la page
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Charger les scripts
+    await loadScripts();
+    
+    // Restaurer la sélection précédente
+    const saved = localStorage.getItem('mondialRelay');
+    if (saved) {
+      try {
+        const relay = JSON.parse(saved);
+        displayRelay(relay);
+        document.getElementById('relay-data').value = saved;
+        document.getElementById('relay-id').value = relay.id;
+      } catch (e) {
+        console.error('Erreur parsing relay:', e);
+      }
+    }
+    
+    // Bouton de recherche
+    document.getElementById('btn-search')?.addEventListener('click', () => {
+      const cp = document.getElementById('cp-search').value.trim();
+      if (cp && cp.length === 5) {
+        initWidget(cp);
+      } else {
+        alert('Veuillez entrer un code postal valide (5 chiffres)');
+      }
+    });
+    
+    // Enter dans le champ
+    document.getElementById('cp-search')?.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('btn-search').click();
+      }
+    });
+  });
+</script>
+
+<style>
+  .mondial-relay-widget {
+    padding: 20px 0;
+  }
+
+  .search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .search-bar input {
+    flex: 0 0 200px;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 16px;
+  }
+
+  .search-bar input:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+
+  .search-bar button {
+    padding: 12px 24px;
+    background: #e2001a;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .search-bar button:hover {
+    background: #c00016;
+  }
+
+  #Zone_Widget {
+    min-height: 450px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 15px;
+    background: white;
+  }
+
+  .relay-info {
+    margin-top: 20px;
+    padding: 20px;
+    background: #ecfdf5;
+    border: 2px solid #10b981;
+    border-radius: 8px;
+  }
+
+  .relay-info.hidden {
+    display: none;
+  }
+
+  .relay-info h3 {
+    margin: 0 0 15px 0;
+    color: #059669;
+  }
+
+  .relay-info p {
+    margin: 5px 0;
+    color: #1f2937;
+  }
+
+  .relay-name {
+    font-size: 1.1em;
+  }
+
+  .relay-id {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #6b7280;
+  }
+</style>
