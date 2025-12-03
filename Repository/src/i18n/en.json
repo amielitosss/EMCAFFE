@@ -446,7 +446,47 @@
     
   "popup": {
     "title": "Popup title"
+  },
+
+  
+  "destination": {
+    "personalInfo": "Personal Information",
+    "login": "Login",
+    "register": "Register",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+
+    "confirmPassword": "Confirm Password",
+    "passwordRequirements": "Password must be at least 8 characters",
+    "acceptTerms": "I accept the",
+    "termsAndConditions": "Terms and Conditions",
+    "or": "or",
+    "continueAsGuest": "Continue as Guest",
+    "addresses": "Delivery Address",
+    "email": "Email",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "address": "Address",
+    "addressComplement": "Address Complement (Apartment, Building, etc.)",
+    "phone": "Phone Number",
+    "postalCode": "Postal Code",
+    "city": "City",
+    "country": "Country",
+    "deliveryMode": "Delivery Method",
+    "deliveryType": "Delivery Type",
+    "deliveryHome": "Home Delivery",
+    "deliveryHomeDesc": "Your order will be delivered to your home address.",
+    "deliveryRelay": "Pickup Point",
+    "deliveryRelayDesc": "Collect your order at a nearby pickup point.",
+    "deliverySpeed": "Delivery Speed",
+    "deliveryStandard": "Standard Delivery",
+    "deliveryExpress": "Express Delivery",
+    "businessDays": "business days",
+    "selectRelayPoint": "Select a Pickup Point",
+    "previous": "Previous",
+    "continue": "Continue"
   }
+
 
 
 }

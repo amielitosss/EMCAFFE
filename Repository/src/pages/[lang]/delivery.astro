@@ -4,6 +4,8 @@ import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import countries from "@/data/countries.json";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import AuthForm from "@/components/delivery/AuthForm.astro";
+import SendCloudPickupPoint from "@/components/SendCloudPickupPoint.astro";
 
 export function getStaticPaths() {
   const languages = ["fr", "en", "es"];
@@ -44,232 +46,308 @@ const t = useTranslations(lang);
       <section class="w-full md:flex-1 bg-[#FEFBED] border border-[#5C3F32] rounded-md p-8 space-y-8">
 
         <!-- STEP ONE -->
-        <div id="stepOne" class="space-y-6">
-          <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
-            {t("destination.personalInfo")}
-          </h2>
-
-          <form class="space-y-4">
-            <div>
-              <label class="block font-semibold mb-1 text-[#5C3F32]">
-                {t("destination.email")} *
-              </label>
-              <input
-                id="emailInput"
-                type="email"
-                class="w-full border border-[#5C3F32] p-2"
-                placeholder="abcd@gmail.com"
-                required
-              />
-            </div>
-
-            <div>
-              <label class="block font-semibold mb-1 text-[#5C3F32]">
-                {t("destination.password")} *
-              </label>
-              <input
-                id="passwordInput"
-                type="password"
-                class="w-full border border-[#5C3F32] p-2"
-                placeholder="••••••••"
-                required
-              />
-            </div>
-
-            <div>
-              <a
-                href={`/${lang}/forgot-password`}
-                class="text-sm text-[#A47343] hover:underline flex justify-center mt-2"
-              >
-                {t("destination.forgotPassword")}
-              </a>
-            </div>
-
-            <div class="flex justify-center">
-              <button
-                id="toStep2"
-                type="button"
-                class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition"
-              >
-                {t("destination.continue")}
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <!-- STEP TWO -->
-        <div id="stepTwo" class="space-y-6 hidden">
-          <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
-            {t("destination.addresses")}
-          </h2>
-
-          <form class="space-y-4">
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <label class="block font-semibold mb-1 text-[#5C3F32]">
-                  {t("destination.firstName")} *
-                </label>
-                <input
-                  type="text"
-                  class="w-full border border-[#5C3F32] rounded-md p-2"
-                  required
-                />
-              </div>
-              <div>
-                <label class="block font-semibold mb-1 text-[#5C3F32]">
-                  {t("destination.lastName")} *
-                </label>
-                <input
-                  type="text"
-                  class="w-full border border-[#5C3F32] rounded-md p-2"
-                  required
-                />
-              </div>
-            </div>
-
-         
-<!-- MAIN ADDRESS -->
-<div>
-  <label class="block font-semibold mb-1 text-[#5C3F32]">
-    {t("destination.address")} *
-  </label>
-  <input
-    id="deliveryAddress"
-    type="text"
-    class="w-full border border-[#5C3F32] rounded-md p-2"
-    placeholder="12 Rue du Marché"
-    required
-  />
+      <div id="stepOne" class="space-y-6">
+  <AuthForm lang={lang} t={t} />
 </div>
 
-<!-- ADDRESS COMPLEMENT -->
-<div>
-  <label class="block font-semibold mb-1 text-[#5C3F32]">
-    {t("destination.addressComplement")}
-  </label>
-  <input
-    id="deliveryAddress2"
-    type="text"
-    class="w-full border border-[#5C3F32] rounded-md p-2"
-    placeholder="Appartement B, Bâtiment 3, etc."
-  />
+       <!-- STEP TWO -->
+<div id="stepTwo" class="space-y-6 hidden">
+  <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
+    {t("destination.addresses")}
+  </h2>
+
+  <form id="deliveryForm" class="space-y-4">
+    <!-- EMAIL (visible uniquement pour les invités) -->
+    <div id="guestEmailField" class="hidden">
+      <label class="block font-semibold mb-1 text-[#5C3F32]">
+        {t("destination.email")} *
+      </label>
+      <input
+        id="deliveryEmail"
+        type="email"
+        class="w-full border border-[#5C3F32] rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#A47343]"
+        placeholder="votre.email@exemple.com"
+      />
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div>
+        <label class="block font-semibold mb-1 text-[#5C3F32]">
+          {t("destination.firstName")} *
+        </label>
+        <input
+          id="deliveryFirstName"
+          type="text"
+          class="w-full border border-[#5C3F32] rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#A47343]"
+          placeholder="Jean"
+          required
+        />
+      </div>
+      <div>
+        <label class="block font-semibold mb-1 text-[#5C3F32]">
+          {t("destination.lastName")} *
+        </label>
+        <input
+          id="deliveryLastName"
+          type="text"
+          class="w-full border border-[#5C3F32] rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#A47343]"
+          placeholder="Dupont"
+          required
+        />
+      </div>
+    </div>
+
+    <!-- MAIN ADDRESS -->
+    <div>
+      <label class="block font-semibold mb-1 text-[#5C3F32]">
+        {t("destination.address")} *
+      </label>
+      <input
+        id="deliveryAddress"
+        type="text"
+        class="w-full border border-[#5C3F32] rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#A47343]"
+        placeholder="12 Rue du Marché"
+        required
+      />
+    </div>
+
+    <!-- ADDRESS COMPLEMENT -->
+    <div>
+      <label class="block font-semibold mb-1 text-[#5C3F32]">
+        {t("destination.addressComplement")}
+      </label>
+      <input
+        id="deliveryAddress2"
+        type="text"
+        class="w-full border border-[#5C3F32] rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#A47343]"
+        placeholder="Appartement B, Bâtiment 3, etc."
+      />
+    </div>
+
+    <!-- PHONE -->
+    <div>
+      <label class="block font-semibold mb-1 text-[#5C3F32]">
+        {t("destination.phone")} *
+      </label>
+      <input
+        id="deliveryPhone"
+        type="tel"
+        class="w-full border border-[#5C3F32] rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#A47343]"
+        placeholder="+33 6 12 34 56 78"
+        required
+      />
+    </div>
+
+    <!-- POSTAL CODE & CITY -->
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div>
+        <label class="block font-semibold mb-1 text-[#5C3F32]">
+          {t("destination.postalCode")} *
+        </label>
+        <input
+          id="deliveryPostal"
+          type="text"
+          class="w-full border border-[#5C3F32] rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#A47343]"
+          placeholder="75001"
+          required
+        />
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-1 text-[#5C3F32]">
+          {t("destination.city")} *
+        </label>
+        <input
+          id="deliveryCity"
+          type="text"
+          class="w-full border border-[#5C3F32] rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#A47343]"
+          placeholder="Paris"
+          required
+        />
+      </div>
+    </div>
+
+    <!-- COUNTRY -->
+    <div>
+      <label class="block font-semibold mb-1 text-[#5C3F32]">
+        {t("destination.country")} *
+      </label>
+      <select
+        id="deliveryCountry"
+        class="w-full border border-[#5C3F32] rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#A47343]"
+        required
+      >
+        {countries.map((c) => <option value={c}>{c}</option>)}
+      </select>
+    </div>
+
+    <!-- NAVIGATION BUTTONS -->
+    <div class="flex justify-between gap-2">
+      <button
+        id="backToStep1"
+        type="button"
+        class="border border-[#5C3F32] text-[#5C3F32] px-6 py-2 rounded-md hover:bg-[#f9f4ee] transition"
+      >
+        ← {t("destination.previous")}
+      </button>
+      <button
+        id="toStep3"
+        type="button"
+        class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition"
+      >
+        {t("destination.continue")}
+      </button>
+    </div>
+  </form>
 </div>
 
+       <!-- STEP THREE -->
+<div id="stepThree" class="space-y-6 hidden">
+  <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
+    {t("destination.deliveryMode")}
+  </h2>
 
+  <form id="deliveryModeForm" class="space-y-6">
+    <!-- CHOIX DU TYPE DE LIVRAISON -->
+    <div class="space-y-4">
+      <h3 class="font-semibold text-[#5C3F32]">
+        {t("destination.deliveryType")}
+      </h3>
 
-<div>
-  <label class="block font-semibold mb-1 text-[#5C3F32]">
-    {t("destination.phone")} *
-  </label>
-  <input
-    id="deliveryPhone"
-    type="text"
-    class="w-full border border-[#5C3F32] rounded-md p-2"
-    placeholder="+33 6 12 34 56 78"
-    required
-  />
+      <!-- LIVRAISON À DOMICILE -->
+      <label class="flex items-start border-2 border-[#A47343] rounded-lg p-4 cursor-pointer hover:bg-[#f9f4ee] transition" id="homeDeliveryLabel">
+        <input 
+          type="radio" 
+          name="deliveryType" 
+          value="home" 
+          id="deliveryHome"
+          class="mt-1 mr-3"
+          checked 
+        />
+        <div class="flex-1">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-semibold text-[#5C3F32]">
+              🏠 {t("destination.deliveryHome")}
+            </span>
+          </div>
+          <p class="text-sm text-gray-600">
+            {t("destination.deliveryHomeDesc")}
+          </p>
+        </div>
+      </label>
+
+      <!-- LIVRAISON EN POINT RELAIS -->
+      <label class="flex items-start border-2 border-[#A47343] rounded-lg p-4 cursor-pointer hover:bg-[#f9f4ee] transition" id="relayDeliveryLabel">
+        <input 
+          type="radio" 
+          name="deliveryType" 
+          value="relay" 
+          id="deliveryRelay"
+          class="mt-1 mr-3"
+        />
+        <div class="flex-1">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-semibold text-[#5C3F32]">
+              📦 {t("destination.deliveryRelay")}
+            </span>
+          </div>
+          <p class="text-sm text-gray-600">
+            {t("destination.deliveryRelayDesc")}
+          </p>
+        </div>
+      </label>
+    </div>
+
+    <!-- OPTIONS DE VITESSE POUR LIVRAISON À DOMICILE -->
+    <div id="homeDeliveryOptions" class="space-y-4">
+      <h3 class="font-semibold text-[#5C3F32]">
+        {t("destination.deliverySpeed")}
+      </h3>
+
+      <label class="flex items-center justify-between border border-[#A47343] rounded-md p-4 cursor-pointer hover:bg-[#f9f4ee] transition">
+        <div class="flex items-center gap-3">
+          <input 
+            type="radio" 
+            name="deliverySpeed" 
+            value="standard" 
+            id="speedStandard"
+            checked 
+          />
+          <div>
+            <div class="font-medium">{t("destination.deliveryStandard")}</div>
+            <div class="text-sm text-gray-600">3-5 {t("destination.businessDays")}</div>
+          </div>
+        </div>
+        <span class="font-semibold text-[#5C3F32]">5 €</span>
+      </label>
+
+      <label class="flex items-center justify-between border border-[#A47343] rounded-md p-4 cursor-pointer hover:bg-[#f9f4ee] transition">
+        <div class="flex items-center gap-3">
+          <input 
+            type="radio" 
+            name="deliverySpeed" 
+            value="express" 
+            id="speedExpress"
+          />
+          <div>
+            <div class="font-medium">{t("destination.deliveryExpress")}</div>
+            <div class="text-sm text-gray-600">1-2 {t("destination.businessDays")}</div>
+          </div>
+        </div>
+        <span class="font-semibold text-[#5C3F32]">10 €</span>
+      </label>
+    </div>
+
+    <!-- OPTIONS POUR POINT RELAIS -->
+    <div id="relayDeliveryOptions" class="space-y-4 hidden">
+      <h3 class="font-semibold text-[#5C3F32]">
+        {t("destination.selectRelayPoint")}
+      </h3>
+
+      <div class="border-2 border-[#A47343] rounded-lg p-4 bg-[#f9f4ee]">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <input 
+              type="radio" 
+              name="deliverySpeed" 
+              value="relay" 
+              id="speedRelay"
+              checked
+            />
+            <div>
+              <div class="font-medium">{t("destination.deliveryRelay")}</div>
+              <div class="text-sm text-gray-600">3-5 {t("destination.businessDays")}</div>
+            </div>
+          </div>
+          <span class="font-semibold text-[#5C3F32]">3,50 €</span>
+        </div>
+
+        <!-- IMPORT DU COMPOSANT DE RECHERCHE DE POINTS RELAIS -->
+        <SendCloudPickupPoint />
+      </div>
+    </div>
+
+    <!-- NAVIGATION -->
+    <div class="flex justify-between gap-2 pt-4">
+      <button
+        id="backToStep2"
+        type="button"
+        class="border border-[#5C3F32] text-[#5C3F32] px-6 py-2 rounded-md hover:bg-[#f9f4ee] transition"
+      >
+        ← {t("destination.previous")}
+      </button>
+      <button
+        id="toStep4"
+        type="button"
+        class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition"
+      >
+        {t("destination.continue")} →
+      </button>
+    </div>
+  </form>
 </div>
 
-
-            <div>
-              <label class="block font-semibold mb-1 text-[#5C3F32]">
-                {t("destination.postalCode")} *
-              </label>
-              <input
-                id="deliveryPostal"
-                type="text"
-                class="w-full border border-[#5C3F32] rounded-md p-2"
-                required
-              />
-            </div>
-
-            <div>
-              <label class="block font-semibold mb-1 text-[#5C3F32]">
-                {t("destination.city")} *
-              </label>
-              <input
-                id="deliveryCity"
-                type="text"
-                class="w-full border border-[#5C3F32] rounded-md p-2"
-                required
-              />
-            </div>
-
-            <div>
-              <label class="block font-semibold mb-1 text-[#5C3F32]">
-                {t("destination.country")} *
-              </label>
-              <select
-                class="w-full border border-[#5C3F32] rounded-md p-2"
-                id="deliveryCountry"
-                required
-              >
-                {countries.map((c) => <option value={c}>{c}</option>)}
-              </select>
-            </div>
-
-            <div class="flex justify-between gap-2">
-              <button
-                id="backToStep1"
-                type="button"
-                class="border border-[#5C3F32] text-[#5C3F32] px-6 py-2 rounded-md hover:bg-[#f9f4ee] transition"
-              >
-                ← {t("destination.previous")}
-              </button>
-              <button
-                id="toStep3"
-                type="button"
-                class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition"
-              >
-                {t("destination.continue")}
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <!-- STEP THREE -->
-        <div id="stepThree" class="space-y-6 hidden">
-          <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
-            {t("destination.deliveryMode")}
-          </h2>
-
-          <form id="deliveryForm" class="space-y-4">
-            <label class="flex items-center justify-between border border-[#A47343] rounded-md p-4 cursor-pointer hover:bg-[#f9f4ee] transition">
-              <div class="flex items-center gap-3">
-                <input type="radio" name="delivery" value="standard" checked />
-                <span>{t("destination.deliveryStandard")}</span>
-              </div>
-              <span class="font-semibold">5 €</span>
-            </label>
-
-            <label class="flex items-center justify-between border border-[#A47343] rounded-md p-4 cursor-pointer hover:bg-[#f9f4ee] transition">
-              <div class="flex items-center gap-3">
-                <input type="radio" name="delivery" value="express" />
-                <span>{t("destination.deliveryExpress")}</span>
-              </div>
-              <span class="font-semibold">10 €</span>
-            </label>
-
-            <div class="flex justify-between gap-2">
-              <button
-                id="backToStep2"
-                type="button"
-                class="border border-[#5C3F32] text-[#5C3F32] px-6 py-2 rounded-md hover:bg-[#f9f4ee] transition"
-              >
-                ← {t("destination.previous")}
-              </button>
-              <button
-                id="toStep4"
-                type="button"
-                class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition"
-              >
-                {t("destination.continue")}
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <!-- STEP FOUR -->
+       <!-- STEP FOUR -->
         <div id="stepFour" class="space-y-6 hidden">
           <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
             {t("destination.payment")}
@@ -451,3 +529,182 @@ const t = useTranslations(lang);
 <!-- Scripts -->
 <script src="https://js.stripe.com/v3/"></script>
 <script src="/scripts/destination.js" defer></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const deliveryHome = document.getElementById('deliveryHome') as HTMLInputElement;
+    const deliveryRelay = document.getElementById('deliveryRelay') as HTMLInputElement;
+    const homeDeliveryOptions = document.getElementById('homeDeliveryOptions');
+    const relayDeliveryOptions = document.getElementById('relayDeliveryOptions');
+    const homeDeliveryLabel = document.getElementById('homeDeliveryLabel');
+    const relayDeliveryLabel = document.getElementById('relayDeliveryLabel');
+
+    /* ---------------------------------------------------------
+       MISE À JOUR DU RÉCAPITULATIF
+    --------------------------------------------------------- */
+    function updateSummary() {
+      const deliveryType = document.querySelector('input[name="deliveryType"]:checked') as HTMLInputElement;
+      const deliverySpeed = document.querySelector('input[name="deliverySpeed"]:checked') as HTMLInputElement;
+      
+      let deliveryPrice = 0;
+      
+      if (deliverySpeed?.value === "express") deliveryPrice = 10;
+      else if (deliverySpeed?.value === "relay") deliveryPrice = 3.5;
+      else if (deliverySpeed?.value === "standard") deliveryPrice = 5;
+
+      // Récupérer le sous-total du panier
+      const cartSubtotal = parseFloat(sessionStorage.getItem('cartTotal') || '0');
+      const total = cartSubtotal + deliveryPrice;
+
+      // Mettre à jour l'affichage
+      const summaryDelivery = document.getElementById('summaryDelivery');
+      const summaryTotal = document.getElementById('summaryTotal');
+      
+      if (summaryDelivery) summaryDelivery.textContent = `${deliveryPrice.toFixed(2)}€`;
+      if (summaryTotal) summaryTotal.textContent = `${total.toFixed(2)}€`;
+
+      console.log('📊 Summary mis à jour:', { deliveryPrice, cartSubtotal, total });
+    }
+
+    /* ---------------------------------------------------------
+       AFFICHAGE CONDITIONNEL DES OPTIONS
+    --------------------------------------------------------- */
+    function updateDeliveryOptions() {
+      if (deliveryHome?.checked) {
+        homeDeliveryOptions?.classList.remove('hidden');
+        relayDeliveryOptions?.classList.add('hidden');
+        homeDeliveryLabel?.classList.add('ring-2', 'ring-[#5C3F32]');
+        relayDeliveryLabel?.classList.remove('ring-2', 'ring-[#5C3F32]');
+      } else if (deliveryRelay?.checked) {
+        homeDeliveryOptions?.classList.add('hidden');
+        relayDeliveryOptions?.classList.remove('hidden');
+        homeDeliveryLabel?.classList.remove('ring-2', 'ring-[#5C3F32]');
+        relayDeliveryLabel?.classList.add('ring-2', 'ring-[#5C3F32]');
+      }
+      updateSummary(); // ✅ MISE À JOUR DU PRIX
+    }
+
+    deliveryHome?.addEventListener('change', updateDeliveryOptions);
+    deliveryRelay?.addEventListener('change', updateDeliveryOptions);
+
+    // ✅ Écouter les changements de vitesse de livraison
+    const speedRadios = document.querySelectorAll('input[name="deliverySpeed"]');
+    speedRadios.forEach(radio => {
+      radio.addEventListener('change', updateSummary);
+    });
+
+    // Initialiser l'affichage
+    updateDeliveryOptions();
+    updateSummary();
+
+    /* ---------------------------------------------------------
+       ÉCOUTE DE LA SÉLECTION DU POINT RELAIS
+    --------------------------------------------------------- */
+    window.addEventListener('relay-selected', ((e: CustomEvent) => {
+      console.log('✅ Point relais sélectionné:', e.detail);
+      window.selectedRelayPoint = e.detail;
+    }) as EventListener);
+
+    window.addEventListener('relay-deselected', () => {
+      console.log('❌ Point relais désélectionné');
+      window.selectedRelayPoint = null;
+    });
+
+    /* ---------------------------------------------------------
+       VALIDATION ET PASSAGE À L'ÉTAPE 4
+    --------------------------------------------------------- */
+    const btnToStep4 = document.getElementById('toStep4');
+    const stepThree = document.getElementById('stepThree');
+    const stepFour = document.getElementById('stepFour');
+
+    btnToStep4?.addEventListener('click', (event) => {
+      event.preventDefault(); // ✅ Empêcher tout comportement par défaut
+      event.stopPropagation(); // ✅ Empêcher la propagation
+
+      console.log('🔘 Clic sur toStep4');
+
+      const deliveryType = document.querySelector('input[name="deliveryType"]:checked') as HTMLInputElement;
+      const deliverySpeed = document.querySelector('input[name="deliverySpeed"]:checked') as HTMLInputElement;
+
+      console.log('📋 Type:', deliveryType?.value);
+      console.log('⚡ Vitesse:', deliverySpeed?.value);
+      console.log('📍 Point relais:', window.selectedRelayPoint);
+
+      // Validation 1
+      if (!deliveryType) {
+        console.log('❌ Pas de type');
+        alert("Veuillez sélectionner un type de livraison");
+        return false;
+      }
+
+      // Validation 2
+      if (!deliverySpeed) {
+        console.log('❌ Pas de vitesse');
+        alert("Veuillez sélectionner une option de livraison");
+        return false;
+      }
+
+      // Validation 3 - Point relais
+      if (deliveryType.value === "relay") {
+        console.log('🔍 Vérification point relais:', window.selectedRelayPoint);
+        
+        if (!window.selectedRelayPoint) {
+          console.log('❌ STOP - Pas de point relais');
+          alert("Veuillez sélectionner un point relais sur la carte");
+          return false; // ⚠️ ARRÊT ICI
+        }
+      }
+
+      console.log('✅ Toutes les validations OK');
+
+      // Calculer le prix
+      let price = 0;
+      if (deliverySpeed.value === "express") price = 10;
+      else if (deliverySpeed.value === "relay") price = 3.5;
+      else price = 5;
+
+      const deliveryData = {
+        type: deliveryType.value,
+        speed: deliverySpeed.value,
+        price: price,
+        relay: window.selectedRelayPoint || null
+      };
+
+      console.log("✅ Données de livraison validées:", deliveryData);
+
+      // Stocker les données
+      window.deliveryData = deliveryData;
+
+      // Passage à l'étape suivante
+      stepThree?.classList.add('hidden');
+      stepFour?.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    /* ---------------------------------------------------------
+       RETOUR À L'ÉTAPE 2
+    --------------------------------------------------------- */
+    const btnBackToStep2 = document.getElementById('backToStep2');
+    const stepTwo = document.getElementById('stepTwo');
+
+    btnBackToStep2?.addEventListener('click', () => {
+      stepThree?.classList.add('hidden');
+      stepTwo?.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  // Typage TypeScript pour les données globales
+  declare global {
+    interface Window {
+      selectedRelayPoint: any;
+      deliveryData: {
+        type: string;
+        speed: string;
+        price: number;
+        relay: any;
+      };
+      relayMap: any;
+      relayMarkers: any[];
+    }
+  }
+</script>

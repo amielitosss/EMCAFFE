@@ -49,78 +49,205 @@ document.addEventListener("DOMContentLoaded", () => {
     showEl.classList.remove("hidden");
     window.scrollTo({ top: 200, behavior: "smooth" });
   }
+/* ---------------------------------------------------------
+  VARIABLES GLOBALES
+--------------------------------------------------------- */
+let isGuestMode = false;
+let currentUser = null;
 
-  /* ---------------------------------------------------------
-    AUTO-SKIP STEP 1 FOR LOGGED-IN USER
-  --------------------------------------------------------- */
-  if (isLoggedIn()) {
-    console.log("User logged in → skipping Step 1");
+/* ---------------------------------------------------------
+  AUTO-SKIP STEP 1 FOR LOGGED-IN USER
+--------------------------------------------------------- */
+if (isLoggedIn()) {
+  console.log("✅ User logged in → skipping Step 1");
 
-    stepOne.classList.add("hidden");
-    stepTwo.classList.remove("hidden");
+  stepOne?.classList.add("hidden");
+  stepTwo?.classList.remove("hidden");
 
-    if (btnBackToStep1) btnBackToStep1.classList.add("hidden");
+  if (btnBackToStep1) btnBackToStep1.classList.add("hidden");
 
-    const user = JSON.parse(localStorage.getItem("user"));
+  // Masquer le champ email invité
+  const guestEmailField = document.getElementById("guestEmailField");
+  if (guestEmailField) {
+    guestEmailField.classList.add("hidden");
+  }
 
+  const user = userService.getCurrentUser();
+  currentUser = user;
+
+  if (user) {
+    // Pré-remplir TOUS les champs
+    const deliveryFirstName = document.getElementById("deliveryFirstName");
+    const deliveryLastName = document.getElementById("deliveryLastName");
+    const deliveryAddress = document.getElementById("deliveryAddress");
+    const deliveryAddress2 = document.getElementById("deliveryAddress2");
+    const deliveryPhone = document.getElementById("deliveryPhone");
+    const deliveryPostal = document.getElementById("deliveryPostal");
+    const deliveryCity = document.getElementById("deliveryCity");
+    const deliveryCountry = document.getElementById("deliveryCountry");
+
+    if (deliveryFirstName) deliveryFirstName.value = user.first_name || "";
+    if (deliveryLastName) deliveryLastName.value = user.last_name || "";
+    if (deliveryAddress) deliveryAddress.value = user.address_line1 || "";
+    if (deliveryAddress2) deliveryAddress2.value = user.address_line2 || "";
+    if (deliveryPhone) deliveryPhone.value = user.phone || "";
+    if (deliveryPostal) deliveryPostal.value = user.postal_code || "";
+    if (deliveryCity) deliveryCity.value = user.city || "";
+    if (deliveryCountry) deliveryCountry.value = user.country || "France";
+  }
+}
+
+/* ---------------------------------------------------------
+   ÉCOUTER L'ÉVÉNEMENT DE CONNEXION DEPUIS AuthForm
+--------------------------------------------------------- */
+window.addEventListener('proceed-to-step2', (e) => {
+  const { user, isGuest } = e.detail;
+
+  console.log('📨 Event proceed-to-step2 reçu');
+  
+  // Sauvegarder l'état
+  isGuestMode = isGuest;
+  currentUser = user;
+
+  const guestEmailField = document.getElementById("guestEmailField");
+  const deliveryEmail = document.getElementById("deliveryEmail");
+
+  if (isGuest) {
+    // MODE INVITÉ
+    console.log('🎭 Mode invité - Affichage du champ email');
+    
+    if (guestEmailField) {
+      guestEmailField.classList.remove("hidden");
+    }
+    if (deliveryEmail) {
+      deliveryEmail.setAttribute("required", "required");
+    }
+    
+  } else {
+    // MODE CONNECTÉ
+    console.log('✅ Utilisateur connecté:', user);
+
+    if (guestEmailField) {
+      guestEmailField.classList.add("hidden");
+    }
+    if (deliveryEmail) {
+      deliveryEmail.removeAttribute("required");
+    }
+
+    // Pré-remplir TOUS les champs
     if (user) {
-      deliveryAddress.value = user.address_line1 || "";
-      deliveryAddress2.value = user.address_line2 || "";
-      deliveryPostal.value = user.postal_code || "";
-      deliveryCity.value = user.city || "";
-      deliveryCountry.value = user.country || "France";
-      deliveryPhone.value = user.phone || "";
+      const deliveryFirstName = document.getElementById("deliveryFirstName");
+      const deliveryLastName = document.getElementById("deliveryLastName");
+      const deliveryAddress = document.getElementById("deliveryAddress");
+      const deliveryAddress2 = document.getElementById("deliveryAddress2");
+      const deliveryPhone = document.getElementById("deliveryPhone");
+      const deliveryPostal = document.getElementById("deliveryPostal");
+      const deliveryCity = document.getElementById("deliveryCity");
+      const deliveryCountry = document.getElementById("deliveryCountry");
+
+      if (deliveryFirstName) deliveryFirstName.value = user.first_name || "";
+      if (deliveryLastName) deliveryLastName.value = user.last_name || "";
+      if (deliveryAddress) deliveryAddress.value = user.address_line1 || "";
+      if (deliveryAddress2) deliveryAddress2.value = user.address_line2 || "";
+      if (deliveryPhone) deliveryPhone.value = user.phone || "";
+      if (deliveryPostal) deliveryPostal.value = user.postal_code || "";
+      if (deliveryCity) deliveryCity.value = user.city || "";
+      if (deliveryCountry) deliveryCountry.value = user.country || "France";
     }
   }
 
-  /* ---------------------------------------------------------
-     STEP 1 → STEP 2
-  --------------------------------------------------------- */
-  btnToStep2?.addEventListener("click", () => {
-    if (isLoggedIn()) {
-      showStep(stepOne, stepTwo);
-      return;
+  // Masquer le bouton retour pour les utilisateurs connectés
+  if (!isGuest && btnBackToStep1) {
+    btnBackToStep1.classList.add("hidden");
+  }
+
+  // Passer à l'étape 2
+  showStep(stepOne, stepTwo);
+});
+
+/* ---------------------------------------------------------
+   STEP 2 → STEP 3 (Validation complète)
+--------------------------------------------------------- */
+btnToStep3?.addEventListener("click", () => {
+  const guestEmailField = document.getElementById("guestEmailField");
+  const deliveryEmail = document.getElementById("deliveryEmail");
+  const deliveryFirstName = document.getElementById("deliveryFirstName");
+  const deliveryLastName = document.getElementById("deliveryLastName");
+  const deliveryAddress = document.getElementById("deliveryAddress");
+  const deliveryPostal = document.getElementById("deliveryPostal");
+  const deliveryCity = document.getElementById("deliveryCity");
+  const deliveryPhone = document.getElementById("deliveryPhone");
+  const deliveryCountry = document.getElementById("deliveryCountry");
+
+  // Validation email pour les invités
+  if (isGuestMode && !guestEmailField?.classList.contains("hidden")) {
+    const email = deliveryEmail?.value.trim();
+    if (!email) {
+      return alert("Veuillez renseigner votre email");
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return alert("Veuillez renseigner un email valide");
+    }
+    console.log("📧 Email invité:", email);
+  }
 
-    const email = emailInput.value.trim();
-    const pass = passwordInput.value.trim();
+  // Validation des champs obligatoires
+  if (!deliveryFirstName?.value.trim()) {
+    return alert("Veuillez renseigner votre prénom");
+  }
+  if (!deliveryLastName?.value.trim()) {
+    return alert("Veuillez renseigner votre nom");
+  }
+  if (!deliveryAddress?.value.trim()) {
+    return alert("Veuillez renseigner votre adresse");
+  }
+  if (!deliveryPostal?.value.trim()) {
+    return alert("Veuillez renseigner votre code postal");
+  }
+  if (!deliveryCity?.value.trim()) {
+    return alert("Veuillez renseigner votre ville");
+  }
+  if (!deliveryPhone?.value.trim()) {
+    return alert("Veuillez renseigner votre téléphone");
+  }
+  if (!deliveryCountry?.value.trim()) {
+    return alert("Veuillez sélectionner un pays");
+  }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      return alert("Email invalide");
-
-    if (pass.length < 6)
-      return alert("Mot de passe : 6 caractères minimum");
-
-    showStep(stepOne, stepTwo);
+  console.log("✅ Validation Step 2 réussie");
+  console.log("📦 Données:", {
+    email: isGuestMode ? deliveryEmail?.value : currentUser?.email,
+    firstName: deliveryFirstName?.value,
+    lastName: deliveryLastName?.value,
+    address: deliveryAddress?.value,
+    postal: deliveryPostal?.value,
+    city: deliveryCity?.value,
+    phone: deliveryPhone?.value,
+    country: deliveryCountry?.value,
+    isGuest: isGuestMode
   });
 
-  /* ---------------------------------------------------------
-     STEP 2 → STEP 3
-  --------------------------------------------------------- */
-  btnToStep3?.addEventListener("click", () => {
-    const required = stepTwo.querySelectorAll("input[required], select[required]");
+  showStep(stepTwo, stepThree);
+});
 
-    for (const field of required) {
-      if (!field.value.trim()) return alert("Veuillez remplir tous les champs");
-    }
-
-    showStep(stepTwo, stepThree);
-  });
-
-  btnBackToStep1?.addEventListener("click", () => {
-    if (isLoggedIn()) return;
+/* ---------------------------------------------------------
+   NAVIGATION RETOUR
+--------------------------------------------------------- */
+btnBackToStep1?.addEventListener("click", () => {
+  // Empêcher le retour si connecté
+  if (isLoggedIn()) {
+    console.log("⚠️ Impossible de revenir en arrière (déjà connecté)");
+    return;
+  }
+  
+  // Permettre le retour uniquement pour les invités
+  if (isGuestMode) {
     showStep(stepTwo, stepOne);
-  });
+  }
+});
 
-  /* ---------------------------------------------------------
-     STEP 3 → STEP 4
-  --------------------------------------------------------- */
-  btnToStep4?.addEventListener("click", () => {
-    showStep(stepThree, stepFour);
-    renderSummaryCard();
-  });
 
-  btnBackToStep2?.addEventListener("click", () => showStep(stepThree, stepTwo));
+ 
 
   /* ---------------------------------------------------------
      STEP 4 ← BACK TO STEP 3
@@ -128,43 +255,84 @@ document.addEventListener("DOMContentLoaded", () => {
   btnBackToStep3?.addEventListener("click", () => {
     showStep(stepFour, stepThree);
   });
+/* ---------------------------------------------------------
+   DELIVERY COST - VERSION COMPLÈTE
+--------------------------------------------------------- */
 
-  /* ---------------------------------------------------------
-     DELIVERY COST
-  --------------------------------------------------------- */
-  deliveryForm?.addEventListener("change", (e) => {
-    deliveryCost = e.target.value === "express" ? 10 : 5;
-    localStorage.setItem("deliveryCost", deliveryCost);
+deliveryForm?.addEventListener("change", (e) => {
+const target = e.target;
+  
+  if (target.name === 'deliverySpeed') {
+    // Calculer le coût selon l'option choisie
+    if (target.value === "express") {
+      deliveryCost = 10;
+    } else if (target.value === "relay") {
+      deliveryCost = 3.5;
+    } else if (target.value === "standard") {
+      deliveryCost = 5;
+    }
+    
+    localStorage.setItem("deliveryCost", deliveryCost.toString());
+    console.log('💰 Coût de livraison mis à jour:', deliveryCost);
     renderSummaryCard();
-  });
+  }
+});
 
-  function renderSummaryCard() {
-    const itemsEl = document.getElementById("summaryItems");
-    const delEl = document.getElementById("summaryDelivery");
-    const totEl = document.getElementById("summaryTotal");
+/* ---------------------------------------------------------
+   RENDER SUMMARY CARD - VERSION AMÉLIORÉE
+--------------------------------------------------------- */
+function renderSummaryCard() {
+  const itemsEl = document.getElementById("summaryItems");
+  const delEl = document.getElementById("summaryDelivery");
+  const totEl = document.getElementById("summaryTotal");
 
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    itemsEl.innerHTML = "";
-    let total = 0;
-
-    cart.forEach((item) => {
-      const subtotal = item.price * item.quantity;
-      total += subtotal;
-
-      itemsEl.innerHTML += `
-        <div class="flex justify-between border-b pb-1">
-          <span>${item.name} x${item.quantity}</span>
-          <span>${subtotal.toFixed(2)}€</span>
-        </div>
-      `;
-    });
-
-    delEl.textContent = deliveryCost.toFixed(2) + "€";
-    totEl.textContent = (total + deliveryCost).toFixed(2) + "€";
+  if (!itemsEl || !delEl || !totEl) {
+    console.warn('⚠️ Éléments du summary non trouvés');
+    return;
   }
 
-  renderSummaryCard();
+  const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+  itemsEl.innerHTML = "";
+  let subtotal = 0;
+
+  // Afficher chaque article
+  cart.forEach((item) => {
+    const itemTotal = item.price * item.quantity;
+    subtotal += itemTotal;
+
+    itemsEl.innerHTML += `
+      <div class="flex justify-between border-b border-[#5C3F32]/20 pb-2 mb-2">
+        <span class="text-sm">${item.name} <span class="text-[#A47343]">x${item.quantity}</span></span>
+        <span class="text-sm font-medium">${itemTotal.toFixed(2)}€</span>
+      </div>
+    `;
+  });
+
+  // Si le panier est vide
+  if (cart.length === 0) {
+    itemsEl.innerHTML = `
+      <p class="text-center text-[#A47343] text-sm italic">Votre panier est vide</p>
+    `;
+  }
+
+  // Calculer le total final
+  const total = subtotal + deliveryCost;
+
+  // Mettre à jour l'affichage
+  delEl.textContent = deliveryCost.toFixed(2) + "€";
+  totEl.textContent = total.toFixed(2) + "€";
+
+  // Sauvegarder pour d'autres parties de l'application
+  sessionStorage.setItem('cartSubtotal', subtotal.toFixed(2));
+  sessionStorage.setItem('deliveryCost', deliveryCost.toFixed(2));
+  sessionStorage.setItem('cartTotal', total.toFixed(2));
+
+  console.log('📊 Summary Card:', { subtotal, deliveryCost, total });
+}
+
+// Initialiser le rendu
+renderSummaryCard();
 
   /* ---------------------------------------------------------
      PAYMENT UI

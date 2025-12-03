@@ -1,0 +1,349 @@
+---
+// Pas d'import nécessaire ici
+---
+
+<div id="relaySearchComponent" class="space-y-4 bg-white p-4 rounded-lg border border-[#A47343]">
+  <h4 class="font-semibold text-[#5C3F32]">
+    📍 Trouvez votre point relais
+  </h4>
+
+  <!-- Champs de recherche -->
+  <div class="flex gap-2">
+    <input 
+      id="postcodeInput" 
+      type="text" 
+      placeholder="Code postal" 
+      class="border border-[#A47343] p-2 flex-1 rounded focus:outline-none focus:ring-2 focus:ring-[#A47343]" 
+    />
+    <input 
+      id="cityInput" 
+      type="text" 
+      placeholder="Ville (optionnel)" 
+      class="border border-[#A47343] p-2 flex-1 rounded focus:outline-none focus:ring-2 focus:ring-[#A47343]" 
+    />
+    <button 
+      id="searchBtn" 
+      type="button"
+      class="bg-[#5C3F32] text-white px-4 py-2 rounded hover:bg-[#A47343] transition"
+    >
+      Rechercher
+    </button>
+  </div>
+
+  <p id="status" class="text-sm"></p>
+
+  <!-- Carte -->
+  <div id="map" class="w-full h-96 rounded border border-[#A47343] mt-4"></div>
+
+  <!-- Liste des points relais -->
+  <ul id="pointsList" class="space-y-2 mt-4 max-h-64 overflow-y-auto"></ul>
+
+  <!-- Point relais sélectionné -->
+  <div id="selectedRelayInfo" class="hidden mt-4 p-4 bg-green-50 rounded border-2 border-green-300">
+    <div class="flex items-start justify-between">
+      <div class="flex-1">
+        <div class="font-semibold text-green-800">✅ Point relais sélectionné</div>
+        <div class="text-sm mt-2">
+          <div id="selectedRelayName" class="font-medium"></div>
+          <div id="selectedRelayAddress" class="text-gray-600 mt-1"></div>
+          <div id="selectedRelayCarrier" class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded inline-block mt-1"></div>
+        </div>
+      </div>
+      <button 
+        type="button"
+        id="changeRelay"
+        class="text-sm text-[#5C3F32] hover:underline font-medium"
+      >
+        Modifier
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" is:inline></script>
+
+<script is:inline>
+  window.addEventListener('DOMContentLoaded', () => {
+    let selectedRelayPoint = null;
+
+    function initRelayMap() {
+      if (typeof L === 'undefined') {
+        console.error('Leaflet n\'est pas chargé !');
+        const statusEl = document.getElementById('status');
+        if (statusEl) {
+          statusEl.textContent = 'Erreur: Leaflet n\'est pas chargé';
+          statusEl.className = 'text-sm text-red-500';
+        }
+        return null;
+      }
+
+      const mapElement = document.getElementById('map');
+      if (!mapElement) {
+        console.error('Élément #map non trouvé');
+        return null;
+      }
+
+      // Détruire la carte existante si elle existe
+      if (window.relayMap) {
+        window.relayMap.remove();
+        window.relayMap = null;
+      }
+
+      try {
+        const map = L.map('map').setView([46.603354, 1.888334], 6);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors',
+          maxZoom: 19
+        }).addTo(map);
+
+        window.relayMap = map;
+        window.relayMarkers = [];
+
+        console.log('✅ Carte Leaflet initialisée');
+        return map;
+      } catch (error) {
+        console.error('Erreur lors de l\'initialisation de la carte:', error);
+        return null;
+      }
+    }
+
+    const map = initRelayMap();
+    if (!map) return;
+
+    const searchBtn = document.getElementById('searchBtn');
+    const postcodeInput = document.getElementById('postcodeInput');
+    const cityInput = document.getElementById('cityInput');
+    const statusEl = document.getElementById('status');
+    const pointsList = document.getElementById('pointsList');
+    const selectedRelayInfo = document.getElementById('selectedRelayInfo');
+    const selectedRelayName = document.getElementById('selectedRelayName');
+    const selectedRelayAddress = document.getElementById('selectedRelayAddress');
+    const selectedRelayCarrier = document.getElementById('selectedRelayCarrier');
+    const changeRelayBtn = document.getElementById('changeRelay');
+
+    // Fonction de recherche
+   async function searchRelayPoints(e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  const postcode = postcodeInput?.value.trim();
+  const city = cityInput?.value.trim();
+
+  if (!postcode) {
+    statusEl.textContent = 'Veuillez entrer un code postal';
+    statusEl.className = 'text-sm text-orange-500';
+    return;
+  }
+
+  statusEl.textContent = 'Recherche en cours...';
+  statusEl.className = 'text-sm text-blue-500';
+
+  const params = new URLSearchParams({ postal_code: postcode, country: 'FR' });
+  if (city) params.append('city', city);
+
+  const url = `https://api-emcafe-3.onrender.com/api/sendcloud/service-points?${params.toString()}`;
+
+  try {
+    console.log('🔍 URL:', url);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+      }
+    });
+
+    console.log('📡 Statut:', response.status);
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('📦 Données brutes:', data);
+
+    // CORRECTION : les données sont directement un tableau
+    let points = [];
+    
+    if (Array.isArray(data)) {
+      points = data; // C'est directement le tableau
+    } else if (data.service_points && Array.isArray(data.service_points)) {
+      points = data.service_points;
+    }
+
+    console.log('✅ Points relais trouvés:', points.length);
+
+    if (points.length === 0) {
+      statusEl.textContent = 'Aucun point relais trouvé pour ce code postal';
+      statusEl.className = 'text-sm text-orange-500';
+      pointsList.innerHTML = '<li class="border p-2 rounded text-gray-500">Aucun point relais disponible.</li>';
+      return;
+    }
+
+    statusEl.textContent = `${points.length} point(s) relais trouvé(s)`;
+    statusEl.className = 'text-sm text-green-600';
+
+    // Réinitialiser la carte
+    if (relayMap) {
+      relayMap.remove();
+    }
+    relayMarkers = [];
+
+    // Créer la carte centrée sur le premier point
+    const firstPoint = points[0];
+    const lat = parseFloat(firstPoint.raw?.latitude || firstPoint.latitude || 48.8566);
+    const lng = parseFloat(firstPoint.raw?.longitude || firstPoint.longitude || 2.3522);
+
+    relayMap = L.map('map').setView([lat, lng], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(relayMap);
+
+    // Icône personnalisée
+    const customIcon = L.divIcon({
+      className: 'custom-marker',
+      html: '<div style="font-size:24px;">📍</div>',
+      iconSize: [30, 30],
+      iconAnchor: [15, 30]
+    });
+
+    // Ajouter les marqueurs
+    pointsList.innerHTML = '';
+
+    points.forEach((point, index) => {
+      const pointLat = parseFloat(point.raw?.latitude || point.latitude);
+      const pointLng = parseFloat(point.raw?.longitude || point.longitude);
+
+      if (pointLat && pointLng) {
+        const marker = L.marker([pointLat, pointLng], { icon: customIcon })
+          .addTo(relayMap)
+          .bindPopup(`
+            <strong>${point.name || 'Sans nom'}</strong><br>
+            ${point.raw?.street || point.address || ''} ${point.raw?.house_number || ''}<br>
+            ${point.postal_code || ''} ${point.city || ''}<br>
+            <span style="background:#3b82f6;color:white;padding:2px 6px;border-radius:4px;font-size:11px;">
+              ${point.carrier || ''}
+            </span>
+          `);
+
+        relayMarkers.push(marker);
+
+        // Liste des points
+        const li = document.createElement('li');
+        li.className = 'border border-[#A47343] p-3 rounded hover:bg-[#f9f4ee] cursor-pointer transition';
+        li.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <div class="font-semibold text-[#5C3F32]">${point.name || 'Sans nom'}</div>
+              <div class="text-sm text-gray-600 mt-1">
+                ${point.raw?.street || point.address || ''} ${point.raw?.house_number || ''}
+              </div>
+              <div class="text-sm text-gray-600">
+                ${point.postal_code || ''} ${point.city || ''}
+              </div>
+              ${point.raw?.phone ? `<div class="text-xs text-gray-500 mt-1">📞 ${point.raw.phone}</div>` : ''}
+              <div class="mt-2">
+                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">${point.carrier || ''}</span>
+              </div>
+            </div>
+            <button 
+              type="button"
+              class="select-relay-btn bg-[#5C3F32] text-white px-3 py-1 rounded text-sm hover:bg-[#A47343] transition ml-2"
+              data-index="${index}"
+            >
+              Sélectionner
+            </button>
+          </div>
+        `;
+
+        // Clic sur la ligne entière pour centrer la carte
+        li.addEventListener('click', (e) => {
+          if (!e.target.classList.contains('select-relay-btn')) {
+            relayMap.setView([pointLat, pointLng], 15);
+            marker.openPopup();
+          }
+        });
+
+        // Bouton de sélection
+        const selectBtn = li.querySelector('.select-relay-btn');
+        selectBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          selectRelayPoint(point);
+        });
+
+        pointsList.appendChild(li);
+      }
+    });
+
+  } catch (err) {
+    console.error('❌ Erreur:', err);
+    statusEl.textContent = `Erreur: ${err.message}`;
+    statusEl.className = 'text-sm text-red-500';
+    pointsList.innerHTML = '<li class="border p-2 rounded text-red-500">Erreur lors de la récupération des points relais.</li>';
+  }
+}
+
+
+    // ÉVÉNEMENT SUR LE BOUTON (avec preventDefault)
+    searchBtn?.addEventListener('click', searchRelayPoints);
+
+    // Permettre la recherche avec la touche Entrée
+    postcodeInput?.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        searchRelayPoints(e);
+      }
+    });
+
+    cityInput?.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        searchRelayPoints(e);
+      }
+    });
+
+    // Fonction de sélection
+    function selectRelayPoint(relay) {
+      selectedRelayPoint = relay;
+
+      if (selectedRelayName) selectedRelayName.textContent = relay.name || 'Sans nom';
+      if (selectedRelayAddress) {
+        const address = `${relay.street || ''} ${relay.house_number || ''}`.trim() || relay.address || '';
+        selectedRelayAddress.textContent = `${address}, ${relay.postal_code || ''} ${relay.city || ''}`;
+      }
+      if (selectedRelayCarrier) selectedRelayCarrier.textContent = relay.carrier || '';
+
+      selectedRelayInfo?.classList.remove('hidden');
+
+      // Dispatch event
+      window.dispatchEvent(new CustomEvent('relay-selected', { detail: relay }));
+
+      console.log('✅ Point relais sélectionné:', relay);
+    }
+
+    changeRelayBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      selectedRelayPoint = null;
+      selectedRelayInfo?.classList.add('hidden');
+      window.dispatchEvent(new CustomEvent('relay-deselected'));
+    });
+  });
+</script>
+
+<style>
+  #map {
+    z-index: 0;
+  }
+
+  .custom-marker {
+    background: transparent;
+    border: none;
+  }
+</style>

@@ -444,6 +444,47 @@
     
   "popup": {
     "title": "Título del popup"
+  },
+
+  
+  "destination": {
+    "personalInfo": "Personal Information",
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "confirmPassword": "Confirm Password",
+    "passwordRequirements": "Password must be at least 8 characters",
+    "acceptTerms": "I accept the",
+    "termsAndConditions": "Terms and Conditions",
+    "or": "or",
+    "continueAsGuest": "Continue as Guest",
+    "addresses": "Dirección de entrega",
+    "address": "Dirección",
+    "addressComplement": "Complemento de dirección (Apartamento, Edificio, etc.)",
+    "phone": "Teléfono",
+    "postalCode": "Código postal",
+    "city": "Ciudad",
+    "country": "País",
+    "previous": "Anterior",
+    "continue": "Continuar",
+     "deliveryMode": "Método de Entrega",
+    "deliveryType": "Tipo de Entrega",
+    "deliveryHome": "Entrega a Domicilio",
+    "deliveryHomeDesc": "Su pedido será entregado en su dirección.",
+    "deliveryRelay": "Punto de Recogida",
+    "deliveryRelayDesc": "Recoja su pedido en un punto de recogida cercano.",
+    "deliverySpeed": "Velocidad de Entrega",
+    "deliveryStandard": "Entrega Estándar",
+    "deliveryExpress": "Entrega Exprés",
+    "businessDays": "días laborables",
+    "selectRelayPoint": "Seleccione un Punto de Recogida"
+
   }
+
+
 
 }

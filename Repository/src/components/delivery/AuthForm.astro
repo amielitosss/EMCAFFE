@@ -1,0 +1,356 @@
+---
+// src/components/AuthForm.astro
+interface Props {
+  lang: string;
+  t: (key: string) => string;
+}
+
+const { lang, t } = Astro.props;
+---
+
+<div id="authFormContainer" class="space-y-6">
+  <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
+    {t("destination.personalInfo")}
+  </h2>
+
+  <!-- Onglets Connexion / Inscription -->
+  <div class="flex border-b border-gray-200">
+    <button
+      id="tabLogin"
+      class="flex-1 py-3 text-center font-semibold border-b-2 border-[#5C3F32] text-[#5C3F32] transition"
+    >
+      {t("destination.login")}
+    </button>
+    <button
+      id="tabRegister"
+      class="flex-1 py-3 text-center font-semibold border-b-2 border-transparent text-gray-500 hover:text-[#5C3F32] transition"
+    >
+      {t("destination.register")}
+    </button>
+  </div>
+
+  <!-- Formulaire de Connexion -->
+  <form id="loginForm" class="space-y-4">
+    <div>
+      <label class="block font-semibold mb-1 text-[#5C3F32]">
+        {t("destination.email")} *
+      </label>
+      <input
+        id="loginEmail"
+        type="email"
+        class="w-full border border-[#5C3F32] p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#A47343]"
+        placeholder="abcd@gmail.com"
+        required
+      />
+    </div>
+
+    <div>
+      <label class="block font-semibold mb-1 text-[#5C3F32]">
+        {t("destination.password")} *
+      </label>
+      <input
+        id="loginPassword"
+        type="password"
+        class="w-full border border-[#5C3F32] p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#A47343]"
+        placeholder="••••••••"
+        required
+      />
+    </div>
+
+    <div>
+      <a
+        href={`/${lang}/forgot-password`}
+        class="text-sm text-[#A47343] hover:underline flex justify-center"
+      >
+        {t("destination.forgotPassword")}
+      </a>
+    </div>
+
+    <div id="loginError" class="text-red-500 text-sm text-center hidden"></div>
+
+    <div class="flex justify-center">
+      <button
+        id="loginBtn"
+        type="submit"
+        class="bg-[#5C3F32] text-white px-6 py-2 rounded-md hover:bg-[#A47343] transition w-full disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {t("destination.login")}
+      </button>
+    </div>
+  </form>
+
+  <!-- Formulaire d'Inscription -->
+  <form id="registerForm" class="space-y-4 hidden">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block font-semibold mb-1 text-[#5C3F32]">
+          {t("destination.firstName")} *
+        </label>
+        <input
+          id="registerFirstName"
+          type="text"
+          class="w-full border border-[#5C3F32] p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#A47343]"
+          placeholder={t("destination.firstName")}
+          required
+        />
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-1 text-[#5C3F32]">
+          {t("destination.lastName")} *
+        </label>
+        <input
+          id="registerLastName"
+          type="text"
+          class="w-full border border-[#5C3F32] p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#A47343]"
+          placeholder={t("destination.lastName")}
+          required
+        />
+      </div>
+    </div>
+
+    <div>
+      <label class="block font-semibold mb-1 text-[#5C3F32]">
+        {t("destination.email")} *
+      </label>
+      <input
+        id="registerEmail"
+        type="email"
+        class="w-full border border-[#5C3F32] p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#A47343]"
+        placeholder="abcd@gmail.com"
+        required
+      />
+    </div>
+
+    <div>
+      <label class="block font-semibold mb-1 text-[#5C3F32]">
+        {t("destination.password")} *
+      </label>
+      <input
+        id="registerPassword"
+        type="password"
+        class="w-full border border-[#5C3F32] p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#A47343]"
+        placeholder="••••••••"
+        minlength="8"
+        required
+      />
+      <p class="text-xs text-gray-500 mt-1">
+        {t("destination.passwordRequirements")}
+      </p>
+    </div>
+
+    <div>
+      <label class="block font-semibold mb-1 text-[#5C3F32]">
+        {t("destination.confirmPassword")} *
+      </label>
+      <input
+        id="registerConfirmPassword"
+        type="password"
+        class="w-full border border-[#5C3F32] p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#A47343]"
+        placeholder="••••••••"
+        required
+      />
+    </div>
+
+    <div class="flex items-start">
+      <input
+        id="registerTerms"
+        type="checkbox"
+        class="mt-1 mr-2"
+        required
+      />
+      <label for="registerTerms" class="text-sm text-gray-700">
+        {t("destination.acceptTerms")} 
+        <a href={`/${lang}/terms`} class="text-[#A47343] hover:underline" target="_blank">
+          {t("destination.termsAndConditions")}
+        </a>
+      </label>
+    </div>
+
+    <div id="registerError" class="text-red-500 text-sm text-center hidden"></div>
+
+    <div class="flex justify-center">
+      <button
+        id="registerBtn"
+        type="submit"
+        class="bg-[#5C3F32] text-white px-6 py-2 rounded-md hover:bg-[#A47343] transition w-full disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {t("destination.register")}
+      </button>
+    </div>
+  </form>
+
+  <!-- Divider -->
+  <div class="relative flex items-center my-6">
+    <div class="flex-grow border-t border-gray-300"></div>
+    <span class="flex-shrink mx-4 text-gray-500 text-sm">
+      {t("destination.or")}
+    </span>
+    <div class="flex-grow border-t border-gray-300"></div>
+  </div>
+
+  <!-- Bouton Commander en tant qu'invité -->
+  <div class="flex justify-center">
+    <button
+      id="guestCheckoutBtn"
+      type="button"
+      class="bg-white text-[#5C3F32] border-2 border-[#5C3F32] px-6 py-2 rounded-md hover:bg-[#5C3F32] hover:text-white transition w-full"
+    >
+      {t("destination.continueAsGuest")}
+    </button>
+  </div>
+</div>
+
+<script>
+  import { userService } from '../../lib/api/userService';
+
+  // Gestion des onglets
+  const tabLogin = document.getElementById('tabLogin');
+  const tabRegister = document.getElementById('tabRegister');
+  const loginForm = document.getElementById('loginForm') as HTMLFormElement;
+  const registerForm = document.getElementById('registerForm') as HTMLFormElement;
+
+  function switchToLogin() {
+    tabLogin?.classList.add('border-[#5C3F32]', 'text-[#5C3F32]');
+    tabLogin?.classList.remove('border-transparent', 'text-gray-500');
+    tabRegister?.classList.remove('border-[#5C3F32]', 'text-[#5C3F32]');
+    tabRegister?.classList.add('border-transparent', 'text-gray-500');
+    
+    loginForm?.classList.remove('hidden');
+    registerForm?.classList.add('hidden');
+  }
+
+  function switchToRegister() {
+    tabRegister?.classList.add('border-[#5C3F32]', 'text-[#5C3F32]');
+    tabRegister?.classList.remove('border-transparent', 'text-gray-500');
+    tabLogin?.classList.remove('border-[#5C3F32]', 'text-[#5C3F32]');
+    tabLogin?.classList.add('border-transparent', 'text-gray-500');
+    
+    registerForm?.classList.remove('hidden');
+    loginForm?.classList.add('hidden');
+  }
+
+  tabLogin?.addEventListener('click', switchToLogin);
+  tabRegister?.addEventListener('click', switchToRegister);
+
+  // ==================== CONNEXION ====================
+  loginForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const email = (document.getElementById('loginEmail') as HTMLInputElement).value.trim();
+    const password = (document.getElementById('loginPassword') as HTMLInputElement).value;
+    const errorEl = document.getElementById('loginError');
+    const btn = document.getElementById('loginBtn') as HTMLButtonElement;
+
+    if (errorEl) errorEl.classList.add('hidden');
+    btn.disabled = true;
+    const originalText = btn.textContent || 'Connexion';
+    btn.textContent = 'Connexion...';
+
+    try {
+      const result = await userService.login({ email, password });
+      
+      console.log('✅ Connexion réussie:', result.user);
+      
+      // Émettre un événement pour passer à l'étape 2
+      window.dispatchEvent(new CustomEvent('proceed-to-step2', { 
+        detail: { 
+          user: result.user, 
+          isGuest: false,
+          token: result.token 
+        } 
+      }));
+      
+    } catch (error: any) {
+      console.error('❌ Erreur connexion:', error);
+      
+      if (errorEl) {
+        errorEl.textContent = error.message || 'Erreur lors de la connexion';
+        errorEl.classList.remove('hidden');
+      }
+      
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+  });
+
+  // ==================== INSCRIPTION ====================
+  registerForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const firstName = (document.getElementById('registerFirstName') as HTMLInputElement).value.trim();
+    const lastName = (document.getElementById('registerLastName') as HTMLInputElement).value.trim();
+    const email = (document.getElementById('registerEmail') as HTMLInputElement).value.trim();
+    const password = (document.getElementById('registerPassword') as HTMLInputElement).value;
+    const confirmPassword = (document.getElementById('registerConfirmPassword') as HTMLInputElement).value;
+    const errorEl = document.getElementById('registerError');
+    const btn = document.getElementById('registerBtn') as HTMLButtonElement;
+
+    if (errorEl) errorEl.classList.add('hidden');
+
+    // Validation mot de passe
+    if (password !== confirmPassword) {
+      if (errorEl) {
+        errorEl.textContent = 'Les mots de passe ne correspondent pas';
+        errorEl.classList.remove('hidden');
+      }
+      return;
+    }
+
+    if (password.length < 8) {
+      if (errorEl) {
+        errorEl.textContent = 'Le mot de passe doit contenir au moins 8 caractères';
+        errorEl.classList.remove('hidden');
+      }
+      return;
+    }
+
+    btn.disabled = true;
+    const originalText = btn.textContent || 'S\'inscrire';
+    btn.textContent = 'Inscription...';
+
+    try {
+      const result = await userService.register({
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        password
+      });
+      
+      console.log('✅ Inscription réussie:', result.user);
+      
+      // Émettre un événement pour passer à l'étape 2
+      window.dispatchEvent(new CustomEvent('proceed-to-step2', { 
+        detail: { 
+          user: result.user, 
+          isGuest: false,
+          token: result.token 
+        } 
+      }));
+      
+    } catch (error: any) {
+      console.error('❌ Erreur inscription:', error);
+      
+      if (errorEl) {
+        errorEl.textContent = error.message || 'Erreur lors de l\'inscription';
+        errorEl.classList.remove('hidden');
+      }
+      
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+  });
+
+  // ==================== INVITÉ ====================
+  document.getElementById('guestCheckoutBtn')?.addEventListener('click', () => {
+    console.log('🎭 Mode invité activé');
+    
+    // Émettre un événement pour passer à l'étape 2
+    window.dispatchEvent(new CustomEvent('proceed-to-step2', { 
+      detail: { 
+        user: null, 
+        isGuest: true 
+      } 
+    }));
+  });
+</script>
