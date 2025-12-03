@@ -1,15 +1,16 @@
 ---
-import Layout from "@/layouts/Layout.astro";
-import Header from "@/components/Header.astro";
-import Footer from "@/components/Footer.astro";
-import countries from "@/data/countries.json";
-import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import Layout from '@/layouts/Layout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import countries from '@/data/countries.json';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+import SendcloudPickupPoints from '@/components/SendcloudPickupPoints.astro';
 
 export function getStaticPaths() {
-  const languages = ["fr", "en", "es"];
-  return languages.map((lang) => ({
-    params: { lang },
-  }));
+	const languages = ['fr', 'en', 'es'];
+	return languages.map((lang) => ({
+		params: { lang },
+	}));
 }
 
 const lang = getLangFromUrl(Astro.url);
@@ -17,523 +18,510 @@ const t = useTranslations(lang);
 ---
 
 <Layout title="Destination">
-  <Header />
+	<Header />
 
-  <!-- Banner -->
-  <section
-    class="relative w-full h-[250px] md:h-[350px] overflow-hidden z-0"
-    style="margin-top: 160px;"
-  >
-    <img
-      src="/img/grains.webp"
-      alt="Coffee beans background"
-      class="absolute inset-0 w-full h-full object-cover object-[center_40%]"
-    />
-    <div class="absolute inset-0 flex items-center justify-center bg-black/40">
-      <h1 class="text-white text-4xl md:text-6xl font-[Chalkduster] tracking-widest">
-        DESTINATION
-      </h1>
-    </div>
-  </section>
+	<!-- Banner -->
+	<section
+		class="relative z-0 h-[250px] w-full overflow-hidden md:h-[350px]"
+		style="margin-top: 160px;"
+	>
+		<img
+			src="/img/grains.webp"
+			alt="Coffee beans background"
+			class="absolute inset-0 h-full w-full object-cover object-[center_40%]"
+		/>
+		<div
+			class="absolute inset-0 flex items-center justify-center bg-black/40"
+		>
+			<h1
+				class="font-[Chalkduster] text-4xl tracking-widest text-white md:text-6xl"
+			>
+				DESTINATION
+			</h1>
+		</div>
+	</section>
 
-  <!-- Main -->
-  <main class="bg-[#FEFBED] flex flex-col items-center justify-center px-6 md:px-12 py-12">
-    <div class="w-full md:w-3/4 lg:w-4/5 flex flex-col md:flex-row gap-8 items-start">
+	<!-- Main -->
+	<main
+		class="flex flex-col items-center justify-center bg-[#FEFBED] px-6 py-12 md:px-12"
+	>
+		<div
+			class="flex w-full flex-col items-start gap-8 md:w-3/4 md:flex-row lg:w-4/5"
+		>
+			<!-- LEFT: Steps -->
+			<section
+				class="w-full space-y-8 rounded-md border border-[#5C3F32] bg-[#FEFBED] p-8 md:flex-1"
+			>
+				<!-- STEP ONE -->
+				<div id="stepOne" class="space-y-6">
+					<h2
+						class="border-b pb-2 text-xl font-semibold text-[#5C3F32]"
+					>
+						{t('destination.personalInfo')}
+					</h2>
 
-      <!-- LEFT: Steps -->
-      <section class="w-full md:flex-1 bg-[#FEFBED] border border-[#5C3F32] rounded-md p-8 space-y-8">
+					<form class="space-y-4">
+						<div>
+							<label
+								class="mb-1 block font-semibold text-[#5C3F32]"
+							>
+								{t('destination.email')} *
+							</label>
+							<input
+								id="emailInput"
+								type="email"
+								class="w-full border border-[#5C3F32] p-2"
+								placeholder="abcd@gmail.com"
+								required
+							/>
+						</div>
 
-        <!-- STEP ONE -->
-        <div id="stepOne" class="space-y-6">
-          <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
-            {t("destination.personalInfo")}
-          </h2>
+						<div>
+							<label
+								class="mb-1 block font-semibold text-[#5C3F32]"
+							>
+								{t('destination.password')} *
+							</label>
+							<input
+								id="passwordInput"
+								type="password"
+								class="w-full border border-[#5C3F32] p-2"
+								placeholder="••••••••"
+								required
+							/>
+						</div>
 
-          <form class="space-y-4">
-            <div>
-              <label class="block font-semibold mb-1 text-[#5C3F32]">
-                {t("destination.email")} *
-              </label>
-              <input
-                id="emailInput"
-                type="email"
-                class="w-full border border-[#5C3F32] p-2"
-                placeholder="abcd@gmail.com"
-                required
-              />
-            </div>
+						<div>
+							<a
+								href={`/${lang}/forgot-password`}
+								class="mt-2 flex justify-center text-sm text-[#A47343] hover:underline"
+							>
+								{t('destination.forgotPassword')}
+							</a>
+						</div>
 
-            <div>
-              <label class="block font-semibold mb-1 text-[#5C3F32]">
-                {t("destination.password")} *
-              </label>
-              <input
-                id="passwordInput"
-                type="password"
-                class="w-full border border-[#5C3F32] p-2"
-                placeholder="••••••••"
-                required
-              />
-            </div>
+						<div class="flex justify-center">
+							<button
+								id="toStep2"
+								type="button"
+								class="rounded-md bg-black px-6 py-2 text-white transition hover:bg-[#5C3F32]"
+							>
+								{t('destination.continue')}
+							</button>
+						</div>
+					</form>
+				</div>
 
-            <div>
-              <a
-                href={`/${lang}/forgot-password`}
-                class="text-sm text-[#A47343] hover:underline flex justify-center mt-2"
-              >
-                {t("destination.forgotPassword")}
-              </a>
-            </div>
+				<!-- STEP TWO -->
+				<div id="stepTwo" class="hidden space-y-6">
+					<h2
+						class="border-b pb-2 text-xl font-semibold text-[#5C3F32]"
+					>
+						{t('destination.addresses')}
+					</h2>
 
-            <div class="flex justify-center">
-              <button
-                id="toStep2"
-                type="button"
-                class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition"
-              >
-                {t("destination.continue")}
-              </button>
-            </div>
-          </form>
-        </div>
+					<form class="space-y-4">
+						<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+							<div>
+								<label
+									class="mb-1 block font-semibold text-[#5C3F32]"
+								>
+									{t('destination.firstName')} *
+								</label>
+								<input
+									type="text"
+									class="w-full rounded-md border border-[#5C3F32] p-2"
+									required
+								/>
+							</div>
+							<div>
+								<label
+									class="mb-1 block font-semibold text-[#5C3F32]"
+								>
+									{t('destination.lastName')} *
+								</label>
+								<input
+									type="text"
+									class="w-full rounded-md border border-[#5C3F32] p-2"
+									required
+								/>
+							</div>
+						</div>
 
-        <!-- STEP TWO -->
-        <div id="stepTwo" class="space-y-6 hidden">
-          <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
-            {t("destination.addresses")}
-          </h2>
+						<div>
+							<label
+								class="mb-1 block font-semibold text-[#5C3F32]"
+							>
+								{t('destination.addressComplement')} *
+							</label>
+							<input
+								id="deliveryAddress"
+								type="text"
+								class="w-full rounded-md border border-[#5C3F32] p-2"
+								placeholder="12 Rue du Marché, Appartement B"
+								required
+							/>
+						</div>
 
-          <form class="space-y-4">
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <label class="block font-semibold mb-1 text-[#5C3F32]">
-                  {t("destination.firstName")} *
-                </label>
-                <input
-                  type="text"
-                  class="w-full border border-[#5C3F32] rounded-md p-2"
-                  required
-                />
-              </div>
-              <div>
-                <label class="block font-semibold mb-1 text-[#5C3F32]">
-                  {t("destination.lastName")} *
-                </label>
-                <input
-                  type="text"
-                  class="w-full border border-[#5C3F32] rounded-md p-2"
-                  required
-                />
-              </div>
-            </div>
+						<div>
+							<label
+								class="mb-1 block font-semibold text-[#5C3F32]"
+							>
+								{t('destination.phone')} *
+							</label>
+							<input
+								id="deliveryPhone"
+								type="text"
+								class="w-full rounded-md border border-[#5C3F32] p-2"
+								placeholder="+33 6 12 34 56 78"
+								required
+							/>
+						</div>
 
-         
-<div>
-  <label class="block font-semibold mb-1 text-[#5C3F32]">
-    {t("destination.addressComplement")} *
-  </label>
-  <input
-    id="deliveryAddress"
-    type="text"
-    class="w-full border border-[#5C3F32] rounded-md p-2"
-    placeholder="12 Rue du Marché, Appartement B"
-    required
-  />
-</div>
+						<div>
+							<label
+								class="mb-1 block font-semibold text-[#5C3F32]"
+							>
+								{t('destination.postalCode')} *
+							</label>
+							<input
+								id="deliveryPostal"
+								type="text"
+								class="w-full rounded-md border border-[#5C3F32] p-2"
+								required
+							/>
+						</div>
 
+						<div>
+							<label
+								class="mb-1 block font-semibold text-[#5C3F32]"
+							>
+								{t('destination.city')} *
+							</label>
+							<input
+								id="deliveryCity"
+								type="text"
+								class="w-full rounded-md border border-[#5C3F32] p-2"
+								required
+							/>
+						</div>
 
-<div>
-  <label class="block font-semibold mb-1 text-[#5C3F32]">
-    {t("destination.phone")} *
-  </label>
-  <input
-    id="deliveryPhone"
-    type="text"
-    class="w-full border border-[#5C3F32] rounded-md p-2"
-    placeholder="+33 6 12 34 56 78"
-    required
-  />
-</div>
+						<div>
+							<label
+								class="mb-1 block font-semibold text-[#5C3F32]"
+							>
+								{t('destination.country')} *
+							</label>
+							<select
+								class="w-full rounded-md border border-[#5C3F32] p-2"
+								id="deliveryCountry"
+								required
+							>
+								{
+									countries.map((c) => (
+										<option value={c}>{c}</option>
+									))
+								}
+							</select>
+						</div>
 
+						<div class="flex justify-between gap-2">
+							<button
+								id="backToStep1"
+								type="button"
+								class="rounded-md border border-[#5C3F32] px-6 py-2 text-[#5C3F32] transition hover:bg-[#f9f4ee]"
+							>
+								← {t('destination.previous')}
+							</button>
+							<button
+								id="toStep3"
+								type="button"
+								class="rounded-md bg-black px-6 py-2 text-white transition hover:bg-[#5C3F32]"
+							>
+								{t('destination.continue')}
+							</button>
+						</div>
+					</form>
+				</div>
 
-            <div>
-              <label class="block font-semibold mb-1 text-[#5C3F32]">
-                {t("destination.postalCode")} *
-              </label>
-              <input
-                id="deliveryPostal"
-                type="text"
-                class="w-full border border-[#5C3F32] rounded-md p-2"
-                required
-              />
-            </div>
+				<!-- STEP THREE -->
+				<div id="stepThree" class="hidden space-y-6">
+					<SendcloudPickupPoints />
+						
+				</div>
 
-            <div>
-              <label class="block font-semibold mb-1 text-[#5C3F32]">
-                {t("destination.city")} *
-              </label>
-              <input
-                id="deliveryCity"
-                type="text"
-                class="w-full border border-[#5C3F32] rounded-md p-2"
-                required
-              />
-            </div>
+				<!-- STEP FOUR -->
+				<div id="stepFour" class="hidden space-y-6">
+					<h2
+						class="border-b pb-2 text-xl font-semibold text-[#5C3F32]"
+					>
+						{t('destination.payment')}
+					</h2>
 
-            <div>
-              <label class="block font-semibold mb-1 text-[#5C3F32]">
-                {t("destination.country")} *
-              </label>
-              <select
-                class="w-full border border-[#5C3F32] rounded-md p-2"
-                id="deliveryCountry"
-                required
-              >
-                {countries.map((c) => <option value={c}>{c}</option>)}
-              </select>
-            </div>
+					<form class="space-y-6">
+						<!-- BANK TRANSFER -->
+						<label
+							class="payment-option flex cursor-pointer items-center justify-between rounded-md border border-[#A47343] p-4 transition hover:bg-[#f9f4ee]"
+						>
+							<div class="flex items-center gap-3">
+								<input
+									type="radio"
+									name="payment"
+									value="bank_transfer"
+								/>
+								<span>{t('destination.payWithVirement')}</span>
+							</div>
+							<div class="text-xs text-[#A47343]">
+								{t('destination.virement')}
+							</div>
+							<img
+								src="/img/virement.png"
+								class="h-[40px] w-[100px] object-contain opacity-80"
+								alt="Virement bancaire"
+							/>
+						</label>
 
-            <div class="flex justify-between gap-2">
-              <button
-                id="backToStep1"
-                type="button"
-                class="border border-[#5C3F32] text-[#5C3F32] px-6 py-2 rounded-md hover:bg-[#f9f4ee] transition"
-              >
-                ← {t("destination.previous")}
-              </button>
-              <button
-                id="toStep3"
-                type="button"
-                class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition"
-              >
-                {t("destination.continue")}
-              </button>
-            </div>
-          </form>
-        </div>
+						<div
+							id="bankInfoSection"
+							class="mt-3 hidden rounded-md border border-[#A47343] bg-[#faf5ef] p-4"
+						>
+							<p class="mb-3 text-sm">
+								{t('destination.bankTransferInfo')}
+							</p>
+							<div class="space-y-1 text-sm">
+								<p>
+									<strong>IBAN:</strong> FR76 3000 4000 1234 5678
+									9012 345
+								</p>
+								<p><strong>BIC:</strong> BNPAFRPP</p>
+								<p><strong>Bank:</strong> BNP Paribas</p>
+								<p>
+									<strong
+										>{t('destination.reference')}:</strong
+									>
+									<span id="bankReference">ORDER-XXXXXX</span>
+								</p>
+							</div>
+						</div>
 
-        <!-- STEP THREE -->
-<div id="stepThree" class="space-y-6 hidden">
-  <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
-    {t("destination.deliveryMode")}
-  </h2>
+						<!-- CONFIRMATION -->
+						<div
+							id="bankConfirmation"
+							class="mt-4 hidden rounded-md bg-[#5C3F32] p-4 text-white"
+						>
+							<h3 class="text-lg font-semibold">
+								{t('destination.bankTransferConfirmed')}
+							</h3>
+							<p class="mb-2 text-sm">
+								<strong
+									>{
+										t(
+											'destination.bankTransferInstructions',
+										)
+									}:</strong
+								>
+								<span id="bankReferenceTwo"></span>
+							</p>
+							<p class="text-sm">
+								<strong>{t('destination.amount')}:</strong>
+								<span id="bankAmount"></span> €
+							</p>
+						</div>
 
-  <form id="deliveryForm" class="space-y-4">
-    <!-- Livraison à domicile -->
-    <label class="flex items-center justify-between border border-[#A47343] rounded-md p-4 cursor-pointer hover:bg-[#f9f4ee] transition delivery-option">
-      <div class="flex items-center gap-3">
-        <input type="radio" name="delivery" value="standard" checked />
-        <div>
-          <div class="font-semibold">{t("destination.deliveryStandard")}</div>
-          <div class="text-sm text-gray-600">Livraison à domicile - 3 à 5 jours</div>
-        </div>
-      </div>
-      <span class="font-semibold">5,90 €</span>
-    </label>
+						<!-- CARD -->
+						<label
+							class="flex cursor-pointer items-center justify-between rounded-md border border-[#A47343] p-4 hover:bg-[#f9f4ee]"
+						>
+							<div class="flex items-center gap-3">
+								<input
+									type="radio"
+									name="payment"
+									value="card"
+								/>
+								<span>{t('destination.payWithCard')}</span>
+							</div>
+							<div class="flex gap-3">
+								<img
+									src="/img/visa.webp"
+									class="w-[40px]"
+									alt="Visa"
+								/>
+								<img
+									src="/img/mastercard.png"
+									class="w-[40px]"
+									alt="Mastercard"
+								/>
+								<img
+									src="/img/cb.webp"
+									class="w-[40px]"
+									alt="CB"
+								/>
+							</div>
+						</label>
 
-    <!-- Livraison Express -->
-    <label class="flex items-center justify-between border border-[#A47343] rounded-md p-4 cursor-pointer hover:bg-[#f9f4ee] transition delivery-option">
-      <div class="flex items-center gap-3">
-        <input type="radio" name="delivery" value="express" />
-        <div>
-          <div class="font-semibold">{t("destination.deliveryExpress")}</div>
-          <div class="text-sm text-gray-600">Livraison express - 24-48h</div>
-        </div>
-      </div>
-      <span class="font-semibold">12,90 €</span>
-    </label>
+						<!-- CARD FORM SECTION WITH BLUE UI -->
+						<div
+							id="cardFormSection"
+							class="mt-4 hidden max-w-md space-y-4"
+						>
+							<!-- Blue Card Preview -->
+							<div
+								class="max-w-sm rounded-xl bg-gradient-to-br from-[#003366] to-[#0055AA] p-4 text-white shadow-md md:p-6"
+							>
+								<div
+									class="mb-4 flex items-center justify-between"
+								>
+									<span
+										class="text-xs uppercase tracking-wide opacity-80"
+									>
+										EMCAFFÉ
+									</span>
+									<div
+										class="h-7 w-10 rounded-md bg-white/30"
+									>
+									</div>
+								</div>
 
-    <!-- Mondial Relay Point Relais -->
-    <label class="flex items-center justify-between border border-[#A47343] rounded-md p-4 cursor-pointer hover:bg-[#f9f4ee] transition delivery-option">
-      <div class="flex items-center gap-3">
-        <input type="radio" name="delivery" value="mondialrelay" />
-        <div>
-          <div class="font-semibold flex items-center gap-2">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-            </svg>
-            Point Relais Mondial Relay
-          </div>
-          <div class="text-sm text-gray-600">Retrait en point relais - 2 à 4 jours</div>
-        </div>
-      </div>
-      <span class="font-semibold">3,90 €</span>
-    </label>
+								<div
+									id="cardNumberDisplay"
+									class="mb-4 font-mono text-lg tracking-[0.2em] md:text-xl"
+								>
+									•••• •••• •••• ••••
+								</div>
 
-    <!-- Widget Mondial Relay -->
-    <div id="mondialRelayWidget" class="hidden border-2 border-[#e2001a] rounded-lg p-4 bg-white">
-      <h3 class="font-semibold mb-3 text-[#5C3F32] flex items-center gap-2">
-        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-        </svg>
-        Sélectionnez votre Point Relais
-      </h3>
-      
-      <div class="search-bar mb-4">
-        <div class="flex gap-2">
-          <input 
-            type="text" 
-            id="cp-search" 
-            placeholder="Code postal (ex: 75001)"
-            class="flex-1 border border-[#5C3F32] rounded-md p-3 text-base"
-            maxlength="5"
-          />
-          <button 
-            type="button" 
-            id="btn-search-relay"
-            class="bg-[#e2001a] text-white px-6 py-3 rounded-md font-semibold hover:bg-[#c00016] transition whitespace-nowrap"
-          >
-            Rechercher
-          </button>
-        </div>
-      </div>
-      
-      <div id="Zone_Widget" class="min-h-[450px]"></div>
-      
-      <!-- Point Relais sélectionné -->
-      <div id="relay-selected" class="hidden mt-4 p-4 bg-[#ecfdf5] border-2 border-[#10b981] rounded-lg">
-        <h4 class="font-semibold text-[#059669] mb-2 flex items-center gap-2">
-          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-          </svg>
-          Point Relais sélectionné
-        </h4>
-        <div id="relay-details" class="text-sm text-[#1f2937]"></div>
-      </div>
-      
-      <input type="hidden" id="relay-data" name="relayData" />
-      <input type="hidden" id="relay-id" name="relayId" />
-    </div>
+								<div
+									class="flex justify-between text-xs md:text-sm"
+								>
+									<div>
+										<p class="opacity-70">NOM</p>
+										<p
+											id="cardNameDisplay"
+											class="font-semibold"
+										>
+											NOM PRÉNOM
+										</p>
+									</div>
+									<div>
+										<p class="opacity-70">EXP</p>
+										<p
+											id="cardExpiryDisplay"
+											class="font-semibold"
+										>
+											MM/AA
+										</p>
+									</div>
+									<div>
+										<p class="opacity-70">CVC</p>
+										<p
+											id="cardCvcDisplay"
+											class="font-semibold"
+										>
+											•••
+										</p>
+									</div>
+								</div>
+							</div>
 
-    <div class="flex justify-between gap-2 pt-4">
-      <button
-        id="backToStep2"
-        type="button"
-        class="border border-[#5C3F32] text-[#5C3F32] px-6 py-2 rounded-md hover:bg-[#f9f4ee] transition"
-      >
-        ← {t("destination.previous")}
-      </button>
-      <button
-        id="toStep4"
-        type="button"
-        class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {t("destination.continue")}
-      </button>
-    </div>
-  </form>
-</div>
+							<!-- Stripe Card Element -->
+							<div class="max-w-md space-y-3">
+								<label
+									class="mb-1 block text-sm font-medium text-[#5C3F32]"
+								>
+									{t('destination.cardNumber')}
+								</label>
+								<div
+									id="card-element"
+									class="w-full rounded-md border border-[#5C3F32] bg-white p-3"
+								>
+								</div>
+								<p
+									id="card-errors"
+									class="mt-1 text-xs text-red-600"
+								>
+								</p>
+							</div>
+						</div>
 
-        <!-- STEP FOUR -->
-        <div id="stepFour" class="space-y-6 hidden">
-          <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
-            {t("destination.payment")}
-          </h2>
+						<!-- BUTTONS -->
+						<div class="flex justify-between gap-2">
+							<button
+								id="backToStep3"
+								type="button"
+								class="rounded-md border border-[#5C3F32] px-6 py-2 text-[#5C3F32]"
+							>
+								← {t('destination.previous')}
+							</button>
+							<button
+								id="placeOrder"
+								type="button"
+								class="rounded-md bg-black px-6 py-2 text-white hover:bg-[#5C3F32]"
+							>
+								{t('destination.order')}
+							</button>
+						</div>
+					</form>
+				</div>
+			</section>
 
-          <form class="space-y-6">
+			<!-- SUMMARY CARD -->
+			<aside
+				id="summaryCard"
+				class="h-fit w-full rounded-lg border border-[#5C3F32] bg-[#FEFBED] p-6 text-[#5C3F32] shadow-md md:w-[40%]"
+			>
+				<h3 class="mb-4 text-center text-lg font-semibold">
+					🛒 Your Order
+				</h3>
+				<div id="summaryItems" class="mb-4 space-y-4"></div>
 
-            <!-- BANK TRANSFER -->
-            <label class="payment-option flex items-center justify-between border border-[#A47343] rounded-md p-4 hover:bg-[#f9f4ee] transition cursor-pointer">
-              <div class="flex items-center gap-3">
-                <input type="radio" name="payment" value="bank_transfer" />
-                <span>{t("destination.payWithVirement")}</span>
-              </div>
-              <div class="text-xs text-[#A47343]">
-                {t("destination.virement")}
-              </div>
-              <img
-                src="/img/virement.png"
-                class="w-[100px] h-[40px] object-contain opacity-80"
-                alt="Virement bancaire"
-              />
-            </label>
+				<div
+					class="w-full space-y-2 border-t border-[#A47343]/40 pt-2 text-sm"
+				>
+					<div class="flex justify-between">
+						<span>Delivery:</span>
+						<span id="summaryDelivery">0.00€</span>
+					</div>
+					<hr class="my-1 border-[#5C3F32]/40" />
+					<div class="flex justify-between text-lg font-semibold">
+						<span>TTC:</span>
+						<span id="summaryTotal">0.00€</span>
+					</div>
+				</div>
+			</aside>
+		</div>
+	</main>
 
-            <div
-              id="bankInfoSection"
-              class="hidden bg-[#faf5ef] border border-[#A47343] rounded-md p-4 mt-3"
-            >
-              <p class="text-sm mb-3">
-                {t("destination.bankTransferInfo")}
-              </p>
-              <div class="text-sm space-y-1">
-                <p><strong>IBAN:</strong> FR76 3000 4000 1234 5678 9012 345</p>
-                <p><strong>BIC:</strong> BNPAFRPP</p>
-                <p><strong>Bank:</strong> BNP Paribas</p>
-                <p>
-                  <strong>{t("destination.reference")}:</strong>
-                  <span id="bankReference">ORDER-XXXXXX</span>
-                </p>
-              </div>
-            </div>
-
-            <!-- CONFIRMATION -->
-            <div
-              id="bankConfirmation"
-              class="hidden bg-[#5C3F32] rounded-md p-4 mt-4 text-white"
-            >
-              <h3 class="text-lg font-semibold">
-                {t("destination.bankTransferConfirmed")}
-              </h3>
-              <p class="text-sm mb-2">
-                <strong>{t("destination.bankTransferInstructions")}:</strong>
-                <span id="bankReferenceTwo"></span>
-              </p>
-              <p class="text-sm">
-                <strong>{t("destination.amount")}:</strong>
-                <span id="bankAmount"></span> €
-              </p>
-            </div>
-
-            <!-- CARD -->
-            <label class="flex items-center justify-between border border-[#A47343] rounded-md p-4 hover:bg-[#f9f4ee] cursor-pointer">
-              <div class="flex items-center gap-3">
-                <input type="radio" name="payment" value="card" />
-                <span>{t("destination.payWithCard")}</span>
-              </div>
-              <div class="flex gap-3">
-                <img src="/img/visa.webp" class="w-[40px]" alt="Visa" />
-                <img src="/img/mastercard.png" class="w-[40px]" alt="Mastercard" />
-                <img src="/img/cb.webp" class="w-[40px]" alt="CB" />
-              </div>
-            </label>
-
-            <!-- CARD FORM SECTION WITH BLUE UI -->
-            <div id="cardFormSection" class="hidden space-y-4 mt-4 max-w-md">
-              <!-- Blue Card Preview -->
-              <div class="bg-gradient-to-br from-[#003366] to-[#0055AA] text-white rounded-xl p-4 md:p-6 shadow-md max-w-sm">
-                <div class="flex justify-between items-center mb-4">
-                  <span class="text-xs uppercase tracking-wide opacity-80">
-                    EMCAFFÉ
-                  </span>
-                  <div class="w-10 h-7 rounded-md bg-white/30"></div>
-                </div>
-
-                <div
-                  id="cardNumberDisplay"
-                  class="text-lg md:text-xl tracking-[0.2em] font-mono mb-4"
-                >
-                  •••• •••• •••• ••••
-                </div>
-
-                <div class="flex justify-between text-xs md:text-sm">
-                  <div>
-                    <p class="opacity-70">NOM</p>
-                    <p id="cardNameDisplay" class="font-semibold">
-                      NOM PRÉNOM
-                    </p>
-                  </div>
-                  <div>
-                    <p class="opacity-70">EXP</p>
-                    <p id="cardExpiryDisplay" class="font-semibold">
-                      MM/AA
-                    </p>
-                  </div>
-                  <div>
-                    <p class="opacity-70">CVC</p>
-                    <p id="cardCvcDisplay" class="font-semibold">
-                      •••
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Stripe Card Element -->
-              <div class="space-y-3 max-w-md">
-                <label class="block text-sm font-medium text-[#5C3F32] mb-1">
-                  {t("destination.cardNumber")}
-                </label>
-                <div
-                  id="card-element"
-                  class="w-full border border-[#5C3F32] rounded-md p-3 bg-white"
-                ></div>
-                <p
-                  id="card-errors"
-                  class="mt-1 text-xs text-red-600"
-                ></p>
-              </div>
-            </div>
-
-            <!-- BUTTONS -->
-            <div class="flex justify-between gap-2">
-              <button
-                id="backToStep3"
-                type="button"
-                class="border border-[#5C3F32] text-[#5C3F32] px-6 py-2 rounded-md"
-              >
-                ← {t("destination.previous")}
-              </button>
-              <button
-                id="placeOrder"
-                type="button"
-                class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32]"
-              >
-                {t("destination.order")}
-              </button>
-            </div>
-
-          </form>
-        </div>
-
-      </section>
-
-      <!-- SUMMARY CARD -->
-      <aside
-        id="summaryCard"
-        class="bg-[#FEFBED] border border-[#5C3F32] rounded-lg p-6 shadow-md text-[#5C3F32] h-fit w-full md:w-[40%]"
-      >
-        <h3 class="text-lg font-semibold text-center mb-4">🛒 Your Order</h3>
-        <div id="summaryItems" class="space-y-4 mb-4"></div>
-
-        <div class="w-full space-y-2 border-t border-[#A47343]/40 pt-2 text-sm">
-          <div class="flex justify-between">
-            <span>Delivery:</span>
-            <span id="summaryDelivery">0.00€</span>
-          </div>
-          <hr class="my-1 border-[#5C3F32]/40" />
-          <div class="flex justify-between font-semibold text-lg">
-            <span>TTC:</span>
-            <span id="summaryTotal">0.00€</span>
-          </div>
-        </div>
-      </aside>
-
-    </div>
-  </main>
-
-  <Footer />
+	<Footer />
 </Layout>
 
 <!-- Scripts -->
- <script src="../../../public/scripts/checkoutstep3.ts"></script>
+<script src="../../../public/scripts/checkoutstep3.ts"></script>
 <script src="https://js.stripe.com/v3/"></script>
 <script src="/scripts/destination.js" defer></script>
 
-
-
 <style>
-  .delivery-option input[type="radio"]:checked {
-    accent-color: #5C3F32;
-  }
+	.delivery-option input[type='radio']:checked {
+		accent-color: #5c3f32;
+	}
 
-  .delivery-option:has(input:checked) {
-    border-color: #5C3F32;
-    background-color: #f9f4ee;
-  }
+	.delivery-option:has(input:checked) {
+		border-color: #5c3f32;
+		background-color: #f9f4ee;
+	}
 
-  #Zone_Widget {
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 15px;
-    background: white;
-  }
+	#Zone_Widget {
+		border: 1px solid #e5e7eb;
+		border-radius: 8px;
+		padding: 15px;
+		background: white;
+	}
 
-  .search-bar input:focus {
-    outline: none;
-    border-color: #e2001a;
-    box-shadow: 0 0 0 3px rgba(226, 0, 26, 0.1);
-  }
+	.search-bar input:focus {
+		outline: none;
+		border-color: #e2001a;
+		box-shadow: 0 0 0 3px rgba(226, 0, 26, 0.1);
+	}
 
-  #relay-selected p {
-    margin: 3px 0;
-  }
+	#relay-selected p {
+		margin: 3px 0;
+	}
 </style>

@@ -1,0 +1,198 @@
+---
+import { sendcloudService } from '../lib/api/sendcloudService.ts';
+---
+
+<div class="space-y-4 border p-4 rounded shadow">
+  <div class="flex gap-2">
+    <input id="postcodeInput" type="text" placeholder="Code postal" class="border p-2 flex-1" />
+    <input id="cityInput" type="text" placeholder="Ville (optionnel)" class="border p-2 flex-1" />
+    <button id="searchBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Rechercher</button>
+  </div>
+
+  <p id="status" class="text-sm"></p>
+
+  <!-- Carte -->
+  <div id="map" class="w-full h-96 rounded border mt-4"></div>
+
+  <!-- Liste des points relais -->
+  <ul id="pointsList" class="space-y-2 mt-4"></ul>
+</div>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script is:inline>
+  window.addEventListener('DOMContentLoaded', () => {
+    const searchBtn = document.getElementById('searchBtn');
+    const postcodeInput = document.getElementById('postcodeInput');
+    const cityInput = document.getElementById('cityInput');
+    const statusEl = document.getElementById('status');
+    const pointsList = document.getElementById('pointsList');
+
+    if (typeof L === 'undefined') {
+      console.error('Leaflet n\'est pas chargé !');
+      statusEl.textContent = 'Erreur: Leaflet n\'est pas chargé';
+      statusEl.className = 'text-sm text-red-500';
+      return;
+    }
+
+    // Initialiser la carte
+    const map = L.map('map').setView([46.603354, 1.888334], 6);
+
+    // Ajouter les tuiles OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19
+    }).addTo(map);
+
+    let markers = [];
+
+    searchBtn?.addEventListener('click', async () => {
+      const postcode = postcodeInput.value.trim();
+      const city = cityInput.value.trim();
+      
+      if (!postcode) {
+        statusEl.textContent = 'Veuillez entrer un code postal';
+        statusEl.className = 'text-sm text-orange-500';
+        return;
+      }
+
+      statusEl.textContent = 'Recherche en cours...';
+      statusEl.className = 'text-sm text-blue-500';
+
+      const params = new URLSearchParams({ postal_code: postcode, country: 'FR' });
+      if (city) params.append('city', city);
+
+      const url = `https://api-emcafe-3.onrender.com/api/sendcloud/service-points?${params.toString()}`;
+
+      try {
+        const res = await fetch(url);
+        
+        if (!res.ok) {
+          throw new Error(`Erreur HTTP: ${res.status}`);
+        }
+        
+        const points = await res.json();
+        console.log('Points reçus:', points);
+
+        // Nettoyer les anciens marqueurs
+        markers.forEach(marker => map.removeLayer(marker));
+        markers = [];
+
+        if (points.length > 0) {
+          // Afficher la liste
+          pointsList.innerHTML = points.map((p, index) => {
+            const lat = p.raw?.latitude || p.latitude;
+            const lng = p.raw?.longitude || p.longitude;
+            const address = p.raw?.street && p.raw?.house_number 
+              ? `${p.raw.house_number} ${p.raw.street}` 
+              : p.address || 'Adresse non disponible';
+            
+            return `
+              <li class="border p-2 rounded hover:bg-gray-50 cursor-pointer transition" data-index="${index}">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <strong class="text-lg">${p.name || 'Sans nom'}</strong>
+                    <span class="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">${p.carrier || ''}</span>
+                    <br/>
+                    <span class="text-sm text-gray-600">${address}</span><br/>
+                    <span class="text-sm text-gray-600">${p.postal_code || ''} ${p.city || ''}</span>
+                    ${lat && lng ? `<br/><span class="text-xs text-gray-400">📍 ${lat}, ${lng}</span>` : ''}
+                  </div>
+                  ${lat && lng ? '<span class="text-2xl">📍</span>' : ''}
+                </div>
+              </li>
+            `;
+          }).join('');
+
+          // Ajouter les marqueurs sur la carte
+          const bounds = L.latLngBounds([]);
+          let pointsAvecCoords = 0;
+          
+          points.forEach((point, index) => {
+            // Récupérer les coordonnées depuis raw ou directement
+            const lat = point.raw?.latitude || point.latitude;
+            const lng = point.raw?.longitude || point.longitude;
+            
+            if (lat && lng) {
+              const latitude = parseFloat(lat);
+              const longitude = parseFloat(lng);
+              
+              // Icône personnalisée selon le transporteur
+              const iconColor = point.carrier === 'mondial_relay' ? 'red' : 'blue';
+              const customIcon = L.divIcon({
+                className: 'custom-marker',
+                html: `<div style="background-color: ${iconColor}; width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>`,
+                iconSize: [30, 30],
+                iconAnchor: [15, 30]
+              });
+              
+              const address = point.raw?.street && point.raw?.house_number 
+                ? `${point.raw.house_number} ${point.raw.street}` 
+                : point.address || '';
+              
+              const marker = L.marker([latitude, longitude], { icon: customIcon })
+                .addTo(map)
+                .bindPopup(`
+                  <div class="p-3 min-w-[200px]">
+                    <strong class="text-base">${point.name || 'Sans nom'}</strong><br/>
+                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded inline-block mt-1">${point.carrier || ''}</span>
+                    <div class="mt-2 text-sm">
+                      ${address}<br/>
+                      ${point.postal_code || ''} ${point.city || ''}
+                    </div>
+                    ${point.raw?.phone ? `<div class="mt-2 text-sm">📞 ${point.raw.phone}</div>` : ''}
+                    ${point.raw?.formatted_opening_times ? '<div class="mt-2 text-xs text-gray-600">Horaires disponibles</div>' : ''}
+                  </div>
+                `);
+              
+              markers.push(marker);
+              bounds.extend([latitude, longitude]);
+              pointsAvecCoords++;
+
+              // Ouvrir le popup et centrer au survol de la liste
+              const listItem = document.querySelector(`li[data-index="${index}"]`);
+              listItem?.addEventListener('click', () => {
+                map.setView([latitude, longitude], 15);
+                marker.openPopup();
+              });
+            } else {
+              console.warn(`Point ${index} sans coordonnées:`, point);
+            }
+          });
+
+          // Ajuster la vue de la carte pour afficher tous les points
+          if (bounds.isValid() && pointsAvecCoords > 0) {
+            map.fitBounds(bounds, { padding: [50, 50] });
+          }
+
+          statusEl.textContent = `${points.length} point(s) trouvé(s)`;
+          statusEl.className = 'text-sm text-green-600';
+        } else {
+          pointsList.innerHTML = '<li class="border p-2 rounded text-gray-500">Aucun point relais trouvé pour ce code postal.</li>';
+          statusEl.textContent = 'Aucun résultat';
+          statusEl.className = 'text-sm text-gray-500';
+        }
+      } catch (err) {
+        console.error('Erreur:', err);
+        statusEl.textContent = `Erreur: ${err.message}`;
+        statusEl.className = 'text-sm text-red-500';
+        pointsList.innerHTML = '<li class="border p-2 rounded text-red-500">Erreur lors de la récupération des points relais.</li>';
+      }
+    });
+  });
+</script>
+
+<style>
+  #map {
+    z-index: 0;
+  }
+  
+  .custom-marker {
+    background: transparent;
+    border: none;
+  }
+</style>

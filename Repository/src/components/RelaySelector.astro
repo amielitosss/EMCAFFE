@@ -1,0 +1,77 @@
+---
+// src/components/RelayPoints.astro
+interface PointRelay {
+  ID: string;
+  Name: string;
+  Address1: string;
+  City: string;
+}
+
+let postcode: string = '';
+let points: PointRelay[] = [];
+let loading: boolean = false;
+let error: string = '';
+---
+
+<div class="space-y-4">
+  <input
+    id="postcodeInput"
+    type="text"
+    placeholder="Code postal"
+    class="border p-2"
+  />
+
+  <button id="searchBtn" class="bg-blue-500 text-white px-4 py-2 rounded">
+    Rechercher
+  </button>
+
+  <p id="status" class="text-red-500"></p>
+
+  <ul id="pointsList"></ul>
+</div>
+
+<script type="module">
+  const input = document.getElementById('postcodeInput');
+  const button = document.getElementById('searchBtn');
+  const pointsList = document.getElementById('pointsList');
+  const status = document.getElementById('status');
+
+  button.addEventListener('click', async () => {
+    const cp = input.value.trim();
+    if (!cp) return;
+
+    pointsList.innerHTML = '';
+    status.textContent = '';
+    pointsList.innerHTML = '<li>Chargement...</li>';
+
+    try {
+      const res = await fetch(`http://localhost:3000/api/relay/${cp}`);
+      const data = await res.json();
+
+      pointsList.innerHTML = '';
+      if (!data || data.length === 0) {
+        pointsList.innerHTML = '<li>Aucun point relais trouvé.</li>';
+        return;
+      }
+
+      // Mapping backend -> frontend
+      const mapped = data.map((p) => ({
+        ID: p.Num,
+        Name: `Point relais ${p.Num || 'TEST'}`,
+        Address1: p.LgAdr1,
+        City: p.Ville,
+      }));
+
+      for (const point of mapped) {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${point.Name}</strong> - ${point.Address1}, ${point.City}`;
+        pointsList.appendChild(li);
+      }
+
+    } catch (err) {
+      console.error(err);
+      pointsList.innerHTML = '';
+      status.textContent = 'Erreur lors de la récupération des points relais.';
+    }
+  });
+</script>
