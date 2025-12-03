@@ -97,135 +97,165 @@ const t = useTranslations(lang);
           </form>
         </div>
 
-        <!-- STEP TWO -->
-        <div id="stepTwo" class="space-y-6 hidden">
-          <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
-            {t("destination.addresses")}
-          </h2>
+<!-- STEP TWO -->
+<div id="stepTwo" class="space-y-6 hidden">
+  <h2 class="text-xl font-semibold border-b pb-2 text-[#5C3F32]">
+    {t("destination.addresses")}
+  </h2>
 
-          <form class="space-y-4">
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <label class="block font-semibold mb-1 text-[#5C3F32]">
-                  {t("destination.firstName")} *
-                </label>
-                <input
-                  type="text"
-                  class="w-full border border-[#5C3F32] rounded-md p-2"
-                  required
-                />
-              </div>
-              <div>
-                <label class="block font-semibold mb-1 text-[#5C3F32]">
-                  {t("destination.lastName")} *
-                </label>
-                <input
-                  type="text"
-                  class="w-full border border-[#5C3F32] rounded-md p-2"
-                  required
-                />
-              </div>
-            </div>
+  <!-- ADDRESS LIST (rendered by JS) -->
+  <div id="addressList" class="space-y-3 mb-4">
+    <!-- JS will inject address cards here -->
+  </div>
 
-         
-<!-- MAIN ADDRESS -->
-<div>
-  <label class="block font-semibold mb-1 text-[#5C3F32]">
-    {t("destination.address")} *
-  </label>
-  <input
-    id="deliveryAddress"
-    type="text"
-    class="w-full border border-[#5C3F32] rounded-md p-2"
-    placeholder="12 Rue du Marché"
-    required
-  />
+  <!-- Add new address button -->
+  <button
+    id="showAddressForm"
+    type="button"
+    class="text-sm text-[#A47343] hover:underline mb-2"
+  >
+    + {t("destination.addNewAddress")}
+  </button>
+
+  <!-- ADDRESS FORM (create / edit) -->
+  <form id="addressForm" class="space-y-4 hidden">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div>
+        <label class="block font-semibold mb-1 text-[#5C3F32]">
+          {t("destination.firstName")} *
+        </label>
+        <input
+          id="firstNameInput"
+          type="text"
+          class="w-full border border-[#5C3F32] rounded-md p-2"
+          required
+        />
+      </div>
+      <div>
+        <label class="block font-semibold mb-1 text-[#5C3F32]">
+          {t("destination.lastName")} *
+        </label>
+        <input
+          id="lastNameInput"
+          type="text"
+          class="w-full border border-[#5C3F32] rounded-md p-2"
+          required
+        />
+      </div>
+    </div>
+
+    <div>
+      <label class="block font-semibold mb-1 text-[#5C3F32]">
+        {t("destination.address")} *
+      </label>
+      <input
+        id="deliveryAddress"
+        type="text"
+        class="w-full border border-[#5C3F32] rounded-md p-2"
+        required
+      />
+    </div>
+
+    <div>
+      <label class="block font-semibold mb-1 text-[#5C3F32]">
+        {t("destination.addressComplement")}
+      </label>
+      <input
+        id="deliveryAddress2"
+        type="text"
+        class="w-full border border-[#5C3F32] rounded-md p-2"
+      />
+    </div>
+
+    <div>
+      <label class="block font-semibold mb-1 text-[#5C3F32]">
+        {t("destination.phone")} *
+      </label>
+      <input
+        id="deliveryPhone"
+        type="text"
+        class="w-full border border-[#5C3F32] rounded-md p-2"
+        required
+      />
+    </div>
+
+    <div>
+      <label class="block font-semibold mb-1 text-[#5C3F32]">
+        {t("destination.postalCode")} *
+      </label>
+      <input
+        id="deliveryPostal"
+        type="text"
+        class="w-full border border-[#5C3F32] rounded-md p-2"
+        required
+      />
+    </div>
+
+    <div>
+      <label class="block font-semibold mb-1 text-[#5C3F32]">
+        {t("destination.city")} *
+      </label>
+      <input
+        id="deliveryCity"
+        type="text"
+        class="w-full border border-[#5C3F32] rounded-md p-2"
+        required
+      />
+    </div>
+
+    <div>
+      <label class="block font-semibold mb-1 text-[#5C3F32]">
+        {t("destination.country")} *
+      </label>
+      <select
+        id="deliveryCountry"
+        class="w-full border border-[#5C3F32] rounded-md p-2"
+        required
+      >
+        {countries.map((c) => <option value={c}>{c}</option>)}
+      </select>
+    </div>
+
+    <div class="flex justify-end gap-2">
+      <button
+        id="cancelAddressForm"
+        type="button"
+        class="border border-[#5C3F32] text-[#5C3F32] px-4 py-2 rounded-md"
+      >
+        {t("destination.cancel")}
+      </button>
+      <button
+        id="saveAddressBtn"
+        type="button"
+        class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition"
+      >
+        {t("destination.save")}
+      </button>
+    </div>
+  </form>
+
+  <!-- Navigation buttons to steps -->
+  <div class="flex justify-between gap-2 mt-4">
+    <button
+      id="backToStep1"
+      type="button"
+      class="border border-[#5C3F32] text-[#5C3F32] px-6 py-2 rounded-md hover:bg-[#f9f4ee] transition"
+    >
+      ← {t("destination.previous")}
+    </button>
+    <button
+      id="toStep3"
+      type="button"
+      class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition"
+    >
+      {t("destination.continue")}
+    </button>
+  </div>
 </div>
 
-<!-- ADDRESS COMPLEMENT -->
-<div>
-  <label class="block font-semibold mb-1 text-[#5C3F32]">
-    {t("destination.addressComplement")}
-  </label>
-  <input
-    id="deliveryAddress2"
-    type="text"
-    class="w-full border border-[#5C3F32] rounded-md p-2"
-    placeholder="Appartement B, Bâtiment 3, etc."
-  />
-</div>
 
 
 
-<div>
-  <label class="block font-semibold mb-1 text-[#5C3F32]">
-    {t("destination.phone")} *
-  </label>
-  <input
-    id="deliveryPhone"
-    type="text"
-    class="w-full border border-[#5C3F32] rounded-md p-2"
-    placeholder="+33 6 12 34 56 78"
-    required
-  />
-</div>
-
-
-            <div>
-              <label class="block font-semibold mb-1 text-[#5C3F32]">
-                {t("destination.postalCode")} *
-              </label>
-              <input
-                id="deliveryPostal"
-                type="text"
-                class="w-full border border-[#5C3F32] rounded-md p-2"
-                required
-              />
-            </div>
-
-            <div>
-              <label class="block font-semibold mb-1 text-[#5C3F32]">
-                {t("destination.city")} *
-              </label>
-              <input
-                id="deliveryCity"
-                type="text"
-                class="w-full border border-[#5C3F32] rounded-md p-2"
-                required
-              />
-            </div>
-
-            <div>
-              <label class="block font-semibold mb-1 text-[#5C3F32]">
-                {t("destination.country")} *
-              </label>
-              <select
-                class="w-full border border-[#5C3F32] rounded-md p-2"
-                id="deliveryCountry"
-                required
-              >
-                {countries.map((c) => <option value={c}>{c}</option>)}
-              </select>
-            </div>
-
-            <div class="flex justify-between gap-2">
-              <button
-                id="backToStep1"
-                type="button"
-                class="border border-[#5C3F32] text-[#5C3F32] px-6 py-2 rounded-md hover:bg-[#f9f4ee] transition"
-              >
-                ← {t("destination.previous")}
-              </button>
-              <button
-                id="toStep3"
-                type="button"
-                class="bg-black text-white px-6 py-2 rounded-md hover:bg-[#5C3F32] transition"
-              >
-                {t("destination.continue")}
-              </button>
-            </div>
-          </form>
-        </div>
 
         <!-- STEP THREE -->
         <div id="stepThree" class="space-y-6 hidden">
