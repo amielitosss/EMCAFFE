@@ -108,12 +108,6 @@ document.addEventListener("DOMContentLoaded", () => {
   --------------------------------------------------------- */
   btnToStep3?.addEventListener("click", () => {
 
-    // ⭐ GUEST BLOCK IS NOT TOUCHED (AS YOU REQUESTED)
-    if (isGuestMode) {
-      alert("Veuillez vous connecter pour continuer.");
-      return;
-    }
-
     const required = [
       "deliveryFirstName",
       "deliveryLastName",
