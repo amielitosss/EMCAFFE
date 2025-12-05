@@ -524,6 +524,25 @@ const t = useTranslations(lang);
   </main>
 
   <Footer />
+  <!-- Hidden Success Messages for Translation -->
+<span id="paymentSuccessMessage" class="hidden">
+  Votre paiement a été effectué avec succès !
+</span>
+
+<span id="bankSuccessMessage" class="hidden">
+  Votre commande par virement a été enregistrée avec succès !
+</span>
+
+<!-- Popup Modal -->
+<div id="paymentSuccessPopup" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm text-center">
+    <h2 id="popupMessage" class="text-lg font-semibold mb-4"></h2>
+    <button id="popupCloseBtn" class="bg-[#A47343] text-white px-4 py-2 rounded">
+      OK
+    </button>
+  </div>
+</div>
+
 </Layout>
 
 <!-- Scripts -->

@@ -308,7 +308,25 @@
   "payment": "Paiement",
   "payWithVirement": "Payer par Virement bancaire",
   "payWithCard": "Payer par carte bancaire",
-  "order": "Commander"
+  "order": "Commander",
+
+
+    "login": "Connexion",
+    "register": "Inscription",
+    "confirmPassword": "Confirmer le mot de passe",
+    "passwordRequirements": "Le mot de passe doit contenir au moins 8 caractères",
+    "acceptTerms": "J'accepte les",
+    "termsAndConditions": "Conditions générales",
+    "or": "ou",
+    "continueAsGuest": "Continuer en tant qu'invité",
+    "deliveryType": "Type de Livraison",
+    "deliveryHome": "Livraison à Domicile",
+    "deliveryHomeDesc": "Votre commande sera livrée à votre adresse.",
+    "deliveryRelay": "Point Relais",
+    "deliveryRelayDesc": "Récupérez votre commande dans un point relais proche.",
+    "deliverySpeed": "Vitesse de Livraison",
+    "businessDays": "jours ouvrés",
+    "selectRelayPoint": "Sélectionnez un Point Relais"
 
 },
 
@@ -452,44 +470,11 @@
   },
 
   
-  "destination": {
-    "personalInfo": "Informations personnelles",
-    "login": "Connexion",
-    "register": "Inscription",
-    "email": "Email",
-    "password": "Mot de passe",
-    "forgotPassword": "Mot de passe oublié ?",
-    "firstName": "Prénom",
-    "lastName": "Nom",
-    "confirmPassword": "Confirmer le mot de passe",
-    "passwordRequirements": "Le mot de passe doit contenir au moins 8 caractères",
-    "acceptTerms": "J'accepte les",
-    "termsAndConditions": "Conditions générales",
-    "or": "ou",
-    "continueAsGuest": "Continuer en tant qu'invité",
-    "addresses": "Adresse de livraison",
-    "address": "Adresse",
-    "addressComplement": "Complément d'adresse (Appartement, Bâtiment, etc.)",
-    "phone": "Téléphone",
-    "postalCode": "Code postal",
-    "city": "Ville",
-    "country": "Pays",
-    "previous": "Précédent",
-    "continue": "Continuer",
-"deliveryMode": "Mode de Livraison",
-    "deliveryType": "Type de Livraison",
-    "deliveryHome": "Livraison à Domicile",
-    "deliveryHomeDesc": "Votre commande sera livrée à votre adresse.",
-    "deliveryRelay": "Point Relais",
-    "deliveryRelayDesc": "Récupérez votre commande dans un point relais proche.",
-    "deliverySpeed": "Vitesse de Livraison",
-    "deliveryStandard": "Livraison Standard",
-    "deliveryExpress": "Livraison Express",
-    "businessDays": "jours ouvrés",
-    "selectRelayPoint": "Sélectionnez un Point Relais"
 
-  }
 
+
+  "payment_success_message": "Votre paiement a été confirmé. Votre commande a été envoyée par email.",
+  "bank_success_message": "Votre demande de virement a été enregistrée. Vous recevrez un email de confirmation."
 
 
 

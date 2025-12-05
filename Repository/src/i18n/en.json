@@ -423,7 +423,27 @@
   "payment": "Payment",
   "payWithVirement": "Pay with Bank transfer",
   "payWithCard": "Pay with credit card",
-  "order": "Order"
+  "order": "Order",
+
+    "login": "Login",
+    "register": "Register",
+
+
+    "confirmPassword": "Confirm Password",
+    "passwordRequirements": "Password must be at least 8 characters",
+    "acceptTerms": "I accept the",
+    "termsAndConditions": "Terms and Conditions",
+    "or": "or",
+    "continueAsGuest": "Continue as Guest",
+    "deliveryType": "Delivery Type",
+    "deliveryHome": "Home Delivery",
+    "deliveryHomeDesc": "Your order will be delivered to your home address.",
+    "deliveryRelay": "Pickup Point",
+    "deliveryRelayDesc": "Collect your order at a nearby pickup point.",
+    "deliverySpeed": "Delivery Speed",
+    "businessDays": "business days",
+    "selectRelayPoint": "Select a Pickup Point"
+
 },
 
 "cart.whatsapp.button": "Send Order via WhatsApp",
@@ -455,45 +475,10 @@
     "title": "Popup title"
   },
 
-  
-  "destination": {
-    "personalInfo": "Personal Information",
-    "login": "Login",
-    "register": "Register",
-    "password": "Password",
-    "forgotPassword": "Forgot password?",
 
-    "confirmPassword": "Confirm Password",
-    "passwordRequirements": "Password must be at least 8 characters",
-    "acceptTerms": "I accept the",
-    "termsAndConditions": "Terms and Conditions",
-    "or": "or",
-    "continueAsGuest": "Continue as Guest",
-    "addresses": "Delivery Address",
-    "email": "Email",
-    "firstName": "First Name",
-    "lastName": "Last Name",
-    "address": "Address",
-    "addressComplement": "Address Complement (Apartment, Building, etc.)",
-    "phone": "Phone Number",
-    "postalCode": "Postal Code",
-    "city": "City",
-    "country": "Country",
-    "deliveryMode": "Delivery Method",
-    "deliveryType": "Delivery Type",
-    "deliveryHome": "Home Delivery",
-    "deliveryHomeDesc": "Your order will be delivered to your home address.",
-    "deliveryRelay": "Pickup Point",
-    "deliveryRelayDesc": "Collect your order at a nearby pickup point.",
-    "deliverySpeed": "Delivery Speed",
-    "deliveryStandard": "Standard Delivery",
-    "deliveryExpress": "Express Delivery",
-    "businessDays": "business days",
-    "selectRelayPoint": "Select a Pickup Point",
-    "previous": "Previous",
-    "continue": "Continue"
-  }
 
+  "payment_success_message": "Your payment has been confirmed. Your order details have been sent by email.",
+  "bank_success_message": "Your bank transfer request has been recorded. You will receive a confirmation email."
 
 
 }

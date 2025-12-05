@@ -317,7 +317,24 @@
   "payment": "Pago",
   "payWithVirement": "Pagar con Transferencia bancaria",
   "payWithCard": "Pagar con tarjeta bancaria",
-  "order": "Ordenar"
+  "order": "Ordenar",
+
+    "login": "Login",
+    "register": "Register",
+    "confirmPassword": "Confirm Password",
+    "passwordRequirements": "Password must be at least 8 characters",
+    "acceptTerms": "I accept the",
+    "termsAndConditions": "Terms and Conditions",
+    "or": "or",
+    "continueAsGuest": "Continue as Guest",
+    "deliveryType": "Tipo de Entrega",
+    "deliveryHome": "Entrega a Domicilio",
+    "deliveryHomeDesc": "Su pedido será entregado en su dirección.",
+    "deliveryRelay": "Punto de Recogida",
+    "deliveryRelayDesc": "Recoja su pedido en un punto de recogida cercano.",
+    "deliverySpeed": "Velocidad de Entrega",
+    "businessDays": "días laborables",
+    "selectRelayPoint": "Seleccione un Punto de Recogida"
 },
 
 "destination.cardHolder": "Titular de la tarjeta",
@@ -455,43 +472,12 @@
   },
 
   
-  "destination": {
-    "personalInfo": "Personal Information",
-    "login": "Login",
-    "register": "Register",
-    "email": "Email",
-    "password": "Password",
-    "forgotPassword": "Forgot password?",
-    "firstName": "First Name",
-    "lastName": "Last Name",
-    "confirmPassword": "Confirm Password",
-    "passwordRequirements": "Password must be at least 8 characters",
-    "acceptTerms": "I accept the",
-    "termsAndConditions": "Terms and Conditions",
-    "or": "or",
-    "continueAsGuest": "Continue as Guest",
-    "addresses": "Dirección de entrega",
-    "address": "Dirección",
-    "addressComplement": "Complemento de dirección (Apartamento, Edificio, etc.)",
-    "phone": "Teléfono",
-    "postalCode": "Código postal",
-    "city": "Ciudad",
-    "country": "País",
-    "previous": "Anterior",
-    "continue": "Continuar",
-     "deliveryMode": "Método de Entrega",
-    "deliveryType": "Tipo de Entrega",
-    "deliveryHome": "Entrega a Domicilio",
-    "deliveryHomeDesc": "Su pedido será entregado en su dirección.",
-    "deliveryRelay": "Punto de Recogida",
-    "deliveryRelayDesc": "Recoja su pedido en un punto de recogida cercano.",
-    "deliverySpeed": "Velocidad de Entrega",
-    "deliveryStandard": "Entrega Estándar",
-    "deliveryExpress": "Entrega Exprés",
-    "businessDays": "días laborables",
-    "selectRelayPoint": "Seleccione un Punto de Recogida"
 
-  }
+  
+  "payment_success_message": "Su pago ha sido confirmado. Los detalles de su pedido han sido enviados por correo electrónico.",
+  "bank_success_message": "Su solicitud de transferencia bancaria ha sido registrada. Recibirá un correo de confirmación."
+
+
 
 
 
