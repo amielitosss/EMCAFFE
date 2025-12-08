@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: emcaffe
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: node ./dist/server/entry.mjs
+    envVars:
+      - key: NODE_VERSION
+        value: 18.17.0
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 10000
+services:
+  - type: web
+    name: emcaffe
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: node ./dist/server/entry.mjs
+    envVars:
+      - key: NODE_VERSION
+        value: 18.17.0
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 10000

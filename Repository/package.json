@@ -15,6 +15,7 @@
 		"@astrojs/check": "^0.9.3",
 		"@astrojs/compiler": "^2.10.3",
 		"@astrojs/netlify": "^6.6.3",
+		"@astrojs/node": "^9.5.1",
 		"@astrojs/tailwind": "^5.1.1",
 		"@fontsource/inter": "^5.0.21",
 		"astro": "^5.16.4",
