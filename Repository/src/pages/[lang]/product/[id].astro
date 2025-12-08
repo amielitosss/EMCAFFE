@@ -13,19 +13,41 @@ const { id } = Astro.params as { id: string; lang: string };
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang as 'en' | 'fr' | 'es');
 
-interface ProductResponse {
-  success: boolean;
-  data: Product;
-}
-
 let product: Product | null = null;
+let errorMessage = '';
 
 try {
+  console.log('🔍 Récupération du produit ID:', id);
+  
   const result = await productService.getProductWithVariants(id);
-  product = result.data;
-  console.log('Produit récupéré:', product);
+  
+  console.log('📦 Résultat brut API:', JSON.stringify(result, null, 2));
+  
+  // ✅ Vérifier la structure de la réponse
+  if (result && result.success && result.data) {
+    product = result.data;
+    console.log('✅ Produit récupéré:', product);
+  } else if (result && result.data) {
+    // Certaines API retournent directement data sans success
+    product = result.data;
+    console.log('✅ Produit récupéré (format alternatif):', product);
+  } else if (result) {
+    // Peut-être que result EST directement le produit
+    product = result as unknown as Product;
+    console.log('✅ Produit récupéré (format direct):', product);
+  }
+  
+  // Validation finale
+  if (!product || !product.id_product) {
+    console.error('❌ Produit invalide:', product);
+    errorMessage = 'Produit invalide ou incomplet';
+    product = null;
+  }
+  
 } catch (err) {
-  console.error('❌ Impossible de récupérer le produit :', err);
+  console.error('❌ Erreur lors de la récupération du produit :', err);
+  errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
+  product = null;
 }
 
 // Tabs et contenus
@@ -35,6 +57,7 @@ const tabTitles = {
   description: t('tab.description'),
 };
 
+// Valeurs par défaut sécurisées
 const translatedTitle = product?.name || 'Produit inconnu';
 const price = product?.price || 0;
 const img = product?.image_url || '/img/default-product.png';
@@ -43,6 +66,7 @@ const ingredient = product?.ingredient || '';
 const preparation = product?.preparation || '';
 const dimension = product?.size || '';
 ---
+
 <Layout title={`EMCAFFE - ${translatedTitle}`}>
   <Header />
 
@@ -59,10 +83,18 @@ const dimension = product?.size || '';
         dimension={dimension}
         tabTitles={tabTitles}
         t={t}
-        variants={product?.variants || []}
+        variants={product.variants || []}
       />
     ) : (
-      <p class="text-center text-gray-500 mt-8">Produit introuvable.</p>
+      <div class="text-center mt-8">
+        <p class="text-gray-500 text-xl mb-4">Produit introuvable.</p>
+        {errorMessage && (
+          <p class="text-red-500 text-sm">Erreur : {errorMessage}</p>
+        )}
+        <a href="/shop" class="text-blue-500 hover:underline mt-4 inline-block">
+          Retour à la boutique
+        </a>
+      </div>
     )}
   </main>
 
