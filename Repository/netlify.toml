@@ -1,0 +1,10 @@
+# netlify.toml
+[build]
+  command = "npm run build"  # Doit générer dist/client et .netlify/functions
+  publish = "dist/client"    # ✅ Chemin des assets statiques
+  functions = ".netlify/functions"  # ✅ Chemin des fonctions serverless
+
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/entry"
+  status = 200
