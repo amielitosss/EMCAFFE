@@ -1,10 +1,17 @@
-# netlify.toml
 [build]
-  command = "npm run build"  # Doit générer dist/client et .netlify/functions
-  publish = "dist/client"    # ✅ Chemin des assets statiques
-  functions = ".netlify/functions"  # ✅ Chemin des fonctions serverless
+  base = "Repository"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "18"
 
 [[redirects]]
   from = "/*"
   to = "/.netlify/functions/entry"
   status = 200
+
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
