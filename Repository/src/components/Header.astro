@@ -21,7 +21,7 @@ const isHomePage = (isShopPage || isContactRedirect) === false;
 			<span class="burger-line"></span>
 		</button>
 
-		<!-- Logo (Centré sur mobile, à gauche sur desktop) -->
+		<!-- Logo -->
 		<a
 			href={`/${lang}/`}
 			class="absolute left-1/2 flex -translate-x-1/2 flex-row items-center justify-center gap-x-2 py-2 md:relative md:left-auto md:translate-x-0 md:gap-x-4 md:py-0 lg:gap-x-14"
@@ -35,10 +35,12 @@ const isHomePage = (isShopPage || isContactRedirect) === false;
 			</picture>
 		</a>
 
+		<!-- Icons mobiles -->
 		<div class="flex items-center gap-4 md:hidden">
 			<!-- Account Icon -->
 			<a
 				href={`/${lang}/log`}
+				id="account-icon-mobile"
 				class="text-inherit transition hover:scale-110"
 			>
 				<svg
@@ -77,28 +79,44 @@ const isHomePage = (isShopPage || isContactRedirect) === false;
 			</a>
 		</div>
 
-		<!-- Navigation complète (Desktop uniquement) -->
+		<!-- Navigation -->
 		<nav id="nav-menu" class="nav-menu">
 			<ul class="flex flex-col items-center gap-6 md:flex-row md:gap-x-6">
 				<!-- Navigation Links -->
 				<li
 					class="text-lg font-bold font-semibold uppercase hover:text-[#753E1C] md:text-lg md:font-semibold md:normal-case"
 				>
-					<a href={`/${lang}/`} class="nav-link font-[Chalkduster]">{t('nav.home')}</a>
+					<a href={`/${lang}/`} class="nav-link font-[Chalkduster]"
+						>{t('nav.home')}</a
+					>
 				</li>
 				<li
 					class="text-lg font-bold font-semibold uppercase hover:text-[#753E1C] md:text-lg md:font-semibold md:normal-case"
 				>
-					<a href={`/${lang}/shop`} class="nav-link font-[Chalkduster]"
+					<a
+						href={`/${lang}/shop`}
+						class="nav-link font-[Chalkduster]"
 						>{t('nav.products')}</a
 					>
 				</li>
 				<li
 					class="text-lg font-bold font-semibold uppercase hover:text-[#753E1C] md:text-lg md:font-semibold md:normal-case"
 				>
-					<a href={`/${lang}/contact`} class="nav-link font-[Chalkduster]"
+					<a
+						href={`/${lang}/contact`}
+						class="nav-link font-[Chalkduster]"
 						>{t('nav.contact')}</a
 					>
+				</li>
+
+				<!-- Orders link (shown only when logged in) -->
+				<li class="text-lg font-bold uppercase hover:text-[#753E1C]">
+					<a
+						href={`/${lang}/track-order`}
+						class="nav-link font-[Chalkduster]"
+					>
+						Suivre ma commande
+					</a>
 				</li>
 
 				<!-- Language Picker -->
@@ -107,10 +125,12 @@ const isHomePage = (isShopPage || isContactRedirect) === false;
 				</li>
 
 				<!-- Account Icon (Desktop) -->
-				<li class="hidden md:block">
+				<li class="hidden md:block" id="account-nav-item">
 					<a
 						href={`/${lang}/log`}
+						id="account-icon-desktop"
 						class="text-inherit transition hover:scale-110"
+						title="Mon compte"
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -123,6 +143,26 @@ const isHomePage = (isShopPage || isContactRedirect) === false;
 							></path>
 						</svg>
 					</a>
+				</li>
+
+				<!-- Logout Button (shown only when logged in) -->
+				<li class="hidden md:block" id="logout-nav-item">
+					<button
+						id="logout-btn-desktop"
+						class="flex items-center gap-2 text-inherit transition hover:scale-110 hover:text-red-600"
+						title="Déconnexion"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 512 512"
+							class="header-icon h-6 w-6 transition-colors duration-300"
+							fill="currentColor"
+						>
+							<path
+								d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"
+							></path>
+						</svg>
+					</button>
 				</li>
 
 				<!-- Cart Icon (Desktop) -->
@@ -148,6 +188,26 @@ const isHomePage = (isShopPage || isContactRedirect) === false;
 					>
 						0
 					</span>
+				</li>
+
+				<!-- Logout mobile -->
+				<li class="md:hidden" id="logout-mobile-item">
+					<button
+						id="logout-btn-mobile"
+						class="flex w-full items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-white transition hover:bg-red-700"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 512 512"
+							class="h-5 w-5"
+							fill="currentColor"
+						>
+							<path
+								d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"
+							></path>
+						</svg>
+						Déconnexion
+					</button>
 				</li>
 			</ul>
 		</nav>
@@ -267,12 +327,78 @@ const isHomePage = (isShopPage || isContactRedirect) === false;
 	const navMenu = document.getElementById('nav-menu');
 	const navLinks = Array.from(document.querySelectorAll('#nav-menu a'));
 
+	// Auth elements
+	const accountIconMobile = document.getElementById('account-icon-mobile');
+	const accountIconDesktop = document.getElementById('account-icon-desktop');
+	const ordersNavItem = document.getElementById('orders-nav-item');
+	const logoutNavItem = document.getElementById('logout-nav-item');
+	const logoutMobileItem = document.getElementById('logout-mobile-item');
+	const logoutBtnDesktop = document.getElementById('logout-btn-desktop');
+	const logoutBtnMobile = document.getElementById('logout-btn-mobile');
+
 	let currentState = false;
 	let currentThreshold = header?.offsetTop;
 	let isMobile = window.innerWidth < 640;
 
 	const currentPath = window.location.pathname;
 	const isEffectEnabled = currentPath.length <= 4;
+
+	// ✅ Check authentication and update UI
+	function updateAuthUI() {
+		const token = localStorage.getItem('token');
+		const isLoggedIn = !!token;
+
+		if (isLoggedIn) {
+			// Show orders and logout
+			ordersNavItem?.classList.remove('hidden');
+			logoutNavItem?.classList.remove('hidden');
+			logoutMobileItem?.classList.remove('hidden');
+
+			// Change account icon to orders page
+			if (accountIconMobile) {
+				accountIconMobile.setAttribute('href', `/${getLang()}/account`);
+				accountIconMobile.setAttribute('title', 'Mes commandes');
+			}
+			if (accountIconDesktop) {
+				accountIconDesktop.setAttribute('href', `/${getLang()}/account`);
+				accountIconDesktop.setAttribute('title', 'Mes commandes');
+			}
+		} else {
+			// Hide orders and logout
+			logoutNavItem?.classList.add('hidden');
+			logoutMobileItem?.classList.add('hidden');
+
+			// Keep account icon as login
+			if (accountIconMobile) {
+				accountIconMobile.setAttribute('href', `/${getLang()}/log`);
+				accountIconMobile.setAttribute('title', 'Se connecter');
+			}
+			if (accountIconDesktop) {
+				accountIconDesktop.setAttribute('href', `/${getLang()}/log`);
+				accountIconDesktop.setAttribute('title', 'Se connecter');
+			}
+		}
+	}
+
+	// ✅ Logout function
+	function handleLogout() {
+		if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+			localStorage.removeItem('token');
+			localStorage.removeItem('user');
+			updateAuthUI();
+			window.location.href = `/${getLang()}/`;
+		}
+	}
+
+	// ✅ Get current language
+	function getLang(): string {
+		const path = window.location.pathname;
+		return path.startsWith('/en') ? 'en' : 'fr';
+	}
+
+	// Attach logout handlers
+	logoutBtnDesktop?.addEventListener('click', handleLogout);
+	logoutBtnMobile?.addEventListener('click', handleLogout);
 
 	// Burger menu toggle
 	burgerBtn?.addEventListener('click', () => {
@@ -347,7 +473,9 @@ const isHomePage = (isShopPage || isContactRedirect) === false;
 		}
 	}
 
+	// ✅ Initialize on page load
 	document.addEventListener('DOMContentLoaded', () => {
+		updateAuthUI();
 		(window as any).updateCartBadge?.();
 	});
 </script>

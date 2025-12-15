@@ -25,7 +25,7 @@ const defaultVariant = sortedVariants[0];
   <div class="flex flex-col lg:flex-row lg:items-start lg:gap-8">
     <!-- COLONNE GAUCHE - Images avec titre -->
     <div class="flex flex-col items-center lg:sticky lg:top-24 lg:w-1/2 lg:self-start mt-4">
-      
+
       <!-- Titre au-dessus de l'image (visible uniquement sur desktop) -->
       <h2 class="hidden lg:block mb-6 text-center text-2xl font-bold text-[#5C3F32] leading-tight lg:text-3xl xl:text-4xl px-4 font-[Chalkduster]">
         {productName}
@@ -116,7 +116,6 @@ const defaultVariant = sortedVariants[0];
   </div>
 </div>
 
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const quantityInput = document.getElementById('quantity') as HTMLInputElement | null;
@@ -124,33 +123,91 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnPlus = document.getElementById('btn-plus');
   const addToCartBtn = document.getElementById('addToCart');
   const priceEl = document.getElementById('price');
-  const imgBase = document.getElementById('image')?.getAttribute('data-img') ?? '';
+  const mainImage = document.getElementById('image') as HTMLImageElement | null;
+  const imgBase = mainImage?.getAttribute('data-img') ?? '';
 
-  // Variantes dynamiques
-  const variants: { format: string; price: number }[] = addToCartBtn
+  // ✅ GESTION DES ONGLETS
+  const tabButtons = document.querySelectorAll('.tablinks');
+  const tabContents = document.querySelectorAll('.tabcontent');
+
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const targetTab = button.getAttribute('data-tab');
+      
+      // Masquer tous les contenus
+      tabContents.forEach(content => {
+        content.classList.add('hidden');
+      });
+      
+      // Retirer les styles actifs de tous les boutons
+      tabButtons.forEach(btn => {
+        btn.classList.remove('border-b-2', 'border-[#5C3F32]', 'text-[#5C3F32]');
+        btn.classList.add('text-gray-500');
+      });
+      
+      // Afficher le contenu ciblé
+      const targetContent = document.getElementById(targetTab!);
+      if (targetContent) {
+        targetContent.classList.remove('hidden');
+      }
+      
+      // Activer le bouton cliqué
+      button.classList.add('border-b-2', 'border-[#5C3F32]', 'text-[#5C3F32]');
+      button.classList.remove('text-gray-500');
+    });
+  });
+
+  // ✅ GESTION DU CHANGEMENT D'IMAGE
+  const thumbButtons = document.querySelectorAll('.format-thumb');
+  
+  thumbButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const imgNum = button.getAttribute('data-img-num');
+      if (mainImage && imgNum) {
+        mainImage.src = `${imgBase}-${imgNum}.png`;
+        console.log('🖼️ Image changée:', mainImage.src);
+      }
+    });
+  });
+
+  // ✅ Interface corrigée selon vos vrais noms de champs
+  interface Variant {
+    idVariant: string;
+    productId: string;
+    format: string;
+    price: number;
+  }
+
+  const variants: Variant[] = addToCartBtn
     ? JSON.parse(addToCartBtn.dataset.variants ?? '[]')
     : [];
 
-  // Création des boutons dynamiques
+  console.log('🔍 Variants chargés:', variants);
+
+  // ✅ Création des boutons dynamiques
   const formatContainer = document.getElementById('formatButtons');
-  let selectedFormat = variants[0]?.format || '';
-  const priceMap: Record<string, number> = {};
+  let selectedVariant: Variant = variants[0] || { 
+    idVariant: '', 
+    productId: '',
+    format: '', 
+    price: 0 
+  };
 
   variants.forEach((v, i) => {
-    priceMap[v.format] = parseFloat(v.price as any);
-
     const btn = document.createElement('button');
     btn.textContent = v.format;
     btn.className = `rounded-lg border-2 border-[#A47343] px-4 py-2 font-semibold transition sm:px-5 sm:py-2.5 ${
       i === 0 ? 'bg-[#A47343] text-white' : 'text-[#A47343]'
     }`;
     btn.dataset.format = v.format;
+    btn.dataset.variantId = v.idVariant;
 
     btn.addEventListener('click', () => {
-      selectedFormat = v.format;
-      if (priceEl) priceEl.textContent = priceMap[selectedFormat].toFixed(2) + '€';
+      selectedVariant = v;
+      console.log('✅ Variant sélectionné:', selectedVariant);
 
-      // Toggle classes
+      if (priceEl) priceEl.textContent = parseFloat(String(v.price)).toFixed(2) + '€';
+
       formatContainer?.querySelectorAll('button').forEach(b => {
         b.classList.remove('bg-[#A47343]','text-white');
         b.classList.add('text-[#A47343]');
@@ -168,50 +225,36 @@ document.addEventListener('DOMContentLoaded', () => {
       quantityInput.value = String(parseInt(quantityInput.value) - 1);
     }
   });
+
   btnPlus?.addEventListener('click', () => {
-    if (quantityInput) quantityInput.value = String(parseInt(quantityInput.value) + 1);
+    if (quantityInput) {
+      quantityInput.value = String(parseInt(quantityInput.value) + 1);
+    }
   });
 
-  // Changement image
-  document.querySelectorAll<HTMLElement>('.format-thumb').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const num = btn.dataset.imgNum ?? '1';
-      const imgEl = document.getElementById('image') as HTMLImageElement | null;
-      if (imgEl) imgEl.src = `${imgBase}-${num}.png`;
-    });
-  });
-
-  // Tabs
-  function openTab(tabName: string) {
-    document.querySelectorAll<HTMLElement>('.tabcontent').forEach(tab => tab.classList.add('hidden'));
-    document.querySelectorAll<HTMLElement>('.tablinks').forEach(link => {
-      link.classList.remove('border-b-2','border-[#5C3F32]','text-[#5C3F32]');
-      link.classList.add('text-gray-500');
-    });
-    document.getElementById(tabName)?.classList.remove('hidden');
-    document.querySelector<HTMLElement>(`.tablinks[data-tab="${tabName}"]`)?.classList.add('border-b-2','border-[#5C3F32]','text-[#5C3F32]');
-  }
-  document.querySelectorAll<HTMLElement>('.tablinks').forEach(button => {
-    button.addEventListener('click', () => {
-      const tabName = button.getAttribute('data-tab');
-      if (tabName) openTab(tabName);
-    });
-  });
-  openTab('ingredient');
-
-  // Ajout au panier
+  // ✅ Ajout au panier
   addToCartBtn?.addEventListener('click', () => {
     const quantityValue = parseInt(quantityInput?.value ?? '1');
+
     const product = {
       id: addToCartBtn.dataset.productId,
       name: addToCartBtn.dataset.productName,
-      price: priceMap[selectedFormat],
+      price: parseFloat(String(selectedVariant.price)),
       image: addToCartBtn.dataset.productImage,
       quantity: quantityValue,
-      format: selectedFormat
+      format: selectedVariant.format,
+      variantId: selectedVariant.idVariant
     };
-    window.addToCart?.(product);
-    window.dispatchAddToCartModal?.(product);
+
+    console.log('🛒 Produit final ajouté:', product);
+
+    if (typeof window.addToCart === 'function') {
+      window.addToCart(product);
+    }
+
+    if (typeof window.dispatchAddToCartModal === 'function') {
+      window.dispatchAddToCartModal(product);
+    }
   });
 });
 </script>

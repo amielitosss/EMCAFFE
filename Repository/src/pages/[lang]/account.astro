@@ -285,41 +285,68 @@ export { getStaticPaths };
                     </form>
                 </section>
 
-                <!-- Section Commandes -->
-                <section id="orders" class="rounded-2xl bg-white p-8 shadow-lg">
-                    <h2 class="mb-6 text-2xl font-bold text-[#5C3F32]">
-                        {t('account.ordersTitle') || 'Historique des commandes'}
-                    </h2>
+               Voici le code complet pour afficher les commandes de l'utilisateur dans son profil :
 
-                    <div id="orders-list" class="space-y-4">
-                        <!-- Les commandes seront chargées ici dynamiquement -->
-                    </div>
+<!-- Section Commandes -->
+<section id="orders" class="rounded-2xl bg-white p-8 shadow-lg">
+    <h2 class="mb-6 text-2xl font-bold text-[#5C3F32]">
+        {t('account.ordersTitle') || 'Historique des commandes'}
+    </h2>
 
-                    <div id="no-orders" class="py-12 text-center hidden">
-                        <svg
-                            class="mx-auto mb-4 h-24 w-24 text-gray-300"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                            />
-                        </svg>
-                        <p class="mb-4 text-lg text-gray-600">
-                            {t('account.noOrders') || 'Aucune commande pour le moment'}
-                        </p>
-                        <a
-                            href={`/${lang}/products`}
-                            class="inline-block rounded-lg bg-[#5C3F32] px-6 py-3 text-white transition-colors hover:bg-[#8B4513]"
-                        >
-                            {t('account.startShopping') || 'Commencer mes achats'}
-                        </a>
-                    </div>
-                </section>
+    <!-- Loading des commandes -->
+    <div id="orders-loading" class="py-12 text-center">
+        <svg class="mx-auto mb-4 h-12 w-12 animate-spin text-[#5C3F32]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        <p class="text-gray-600">Chargement de vos commandes...</p>
+    </div>
+
+    <!-- Liste des commandes -->
+    <div id="orders-list" class="space-y-4 hidden">
+        <!-- Les commandes seront chargées ici dynamiquement -->
+    </div>
+
+    <!-- Aucune commande -->
+    <div id="no-orders" class="py-12 text-center hidden">
+        <svg
+            class="mx-auto mb-4 h-24 w-24 text-gray-300"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+            />
+        </svg>
+        <p class="mb-4 text-lg text-gray-600">
+            {t('account.noOrders') || 'Aucune commande pour le moment'}
+        </p>
+        <a
+            href={`/${lang}/products`}
+            class="inline-block rounded-lg bg-[#5C3F32] px-6 py-3 text-white transition-colors hover:bg-[#8B4513]"
+        >
+            {t('account.startShopping') || 'Commencer mes achats'}
+        </a>
+    </div>
+
+    <!-- Erreur chargement commandes -->
+    <div id="orders-error" class="py-12 text-center text-red-600 hidden">
+        <svg class="mx-auto mb-4 h-16 w-16 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <p class="text-lg font-semibold mb-2">Erreur de chargement</p>
+        <p class="text-sm text-gray-600 mb-4" id="orders-error-message"></p>
+        <button
+            id="retry-orders-btn"
+            class="inline-block rounded-lg bg-[#5C3F32] px-6 py-3 text-white hover:bg-[#8B4513] transition-colors"
+        >
+            Réessayer
+        </button>
+    </div>
+</section>
 
                 <!-- Section Paramètres -->
                 <section id="settings" class="rounded-2xl bg-white p-8 shadow-lg">
@@ -410,6 +437,8 @@ export { getStaticPaths };
 <script>
   import type { Gender } from '@/lib/api/types/user.types';
 import { userService } from '@/lib/api/userService';
+
+  import { orderService } from '@/lib/api/orderService';
   
   const lang = document.documentElement.lang || 'fr';
   
@@ -507,13 +536,11 @@ import { userService } from '@/lib/api/userService';
   }
   
   async function initAccount() {
-    
-    // Vérifier l'authentification
     const isAuth = userService.isAuthenticated();
-    console.log('Authentifié:', isAuth);
-    
+    console.log('🔐 Authentifié:', isAuth);
+
     if (!isAuth) {
-      console.log('Non authentifié, redirection...');
+      console.log('❌ Non authentifié, redirection...');
       showError('Vous devez être connecté pour accéder à cette page');
       setTimeout(() => {
         window.location.href = `/${lang}/log`;
@@ -524,18 +551,18 @@ import { userService } from '@/lib/api/userService';
     try {
       const user = await userService.getProfile();
       console.log('✅ Profil reçu:', user);
-      
-      // Mettre à jour l'interface
+
       updateUserInterface(user);
-      
-      // Masquer le loading et afficher le contenu
       hideLoadingScreen();
-      
+
+      // ✅ Charger les commandes après le profil
+      await loadOrders();
+
     } catch (error) {
-      console.error('Erreur lors du chargement:', error);
-      
+      console.error('❌ Erreur lors du chargement:', error);
+
       if (error instanceof Error && (error.message.includes('401') || error.message.includes('Session'))) {
-        console.log('Token invalide, déconnexion...');
+        console.log('🔓 Token invalide, déconnexion...');
         userService.logout();
         showError('Votre session a expiré');
         setTimeout(() => {
@@ -663,6 +690,197 @@ import { userService } from '@/lib/api/userService';
     initAccount();
     setupProfileEditing();
     setupLogout();
+  });
+async function loadOrders() {
+    const ordersLoading = document.getElementById('orders-loading');
+    const ordersList = document.getElementById('orders-list');
+    const noOrders = document.getElementById('no-orders');
+    const ordersError = document.getElementById('orders-error');
+    const ordersErrorMessage = document.getElementById('orders-error-message');
+
+    console.log('🛒 Chargement des commandes...');
+
+    try {
+      const orders = await orderService.getMyOrders();
+      console.log('✅ Commandes reçues:', orders);
+
+      // Masquer le loading
+      ordersLoading?.classList.add('hidden');
+
+      if (!orders || orders.length === 0) {
+        console.log('ℹ️ Aucune commande trouvée');
+        noOrders?.classList.remove('hidden');
+        return;
+      }
+
+      // Afficher la liste des commandes
+      ordersList?.classList.remove('hidden');
+      
+      if (ordersList) {
+        ordersList.innerHTML = orders.map(order => {
+          const statusConfig = getStatusConfig(order.status);
+          const itemCount = order.orderItems?.length || 0;
+          
+          return `
+            <div class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+              <!-- En-tête commande -->
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
+                <div>
+                  <p class="text-sm text-gray-500 mb-1">
+                    Commande n° <span class="font-mono font-semibold">${order.id_order.slice(0, 8)}</span>
+                  </p>
+                  <p class="text-xs text-gray-400">
+                    ${new Date(order.created_at).toLocaleDateString('fr-FR', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric'
+                    })}
+                  </p>
+                </div>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${statusConfig.class}">
+                  ${statusConfig.icon} ${statusConfig.label}
+                </span>
+              </div>
+
+             <!-- Articles -->
+<div class="mb-4 space-y-2">
+  ${order.orderItems?.slice(0, 2).map(item => `
+    <div class="flex items-center gap-3">
+      <img 
+        src="${getImageUrl(item.product?.image_url)}" 
+        alt="${item.product?.name || 'Produit'}"
+        class="w-12 h-12 object-cover rounded"
+        onerror="this.src='/img/placeholder-product.jpg'"
+      />
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium text-gray-900 truncate">${item.product?.name || 'Produit inconnu'}</p>
+        <p class="text-xs text-gray-500">Quantité: ${item.quantity}</p>
+      </div>
+      <p class="text-sm font-semibold text-gray-900">${(Number(item.unit_price) * item.quantity).toFixed(2)}€</p>
+    </div>
+  `).join('')}
+  ${itemCount > 2 ? `
+    <p class="text-xs text-gray-500 italic pl-15">
+      + ${itemCount - 2} autre${itemCount > 3 ? 's' : ''} article${itemCount > 3 ? 's' : ''}
+    </p>
+  ` : ''}
+</div>
+
+              <!-- Footer -->
+              <div class="flex items-center justify-between pt-4 border-t">
+                <p class="text-lg font-bold text-[#5C3F32]">
+                  Total: ${Number(order.total).toFixed(2)}€
+                </p>
+                <a 
+                  href="/${lang}/track-order?id=${order.id_order}" 
+                  class="text-sm text-[#5C3F32] hover:text-[#8B4513] font-semibold transition-colors"
+                >
+                  Voir les détails →
+                </a>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+    } catch (error) {
+      console.error('❌ Erreur chargement commandes:', error);
+      
+      ordersLoading?.classList.add('hidden');
+      ordersError?.classList.remove('hidden');
+      
+      if (ordersErrorMessage) {
+        ordersErrorMessage.textContent = error instanceof Error 
+          ? error.message 
+          : 'Impossible de charger vos commandes';
+      }
+    }
+  }
+
+  // ✅ Fonction pour obtenir la config du statut
+  function getStatusConfig(status: string) {
+    const configs: Record<string, { label: string; icon: string; class: string }> = {
+      'PENDING': {
+        label: 'En attente',
+        icon: '⏳',
+        class: 'bg-yellow-100 text-yellow-800'
+      },
+      'CONFIRMED': {
+        label: 'Confirmée',
+        icon: '✅',
+        class: 'bg-green-100 text-green-800'
+      },
+      'SHIPPED': {
+        label: 'Expédiée',
+        icon: '🚚',
+        class: 'bg-blue-100 text-blue-800'
+      },
+      'DELIVERED': {
+        label: 'Livrée',
+        icon: '📦',
+        class: 'bg-indigo-100 text-indigo-800'
+      },
+      'CANCELLED': {
+        label: 'Annulée',
+        icon: '❌',
+        class: 'bg-red-100 text-red-800'
+      }
+    };
+    
+    return configs[status] || {
+      label: status,
+      icon: '❓',
+      class: 'bg-gray-100 text-gray-800'
+    };
+  }
+
+  // ✅ Fonction pour construire l'URL d'image
+  function getImageUrl(imageUrl: string | null | undefined): string {
+    if (!imageUrl) {
+      return '/img/placeholder-product.jpg';
+    }
+
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return imageUrl;
+    }
+
+    const hasExtension = /\.(jpg|jpeg|png|webp|gif)$/i.test(imageUrl);
+    let finalUrl = imageUrl;
+    
+    if (!hasExtension) {
+      finalUrl = `${imageUrl}-1.png`;
+    }
+
+    if (finalUrl.startsWith('/')) {
+      return finalUrl;
+    }
+
+    return `/img/products/${finalUrl}`;
+  }
+
+  // ✅ Bouton réessayer
+  function setupRetryOrders() {
+    const retryBtn = document.getElementById('retry-orders-btn');
+    retryBtn?.addEventListener('click', () => {
+      const ordersError = document.getElementById('orders-error');
+      const ordersLoading = document.getElementById('orders-loading');
+      
+      ordersError?.classList.add('hidden');
+      ordersLoading?.classList.remove('hidden');
+      
+      loadOrders();
+    });
+  }
+
+  // ✅ Modifier la fonction initAccount
+  
+
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('✅ DOM chargé, démarrage...');
+    initAccount();
+    setupProfileEditing();
+    setupLogout();
+    setupRetryOrders();
   });
 </script>
 

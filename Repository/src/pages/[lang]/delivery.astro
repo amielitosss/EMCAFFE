@@ -6,6 +6,7 @@ import countries from "@/data/countries.json";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import AuthForm from "@/components/delivery/AuthForm.astro";
 import SendCloudPickupPoint from "@/components/SendCloudPickupPoint.astro";
+import { sendcloudService } from "@/lib/api/sendCloudService";
 
 export function getStaticPaths() {
   const languages = ["fr", "en", "es"];
@@ -547,7 +548,7 @@ const t = useTranslations(lang);
 
 <!-- Scripts -->
 <script src="https://js.stripe.com/v3/"></script>
-<script src="/scripts/destination.js" defer></script>
+<script type="module" src="/scripts/destination.js" defer></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const deliveryHome = document.getElementById('deliveryHome') as HTMLInputElement;
