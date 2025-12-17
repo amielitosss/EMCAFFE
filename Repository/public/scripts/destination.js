@@ -1,10 +1,53 @@
-
 const STRIPE_PUBLIC_KEY =
 	'pk_test_51SVYto14tHXOJjU15ghHpxe0AP3n8abWKIuwHbRX3oQ55wVLmiHsdZNMVsDeAFuPJEVmknhbHLMLu6Ky0HEEHnRp00gKixVHNi';
 
 const API_BASE_URL = 'https://api-emcafe-3.onrender.com/api';
 
 document.addEventListener('DOMContentLoaded', () => {
+	async function computeSendcloudDeliveryCost({
+		isRelay,
+		totalWeight,
+		token,
+	}) {
+		const response = await fetch(
+			`${API_BASE_URL}/sendcloud/shipping-methods`,
+			{ headers: { Authorization: `Bearer ${token}` } },
+		);
+
+		const data = await response.json();
+		const methods = data.shipping_methods || [];
+		const weightKg = totalWeight / 1000;
+
+		const method = methods.find((m) => {
+			const min = parseFloat(m.min_weight);
+			const max = parseFloat(m.max_weight);
+
+			return (
+				m.carrier === 'colissimo' &&
+				m.service_point_input ===
+					(isRelay ? 'required' : 'not_required') &&
+				m.countries?.some((c) => c.iso_2 === 'FR') &&
+				min <= weightKg &&
+				weightKg <= max
+			);
+		});
+
+		if (!method) throw new Error('Aucune méthode SendCloud trouvée');
+
+		const fr = method.countries.find((c) => c.iso_2 === 'FR');
+		const price = Number(fr?.price ?? 0);
+
+		sessionStorage.setItem('deliveryCost', price.toString());
+		sessionStorage.setItem('sendcloudMethodId', method.id.toString());
+
+		console.log('💰 Livraison calculée:', {
+			method: method.name,
+			price,
+		});
+
+		return price;
+	}
+
 	console.log('destination.js loaded');
 
 	const cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -599,12 +642,23 @@ document.addEventListener('DOMContentLoaded', () => {
 						lastName: document
 							.getElementById('deliveryLastName')
 							?.value?.trim(),
-						address:
-							`${selectedRelay.name} - ${selectedRelay.street || ''} ${selectedRelay.house_number || ''}`.trim(),
-						address2: selectedRelay.additional_info || '',
-						city: selectedRelay.city || '',
-						postalCode: selectedRelay.postal_code || '',
-						country: selectedRelay.country || 'France',
+						address: document
+							.getElementById('deliveryAddress')
+							?.value?.trim(),
+						address2:
+							document
+								.getElementById('deliveryAddress2')
+								?.value?.trim() || '',
+						city: document
+							.getElementById('deliveryCity')
+							?.value?.trim(),
+						postalCode: document
+							.getElementById('deliveryPostal')
+							?.value?.trim(),
+						country:
+							document
+								.getElementById('deliveryCountry')
+								?.value?.trim() || 'France',
 						phone: document
 							.getElementById('deliveryPhone')
 							?.value?.trim(),
@@ -667,16 +721,19 @@ document.addEventListener('DOMContentLoaded', () => {
 					}
 				}
 
-                // Calcul du poids total du panier en grammes
-const totalWeight = cart.reduce((sum, item) => {
-  // extraire le nombre depuis le format, ex: '500g' => 500
-  const weightMatch = item.format?.match(/(\d+)/);
-  const itemWeight = weightMatch ? parseInt(weightMatch[1], 10) : 100; // défaut 100g
-  return sum + itemWeight * (parseInt(item.quantity, 10) || 1);
-}, 0);
+				// Calcul du poids total du panier en grammes
+				const totalWeight = cart.reduce((sum, item) => {
+					// extraire le nombre depuis le format, ex: '500g' => 500
+					const weightMatch = item.format?.match(/(\d+)/);
+					const itemWeight = weightMatch
+						? parseInt(weightMatch[1], 10)
+						: 100; // défaut 100g
+					return (
+						sum + itemWeight * (parseInt(item.quantity, 10) || 1)
+					);
+				}, 0);
 
-console.log('⚖️ Poids total du panier (g):', totalWeight);
-
+				console.log('⚖️ Poids total du panier (g):', totalWeight);
 
 				const deliveryCost = parseFloat(
 					sessionStorage.getItem('deliveryCost') || '0',
@@ -714,64 +771,138 @@ console.log('⚖️ Poids total du panier (g):', totalWeight);
 						quantity: item.quantity,
 						price: item.price,
 					})),
-					amount: total + deliveryCost,
+					amount:
+						cart.reduce(
+							(sum, i) =>
+								sum +
+								parseFloat(i.price || 0) *
+									parseInt(i.quantity, 10),
+							0,
+						) + deliveryCost,
 					delivery_cost: deliveryCost,
 				};
 
-				console.log('📦 Payload:', paymentPayload);
+				console.log('📦 Payload avant livraison:', paymentPayload);
 
-				// --- Création du colis SendCloud ---
-				
-					try {
-                        const { sendcloudService } = await import('../../src/lib/api/sendCloudService   ');
-						const parcelData = {
-							order_id: `order-${Date.now()}`,
-							order_number: `ORD-${Date.now()}`,
-							name: `${deliveryInfo.firstName} ${deliveryInfo.lastName}`,
-							address: deliveryInfo.address || 'Adresse inconnue',
-							address_2: deliveryInfo.address2 || '',
-							city: deliveryInfo.city || 'Ville inconnue',
-							postal_code: (
-								deliveryInfo.postalCode || '00000'
-							).replace(/\s/g, ''),
-							country:
-								deliveryInfo.country === 'France'
-									? 'FR'
-									: deliveryInfo.country,
-							telephone: deliveryInfo.phone || '0000000000',
-							email: customerEmail || 'no-reply@example.com',
-							weight: totalWeight,
-							is_relay_delivery: !!deliveryInfo.isRelayDelivery,
-							relay_point_id: deliveryInfo.relayId || null,
-							items: cart.map((item) => ({
-								description: item.name,
-								quantity: parseInt(item.quantity, 10) || 1,
-								 weight: item.format?.match(/(\d+)/)
-    ? parseInt(item.format.match(/(\d+)/)[1], 10)
-    : 100,
-								value: parseFloat(item.price || 0),
-							})),
-							request_label: true,
-						};
+				let sendcloudMethodId = null;
+				let selectedMethod = null;
+				let deliveryPrice = 0;
 
-						console.log('📦 Parcel data SendCloud:', parcelData);
+				try {
+					const totalWeightKg = totalWeight / 1000;
 
+					const response = await fetch(
+						`https://api-emcafe-3.onrender.com/api/sendcloud/shipping-methods?weightKg=${totalWeightKg}&isRelay=${deliveryInfo.isRelayDelivery}`,
+						{
+							headers: {
+								Authorization: `Bearer ${token}`,
+							},
+						},
+					);
 
-const parcel = await sendcloudService.createParcel(parcelData, token);
-console.log('✅ Colis SendCloud créé:', parcel);
+					const data = await response.json();
 
-						console.log('✅ Colis SendCloud créé:', parcel);
-					} catch (err) {
-						console.error(
-							'❌ Erreur création colis SendCloud:',
-							err,
-						);
-						alert(
-							'Erreur lors de la création du colis SendCloud : ' +
-								err.message,
+					if (!response.ok || !data.success) {
+						throw new Error(
+							data.error || 'Méthode de livraison introuvable',
 						);
 					}
-				
+
+					sendcloudMethodId = data.method.id;
+					deliveryPrice = data.method.price;
+
+					// 🔐 stockage centralisé
+					sessionStorage.setItem(
+						'deliveryCost',
+						deliveryPrice.toString(),
+					);
+
+					console.log('✅ Livraison sélectionnée:', {
+						id: sendcloudMethodId,
+						name: data.method.name,
+						price: deliveryPrice,
+					});
+				} catch (err) {
+					console.error('❌ Erreur livraison:', err);
+					alert('Impossible de calculer les frais de livraison.');
+					return;
+				}
+
+				paymentPayload.delivery_cost = deliveryPrice;
+				paymentPayload.amount =
+					cart.reduce(
+						(sum, i) =>
+							sum +
+							parseFloat(i.price || 0) * parseInt(i.quantity, 10),
+						0,
+					) + deliveryPrice;
+
+				if (sendcloudMethodId) {
+					paymentPayload.sendcloud_shipping_method_id =
+						sendcloudMethodId;
+				}
+
+				console.log('📦 Payload final:', paymentPayload);
+
+				// --- Création du colis SendCloud ---
+				try {
+					const { sendcloudService } = await import(
+						'../../src/lib/api/sendCloudService'
+					);
+
+					const parcelData = {
+						order_id: `order-${Date.now()}`,
+						order_number: `ORD-${Date.now()}`,
+						name: `${deliveryInfo.firstName} ${deliveryInfo.lastName}`,
+						address: deliveryInfo.address,
+						address_2: deliveryInfo.address2 || '',
+						city: deliveryInfo.city,
+						postal_code: deliveryInfo.postalCode.replace(/\s/g, ''),
+						country: 'FR',
+						telephone: deliveryInfo.phone,
+						email: customerEmail,
+						weight: totalWeight,
+
+						// ✅ Point relais
+						to_service_point: deliveryInfo.isRelayDelivery
+							? Number(deliveryInfo.relayId)
+							: undefined,
+						shipment:
+							deliveryInfo.isRelayDelivery && sendcloudMethodId
+								? {
+										id: sendcloudMethodId,
+										name:
+											selectedMethod?.name ||
+											'Colissimo Service Point',
+									}
+								: undefined,
+
+						items: cart.map((item) => ({
+							description: item.name,
+							quantity: parseInt(item.quantity, 10) || 1,
+							weight: item.format?.match(/(\d+)/)
+								? parseInt(item.format.match(/(\d+)/)[1], 10)
+								: 100,
+							value: parseFloat(item.price || 0),
+						})),
+
+						request_label: true,
+					};
+
+					console.log('📦 Parcel data SendCloud:', parcelData);
+
+					const parcel = await sendcloudService.createParcel(
+						parcelData,
+						token,
+					);
+					console.log('✅ Colis SendCloud créé:', parcel);
+				} catch (err) {
+					console.error('❌ Erreur création colis SendCloud:', err);
+					alert(
+						'Erreur lors de la création du colis SendCloud : ' +
+							err.message,
+					);
+				}
 
 				/* ---------------- VIREMENT BANCAIRE ---------------- */
 				if (paymentMethod === 'bank_transfer') {

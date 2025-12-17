@@ -159,7 +159,7 @@ const t = useTranslations(lang);
     orderResult.innerHTML = '';
 
     try {
-      const response = await fetch(`${API_URL}/track`, {
+      const response = await fetch(`${API_URL}/orders/track`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderId, postalCode })
