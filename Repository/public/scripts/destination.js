@@ -3,7 +3,6 @@ const STRIPE_PUBLIC_KEY =
 
 const API_BASE_URL = 'https://api-emcafe-3.onrender.com/api';
 
-
 document.addEventListener('DOMContentLoaded', () => {
 	async function computeSendcloudDeliveryCost({
 		isRelay,
@@ -845,9 +844,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
 				console.log('📦 Payload final:', paymentPayload);
 
+				async function createParcel(parcelData, token) {
+					const API_BASE = 'https://api-emcafe-3.onrender.com/api'; // ou import.meta.env.PUBLIC_API_URL si Astro
+
+					try {
+						const res = await fetch(
+							`${API_BASE}/sendcloud/parcels`,
+							{
+								method: 'POST',
+								headers: {
+									'Content-Type': 'application/json',
+									Authorization: `Bearer ${token}`,
+								},
+								body: JSON.stringify(parcelData),
+							},
+						);
+
+						if (!res.ok) {
+							const err = await res.json();
+							throw new Error(
+								err.error || 'Erreur création colis',
+							);
+						}
+
+						const json = await res.json();
+						return json.data; // la réponse du colis
+					} catch (err) {
+						console.error(
+							'❌ Erreur création colis SendCloud:',
+							err,
+						);
+						throw err;
+					}
+				}
+
 				// --- Création du colis SendCloud ---
 				try {
-
 					const parcelData = {
 						order_id: `order-${Date.now()}`,
 						order_number: `ORD-${Date.now()}`,
@@ -889,13 +921,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 					console.log('📦 Parcel data SendCloud:', parcelData);
 
-					const parcel = await sendcloudService.createParcel(
-						parcelData,
-						token,
-					);
+					const parcel = await createParcel(parcelData, token);
 					console.log('✅ Colis SendCloud créé:', parcel);
 				} catch (err) {
-					console.error('❌ Erreur création colis SendCloud:', err);
 					alert(
 						'Erreur lors de la création du colis SendCloud : ' +
 							err.message,

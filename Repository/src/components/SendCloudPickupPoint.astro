@@ -162,18 +162,11 @@ points = points.filter(point => point.carrier === 'colissimo');
       relayMap = initRelayMap(firstPoint.latitude, firstPoint.longitude, 13);
 
       const customIcon = L.divIcon({
-        className: 'custom-marker',
-         html: `
-    <img 
-      src="../../public/img/coffee-bean-filled-roast-brew-svgrepo-com(1).svg"
-      style="width:28px;height:28px;"
-      alt="Point relais café"
-    />
-  `,
-  iconSize: [22, 22],
+  className: 'custom-marker',
+  html: `<span style="font-size: 28px;">📍</span>`,
+  iconSize: [28, 28],
   iconAnchor: [14, 28]
-      });
-
+});
       pointsList.innerHTML = '';
 
       normalizedPoints.forEach((point, index) => {

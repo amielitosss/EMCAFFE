@@ -565,6 +565,10 @@ const t = useTranslations(lang);
 </Layout>
 
 <!-- Scripts -->
+ <script type="module" is:inline>
+  // Expose le service pour les scripts JS côté client
+  window.sendcloudService = sendcloudService;
+</script>
 <script src="https://js.stripe.com/v3/"></script>
 <script type="module" src="/scripts/destination.js" defer></script>
 <script>
