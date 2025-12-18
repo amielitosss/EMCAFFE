@@ -475,10 +475,28 @@
 
   
   "payment_success_message": "Su pago ha sido confirmado. Los detalles de su pedido han sido enviados por correo electrónico.",
-  "bank_success_message": "Su solicitud de transferencia bancaria ha sido registrada. Recibirá un correo de confirmación."
+  "bank_success_message": "Su solicitud de transferencia bancaria ha sido registrada. Recibirá un correo de confirmación.",
 
-
-
-
+  
+  "shop": { "title": "EMCAFFÉ" },
+  "trackOrder": {
+    "title": "Seguimiento de pedido",
+    "enterPostalCode": "Por favor ingrese su código postal para ver el estado de su pedido.",
+    "postalCode": "Código postal",
+    "track": "Rastrear mi pedido",
+    "orderId": "ID del pedido",
+    "status": "Estado",
+    "date": "Fecha",
+    "trackingNumber": "Número de seguimiento",
+    "deliveryCity": "Ciudad de entrega",
+    "relayDelivery": "Entrega en punto de recogida",
+    "relayPoint": "Punto de recogida",
+    "quantity": "Cantidad",
+    "price": "Precio",
+    "trackParcel": "Rastrear paquete"
+  },
+  "product": {
+  "details": "Detalles del producto"
+  }
 
 }

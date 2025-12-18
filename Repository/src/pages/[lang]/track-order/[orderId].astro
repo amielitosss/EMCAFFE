@@ -1,0 +1,130 @@
+---
+import Footer from '@/components/Footer.astro';
+import Header from '@/components/Header.astro';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+import Layout from '@/layouts/Layout.astro';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Récupérer l'ID de commande depuis l'URL
+const urlParts = Astro.url.pathname.split('/');
+const orderId = urlParts[urlParts.length - 1]; // suppose /fr/track/ORDER_ID
+---
+<Layout title={`EMCAFFE - ${t('shop.title')}`}>
+  <Header />
+
+  <section class="max-w-4xl mx-auto py-12 px-4 mt-48">
+
+    <h1 class="text-3xl font-bold mb-6">{t('trackOrder.title') || 'Suivi de commande'}</h1>
+
+    <p class="mb-4">
+      {t('trackOrder.enterPostalCode') || 'Veuillez entrer votre code postal pour voir le statut de votre commande.'}
+    </p>
+
+    <form id="track-order-form" class="flex gap-4 mb-6" data-order-id={orderId}>
+      <input
+        type="text"
+        name="postalCode"
+        placeholder={t('trackOrder.postalCode') || 'Code postal'}
+        required
+        class="border p-2 rounded w-full sm:w-1/2"
+      />
+      <button
+        type="submit"
+        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+      >
+        {t('trackOrder.track') || 'Suivre ma commande'}
+      </button>
+    </form>
+
+    <div id="track-order-result" class="mt-6"></div>
+  </section>
+
+  <Footer />
+</Layout>
+
+<script is:inline>
+document.getElementById('track-order-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const form = e.currentTarget;
+  const orderId = form.dataset.orderId;
+  const postalCode = form.postalCode.value.trim();
+  if (!postalCode) return;
+
+  const resultContainer = document.getElementById('track-order-result');
+  resultContainer.innerHTML = '<p>Chargement...</p>';
+
+  try {
+    const response = await fetch('https://api-emcafe-3.onrender.com/api/orders/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId, postalCode })
+    });
+
+    const data = await response.json();
+
+    if (!data.success) {
+      resultContainer.innerHTML = `<p class="text-red-600">${data.message}</p>`;
+      return;
+    }
+
+    const order = data.data;
+
+    // Génération des produits et variantes (sans ID)
+    let itemsHTML = '';
+    if (order.orderItems && order.orderItems.length > 0) {
+      itemsHTML = '<ul class="space-y-3 mt-4">';
+      order.orderItems.forEach(item => {
+        let variantHTML = '';
+        if (item.variant && Object.keys(item.variant).length > 0) {
+          variantHTML = Object.entries(item.variant)
+            .filter(([key, value]) => value && key !== 'id') // ignore 'id'
+            .map(([key, value]) => `<p class="text-sm text-gray-600">${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}</p>`)
+            .join('');
+        }
+
+        itemsHTML += `
+          <li class="flex justify-between items-center border rounded-lg p-3 hover:shadow-md transition">
+            <div>
+              <p class="font-bold text-[#5C3F32]">${item.product.name}</p>
+              ${variantHTML}
+              <p class="text-sm">Quantité: ${item.quantity}</p>
+              <p class="text-sm font-medium">Prix: ${item.price}€</p>
+            </div>
+            <img src="${item.product.image_url}-1.png" alt="${item.product.name}" class="w-20 h-20 object-contain rounded"/>
+          </li>
+        `;
+      });
+      itemsHTML += '</ul>';
+    }
+
+    // Affichage final
+    resultContainer.innerHTML = `
+      <div class="bg-white shadow-md rounded-lg p-6 space-y-4">
+        <h2 class="text-2xl font-bold text-[#5C3F32]">Commande ${order.id_order}</h2>
+
+        <div class="flex flex-wrap gap-4 items-center">
+          <p><strong>Statut :</strong> <span class="px-2 py-1 rounded-full text-white ${order.status === 'PENDING' ? 'bg-yellow-500' : 'bg-green-500'}">${order.status}</span></p>
+          <p><strong>Date :</strong> ${new Date(order.created_at).toLocaleDateString()}</p>
+          <p><strong>Numéro de suivi :</strong> ${order.tracking_number || '-'}</p>
+          <p><strong>Ville :</strong> ${order.delivery_city}</p>
+          ${order.is_relay_delivery ? `<p><strong>Point relais :</strong> ${order.relay_point_name}</p>` : ''}
+        </div>
+
+        ${itemsHTML}
+
+        ${order.tracking_url ? `
+          <div class="mt-4 text-center">
+            <a href="${order.tracking_url}" target="_blank" class="inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">Suivre le colis</a>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  } catch (err) {
+    console.error(err);
+    resultContainer.innerHTML = `<p class="text-red-600">Erreur lors du suivi de la commande</p>`;
+  }
+});
+</script>

@@ -474,9 +474,32 @@
 
 
   "payment_success_message": "Votre paiement a été confirmé. Votre commande a été envoyée par email.",
-  "bank_success_message": "Votre demande de virement a été enregistrée. Vous recevrez un email de confirmation."
+  "bank_success_message": "Votre demande de virement a été enregistrée. Vous recevrez un email de confirmation.",
 
+
+
+  "shop": { "title": "EMCAFFÉ" },
+  "trackOrder": {
+    "title": "Suivi de commande",
+    "enterPostalCode": "Veuillez entrer votre code postal pour voir le statut de votre commande.",
+    "postalCode": "Code postal",
+    "track": "Suivre ma commande",
+    "orderId": "ID commande",
+    "status": "Statut",
+    "date": "Date",
+    "trackingNumber": "Numéro de suivi",
+    "deliveryCity": "Ville livraison",
+    "relayDelivery": "Livraison relais",
+    "relayPoint": "Point relais",
+    "quantity": "Quantité",
+    "price": "Prix",
+    "trackParcel": "Suivre le colis"
+
+},
+
+"product": {
+  "details": "Détails du produit"
+}
 
 
 }
-

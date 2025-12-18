@@ -478,7 +478,28 @@
 
 
   "payment_success_message": "Your payment has been confirmed. Your order details have been sent by email.",
-  "bank_success_message": "Your bank transfer request has been recorded. You will receive a confirmation email."
+  "bank_success_message": "Your bank transfer request has been recorded. You will receive a confirmation email.",
+
+   "shop": { "title": "EMCAFFÉ" },
+  "trackOrder": {
+    "title": "Order Tracking",
+    "enterPostalCode": "Please enter your postal code to see the status of your order.",
+    "postalCode": "Postal Code",
+    "track": "Track My Order",
+    "orderId": "Order ID",
+    "status": "Status",
+    "date": "Date",
+    "trackingNumber": "Tracking Number",
+    "deliveryCity": "Delivery City",
+    "relayDelivery": "Relay Delivery",
+    "relayPoint": "Relay Point",
+    "quantity": "Quantity",
+    "price": "Price",
+    "trackParcel": "Track Parcel"
+  },
+  "product": {
+  "details": "Product details"
+}
 
 
 }

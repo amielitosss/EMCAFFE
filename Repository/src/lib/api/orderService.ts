@@ -56,6 +56,27 @@ export const orderService = {
     return data.data;
   },
 
+   async trackOrder(orderId: string, postalCode: string): Promise<Order> {
+
+    const response = await fetch(`${API_BASE_URL}/orders/track`, {
+      method: 'POST',
+      headers: {
+        // 'Authorization': `Bearer ${token}`, // Décommenter si nécessaire
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ orderId, postalCode }),
+    });
+
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.message || 'Erreur lors du suivi de la commande');
+    }
+
+    return data.data;
+  },
+
+
   /**
    * Crée une nouvelle commande
    */

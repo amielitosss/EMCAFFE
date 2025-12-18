@@ -1,7 +1,7 @@
 ---
 import { productService } from '@/lib/api/productService';
-import type { Product, ProductVariant } from "@/lib/api/types/product.types";
-import { getLangFromUrl, useTranslations } from "../i18n/utils";
+import type { Product, ProductVariant } from '@/lib/api/types/product.types';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -9,67 +9,62 @@ const t = useTranslations(lang);
 let products: Product[] = [];
 
 try {
-  const response = await productService.getAllProducts();
-  if (response && Array.isArray(response.data)) {
-    products = response.data;
-  }
+	const response = await productService.getAllProducts();
+	if (response && Array.isArray(response.data)) {
+		products = response.data;
+	}
 } catch (err) {
-  console.error("❌ Erreur API produits:", err);
+	console.error('❌ Erreur API produits:', err);
 }
 
-// Préparer priceMap pour chaque produit
+// Préparer le variant le moins cher pour chaque produit
 const preparedProducts = products.map(product => {
-  const priceMap: Record<string, number> = {};
-
-  (product.variants || []).forEach((v: ProductVariant) => {
-    const key = v.format || 'default';
-    priceMap[key] = (v.price);
-  });
-
-  const defaultFormat = Object.keys(priceMap)[0] || 'default';
-
-  // Si pas de variantes, mettre le prix principal
-  if (!priceMap[defaultFormat]) {
-    priceMap['default'] = (product.price);
-  }
-
+  const variants: ProductVariant[] = product.variants || [];
+  const cheapestVariant = variants.sort((a, b) => a.price - b.price)[0] || null;
   return {
     ...product,
-    priceMap,
-    defaultFormat,
+    cheapestVariant,
   };
 });
 ---
 
 <section class="flex flex-col items-center justify-center py-12">
-  <h2 class="mb-8 text-5xl font-[Chalkduster] uppercase text-[#753E1C] text-center">
-    {t("home-carousel.title")}
+  <h2 class="mb-8 text-center font-[Chalkduster] text-5xl uppercase text-[#753E1C]">
+    {t('home-carousel.title')}
   </h2>
 
-  <div id="carousel-container" class="relative w-[100vw] sm:w-11/12 md:w-3/4 border-2 border-black rounded-2xl bg-[#FEFBED] p-6 sm:p-8 md:p-12 shadow-md overflow-hidden mx-auto">
-    <div id="carousel-track" class="flex transition-transform duration-700 ease-in-out gap-3 sm:gap-6">
-      {preparedProducts.map(product => (
-        <div class="relative flex-shrink-0 flex flex-col items-center justify-between bg-[#ffffff] w-full md:w-1/2 rounded-lg p-4 hover:scale-105 transition-transform">
+  <div
+    id="carousel-container"
+    class="relative mx-auto w-[100vw] overflow-hidden rounded-2xl border-2 border-black bg-[#FEFBED] p-6 shadow-md sm:w-11/12 sm:p-8 md:w-3/4 md:p-12"
+  >
+    <div
+      id="carousel-track"
+      class="flex gap-3 transition-transform duration-700 ease-in-out sm:gap-6"
+    >
+      {preparedProducts.map((product) => (
+        <div class="relative flex w-full flex-shrink-0 flex-col items-center justify-between rounded-lg bg-[#ffffff] p-4 transition-transform hover:scale-105 md:w-1/2">
           <a href={`/${lang}/product/${product.id_product}`} class="w-full">
-            <img src={`${product.image_url}-1.png`} alt={product.name} class="w-full h-auto object-contain rounded-md shadow-lg" />
+            <img
+              src={`${product.image_url}-1.png`}
+              alt={product.name}
+              class="h-auto w-full rounded-md object-contain shadow-lg"
+            />
           </a>
 
-          <h3 class="mt-6 text-lg md:text-xl text-primary font-bold leading-tight text-center font-[Chalkduster]">{product.name}</h3>
+          <h3 class="mt-6 text-center font-[Chalkduster] text-lg font-bold leading-tight text-primary md:text-xl">
+            {product.name}
+          </h3>
 
-          <p class="mt-6 border border-gray-300 text-black font-semibold text-lg md:text-xl px-6 py-2 rounded-full font-[Chalkduster]">
-            {product.priceMap[product.defaultFormat]}€
+          <p class="mt-6 rounded-full border border-gray-300 px-6 py-2 font-[Chalkduster] text-lg font-semibold text-black md:text-xl">
+            {product.cheapestVariant?.price ?? product.price}€
           </p>
 
-          <button
-            class="mt-6 bg-black text-white px-6 py-3 rounded-xl hover:bg-[#5C3F32] transition font-semibold shadow-md add-to-cart"
-            data-product-id={product.id_product}
-            data-product-name={product.name}
-            data-product-image={`${product.image_url}-1.png`}
-            data-price-map={JSON.stringify(product.priceMap)}
-            data-default-format={product.defaultFormat}
+          <a
+            href={`/${lang}/product/${product.id_product}`}
+            class="mt-6 inline-block bg-black text-white px-6 py-3 rounded-xl hover:bg-[#5C3F32] transition font-semibold shadow-md text-center"
           >
-            {t("product.addToCart") || "Ajouter au panier"}
-          </button>
+            {t('product.details') || 'Détails'}
+          </a>
         </div>
       ))}
     </div>
@@ -77,16 +72,18 @@ const preparedProducts = products.map(product => {
 </section>
 
 <script is:inline>
-window.addEventListener("DOMContentLoaded", () => {
-  const track = document.getElementById("carousel-track");
-  const container = document.getElementById("carousel-container");
-  const cards = document.querySelectorAll("#carousel-track > div");
+window.addEventListener('DOMContentLoaded', () => {
+  const track = document.getElementById('carousel-track');
+  const container = document.getElementById('carousel-container');
+  const cards = document.querySelectorAll('#carousel-track > div');
 
   let index = 0;
   let visible = window.innerWidth < 768 ? 1 : 2;
   const total = cards.length;
 
-  function updateVisible() { visible = window.innerWidth < 768 ? 1 : 2; }
+  function updateVisible() {
+    visible = window.innerWidth < 768 ? 1 : 2;
+  }
   function updateCarousel() {
     if (!track || cards.length === 0) return;
     updateVisible();
@@ -100,126 +97,12 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   let autoScroll = setInterval(nextSlide, 5000);
-  container?.addEventListener("mouseenter", () => clearInterval(autoScroll));
-  container?.addEventListener("mouseleave", () => { autoScroll = setInterval(nextSlide, 5000); });
-
-  window.addEventListener("resize", updateCarousel);
-
-  // ===== FONCTIONS UTILITAIRES PANIER =====
-  function getCart() {
-    try {
-      const cart = localStorage.getItem('cart');
-      return cart ? JSON.parse(cart) : [];
-    } catch (error) {
-      console.error('Error reading cart:', error);
-      return [];
-    }
-  }
-
-  function saveCart(cart) {
-    try {
-      localStorage.setItem('cart', JSON.stringify(cart));
-      updateCartBadge();
-      // Dispatch événement pour synchroniser
-      window.dispatchEvent(new CustomEvent('cartUpdated', { detail: cart }));
-    } catch (error) {
-      console.error('Error saving cart:', error);
-    }
-  }
-
-  function updateCartBadge() {
-    const cart = getCart();
-    const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-
-    // Mettre à jour tous les badges possibles
-    const badges = document.querySelectorAll('.cart-badge, .cart-count, #cart-count, [data-cart-count]');
-    
-    badges.forEach(badge => {
-      if (badge) {
-        badge.textContent = totalItems.toString();
-        if (badge.hasAttribute('data-cart-count')) {
-          badge.setAttribute('data-cart-count', totalItems.toString());
-        }
-        
-        if (totalItems > 0) {
-          badge.style.display = 'flex';
-          badge.classList.remove('hidden');
-        } else {
-          badge.style.display = 'none';
-          badge.classList.add('hidden');
-        }
-      }
-    });
-  }
-
-  // ===== FONCTION GLOBALE ADDTOCART =====
-  if (!window.addToCart) {
-    window.addToCart = function(product) {
-      const cart = getCart();
-
-      const existingIndex = cart.findIndex(
-        item => item.id === product.id && item.format === product.format
-      );
-
-      if (existingIndex > -1) {
-        cart[existingIndex].quantity += product.quantity;
-      } else {
-        cart.push(product);
-      }
-
-      saveCart(cart);
-      console.log('✅ Cart updated:', cart);
-      return cart;
-    };
-  }
-
-  // ===== AJOUTER AU PANIER AVEC POPUP =====
-  document.querySelectorAll(".add-to-cart").forEach(btn => {
-    btn.addEventListener("click", (e) => {
-      const target = e.currentTarget;
-      const priceMap = JSON.parse(target.dataset.priceMap || '{}');
-      const format = target.dataset.defaultFormat || 'default';
-      const price = priceMap[format] ?? 0;
-
-      const product = {
-        id: target.dataset.productId,
-        name: target.dataset.productName,
-        price: parseFloat(price),
-        image: target.dataset.productImage,
-        format,
-        quantity: 1
-      };
-
-      console.log("🛒 Adding to cart:", product);
-
-      // Ajouter au panier
-      window.addToCart(product);
-
-      // 🎉 OUVRIR LA POPUP
-      if (typeof window.dispatchAddToCartModal === 'function') {
-        window.dispatchAddToCartModal(product);
-      } else {
-        console.warn('⚠️ dispatchAddToCartModal function not found');
-      }
-
-      // Animation du bouton
-      target.classList.add("scale-95");
-      setTimeout(() => target.classList.remove("scale-95"), 200);
-    });
+  container?.addEventListener('mouseenter', () => clearInterval(autoScroll));
+  container?.addEventListener('mouseleave', () => {
+    autoScroll = setInterval(nextSlide, 5000);
   });
 
-  // ===== ÉCOUTER LES ÉVÉNEMENTS DE PANIER =====
-  window.addEventListener("cartUpdated", updateCartBadge);
-  window.addEventListener("storage", (e) => {
-    if (e.key === "cart") {
-      updateCartBadge();
-    }
-  });
-
-  // Initialiser le carousel et le badge
+  window.addEventListener('resize', updateCarousel);
   updateCarousel();
-  updateCartBadge();
 });
 </script>
-
-

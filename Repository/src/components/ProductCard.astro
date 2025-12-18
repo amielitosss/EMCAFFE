@@ -1,19 +1,19 @@
 ---
 const {
-  img,
-  productName,
-  id,
-  description,
-  ingredient,
-  preparation,
-  dimension,
-  tabTitles,
-  t,
-  variants = [],
+	img,
+	productName,
+	id,
+	description,
+	ingredient,
+	preparation,
+	dimension,
+	tabTitles,
+	t,
+	variants = [],
 } = Astro.props;
 
 function formatTextWithLineBreaks(text: string): string[] {
-  return text?.split('\n') ?? [];
+	return text?.split('\n') ?? [];
 }
 
 // ✅ Trier les variants par prix croissant
@@ -22,244 +22,332 @@ const defaultVariant = sortedVariants[0];
 ---
 
 <div class="m-5 -mt-24 md:m-10 md:mt-0">
-  <div class="flex flex-col lg:flex-row lg:items-start lg:gap-8">
-    <!-- COLONNE GAUCHE - Images avec titre -->
-    <div class="flex flex-col items-center lg:sticky lg:top-24 lg:w-1/2 lg:self-start mt-4">
+	<div class="flex flex-col lg:flex-row lg:items-start lg:gap-8">
+		<!-- COLONNE GAUCHE - Images avec titre -->
+		<div
+			class="mt-4 flex flex-col items-center lg:sticky lg:top-24 lg:w-1/2 lg:self-start"
+		>
+			<!-- Titre au-dessus de l'image (visible uniquement sur desktop) -->
+			<h2
+				class="mb-6 hidden px-4 text-center font-[Chalkduster] text-2xl font-bold leading-tight text-[#5C3F32] lg:block lg:text-3xl xl:text-4xl"
+			>
+				{productName}
+			</h2>
 
-      <!-- Titre au-dessus de l'image (visible uniquement sur desktop) -->
-      <h2 class="hidden lg:block mb-6 text-center text-2xl font-bold text-[#5C3F32] leading-tight lg:text-3xl xl:text-4xl px-4 font-[Chalkduster]">
-        {productName}
-      </h2>
+			<!-- Titre centré pour mobile -->
+			<h2
+				class="mx-auto mb-6 max-w-[950px] px-4 text-center font-[Chalkduster] text-2xl font-bold leading-tight text-[#5C3F32] sm:text-3xl lg:hidden"
+			>
+				{productName}
+			</h2>
 
-      <!-- Titre centré pour mobile -->
-      <h2 class="lg:hidden mb-6 mx-auto max-w-[950px] text-center text-2xl font-bold text-[#5C3F32] leading-tight sm:text-3xl px-4 font-[Chalkduster]">
-        {productName}
-      </h2>
+			<!-- Container avec position relative pour le logo -->
+			<div class="relative mb-6 w-full max-w-xl lg:max-w-lg">
+				<img
+					id="image"
+					class="h-auto w-full rounded-lg bg-white object-cover shadow-lg"
+					src={`${img}-1.png`}
+					data-img={`${img}`}
+					alt={productName}
+				/>
 
-      <!-- Container avec position relative pour le logo -->
-     <div class="mb-6 w-full max-w-xl lg:max-w-lg relative">
-  <img
-    id="image"
-    class="h-auto w-full rounded-lg bg-white object-cover shadow-lg"
-    src={`${img}-1.png`}
-    data-img={`${img}`}
-    alt={productName}
-  />
+				<!-- Logo AB positionné en haut à droite -->
+				<img
+					src="https://www.leslegumesbiodesaison.fr/wp-content/uploads/2024/02/logo_AB_Colour.png"
+					alt="Logo Agriculture Biologique"
+					class="absolute right-2 top-2 h-12 w-12 object-contain drop-shadow-lg sm:h-16 sm:w-16 lg:h-20 lg:w-20"
+				/>
+			</div>
 
-  <!-- Logo AB positionné en haut à droite -->
-  <img 
-    src="https://www.leslegumesbiodesaison.fr/wp-content/uploads/2024/02/logo_AB_Colour.png" 
-    alt="Logo Agriculture Biologique"
-    class="absolute top-2 right-2 h-12 w-12 sm:h-16 sm:w-16 lg:h-20 lg:w-20 object-contain drop-shadow-lg"
-  />
-</div>
+			<div class="mb-8 flex flex-row justify-center gap-3 lg:mb-0">
+				<button
+					data-img-num="1"
+					class="format-thumb w-20 rounded-lg border-2 border-[#5C3F32] p-2 sm:w-24 lg:w-28"
+				>
+					<img
+						class="h-auto w-full rounded bg-white"
+						src={`${img}-1.png`}
+						alt="Image 1"
+					/>
+				</button>
+				<button
+					data-img-num="2"
+					class="format-thumb w-20 rounded-lg border-2 border-[#5C3F32] p-2 sm:w-24 lg:w-28"
+				>
+					<img
+						class="h-auto w-full rounded bg-white"
+						src={`${img}-2.png`}
+						alt="Image 2"
+					/>
+				</button>
+			</div>
+		</div>
+		<!-- COLONNE DROITE -->
+		<div class="flex flex-col items-center lg:w-1/2">
+			<div
+				class="flex w-full max-w-xl flex-col items-center px-4 text-center lg:px-0"
+			>
+				<h3
+					class="mb-3 text-lg font-semibold text-[#5C3F32] sm:text-xl"
+				>
+					{t('product.format')}
+				</h3>
 
-      <div class="mb-8 flex flex-row justify-center gap-3 lg:mb-0">
-        <button data-img-num="1" class="format-thumb w-20 rounded-lg border-2 border-[#5C3F32] p-2 sm:w-24 lg:w-28">
-          <img class="h-auto w-full rounded bg-white" src={`${img}-1.png`} alt="Image 1" />
-        </button>
-        <button data-img-num="2" class="format-thumb w-20 rounded-lg border-2 border-[#5C3F32] p-2 sm:w-24 lg:w-28">
-          <img class="h-auto w-full rounded bg-white" src={`${img}-2.png`} alt="Image 2" />
-        </button>
-      </div>
-    </div>
-    <!-- COLONNE DROITE -->
-    <div class="flex flex-col items-center lg:w-1/2">
-      <div class="flex w-full max-w-xl flex-col items-center px-4 text-center lg:px-0">
-        <h3 class="mb-3 text-lg font-semibold text-[#5C3F32] sm:text-xl">{t('product.format')}</h3>
+				<!-- Conteneur des boutons dynamiques -->
+				<div id="formatButtons" class="mb-4 flex gap-3"></div>
 
-        <!-- Conteneur des boutons dynamiques -->
-        <div id="formatButtons" class="mb-4 flex gap-3"></div>
+				<div class="mb-6 flex items-center gap-4">
+					<span
+						id="price"
+						class="text-3xl font-bold text-[#5C3F32] sm:text-4xl"
+						>{variants[0]?.price ?? 0}€</span
+					>
+					<div
+						class="flex items-center rounded-lg border-2 border-[#5C3F32]"
+					>
+						<button
+							id="btn-minus"
+							class="px-3 py-2 transition hover:bg-gray-100"
+							>-</button
+						>
+						<input
+							type="number"
+							id="quantity"
+							value="1"
+							min="1"
+							class="w-16 border-x-2 border-[#5C3F32] py-2 text-center focus:outline-none"
+						/>
+						<button
+							id="btn-plus"
+							class="px-3 py-2 transition hover:bg-gray-100"
+							>+</button
+						>
+					</div>
+				</div>
 
-        <div class="mb-6 flex items-center gap-4">
-          <span id="price" class="text-3xl font-bold text-[#5C3F32] sm:text-4xl">{variants[0]?.price ?? 0}€</span>
-          <div class="flex items-center rounded-lg border-2 border-[#5C3F32]">
-            <button id="btn-minus" class="px-3 py-2 transition hover:bg-gray-100">-</button>
-            <input type="number" id="quantity" value="1" min="1" class="w-16 border-x-2 border-[#5C3F32] py-2 text-center focus:outline-none" />
-            <button id="btn-plus" class="px-3 py-2 transition hover:bg-gray-100">+</button>
-          </div>
-        </div>
+				<button
+					id="addToCart"
+					class="mb-6 w-full max-w-sm rounded-lg bg-[#5C3F32] px-8 py-3 font-bold text-white shadow-lg transition hover:scale-105 hover:bg-[#8B4513]"
+					data-product-id={id}
+					data-product-name={productName}
+					data-product-image={`${img}-1.png`}
+					data-variants={JSON.stringify(variants)}
+				>
+					{t('product.addToCart')}
+				</button>
 
-        <button
-          id="addToCart"
-          class="mb-6 w-full max-w-sm rounded-lg bg-[#5C3F32] px-8 py-3 font-bold text-white shadow-lg transition hover:scale-105 hover:bg-[#8B4513]"
-          data-product-id={id}
-          data-product-name={productName}
-          data-product-image={`${img}-1.png`}
-          data-variants={JSON.stringify(variants)}
-        >
-          {t('product.addToCart')}
-        </button>
+				<p class="mb-6 text-sm text-gray-600">{dimension}</p>
+			</div>
 
-        <p class="mb-6 text-sm text-gray-600">{dimension}</p>
-      </div>
+			<!-- Tabs -->
+			<div
+				class="mt-8 w-full max-w-2xl rounded-lg bg-white p-4 shadow-lg sm:p-6"
+			>
+				<div
+					class="mb-4 flex justify-center overflow-x-auto border-b border-gray-200"
+				>
+					<button
+						class="tablinks whitespace-nowrap border-b-2 border-[#5C3F32] px-4 py-2 font-semibold text-[#5C3F32]"
+						data-tab="ingredient">{tabTitles.ingredient}</button
+					>
+					<button
+						class="tablinks whitespace-nowrap px-4 py-2 font-semibold text-gray-500 transition hover:text-[#5C3F32]"
+						data-tab="preparation">{tabTitles.preparation}</button
+					>
+					<button
+						class="tablinks whitespace-nowrap px-4 py-2 font-semibold text-gray-500 transition hover:text-[#5C3F32]"
+						data-tab="description">{tabTitles.description}</button
+					>
+				</div>
 
-      <!-- Tabs -->
-      <div class="mt-8 w-full max-w-2xl rounded-lg bg-white p-4 shadow-lg sm:p-6">
-        <div class="mb-4 flex justify-center overflow-x-auto border-b border-gray-200">
-          <button class="tablinks whitespace-nowrap border-b-2 border-[#5C3F32] px-4 py-2 font-semibold text-[#5C3F32]" data-tab="ingredient">{tabTitles.ingredient}</button>
-          <button class="tablinks whitespace-nowrap px-4 py-2 font-semibold text-gray-500 transition hover:text-[#5C3F32]" data-tab="preparation">{tabTitles.preparation}</button>
-          <button class="tablinks whitespace-nowrap px-4 py-2 font-semibold text-gray-500 transition hover:text-[#5C3F32]" data-tab="description">{tabTitles.description}</button>
-        </div>
-
-        <div id="ingredient" class="tabcontent">
-          {formatTextWithLineBreaks(ingredient).map((line) => <p class="mb-2 text-gray-700">{line}</p>)}
-        </div>
-        <div id="preparation" class="tabcontent hidden">
-          {formatTextWithLineBreaks(preparation).map((line) => <p class="mb-2 text-gray-700">{line}</p>)}
-        </div>
-        <div id="description" class="tabcontent hidden">
-          {formatTextWithLineBreaks(description).map((line) => <p class="mb-2 text-gray-700">{line}</p>)}
-        </div>
-      </div>
-    </div>
-  </div>
+				<div id="ingredient" class="tabcontent">
+					{
+						formatTextWithLineBreaks(ingredient).map((line) => (
+							<p class="mb-2 text-gray-700">{line}</p>
+						))
+					}
+				</div>
+				<div id="preparation" class="tabcontent hidden">
+					{
+						formatTextWithLineBreaks(preparation).map((line) => (
+							<p class="mb-2 text-gray-700">{line}</p>
+						))
+					}
+				</div>
+				<div id="description" class="tabcontent hidden">
+					{
+						formatTextWithLineBreaks(description).map((line) => (
+							<p class="mb-2 text-gray-700">{line}</p>
+						))
+					}
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const quantityInput = document.getElementById('quantity') as HTMLInputElement | null;
-  const btnMinus = document.getElementById('btn-minus');
-  const btnPlus = document.getElementById('btn-plus');
-  const addToCartBtn = document.getElementById('addToCart');
-  const priceEl = document.getElementById('price');
-  const mainImage = document.getElementById('image') as HTMLImageElement | null;
-  const imgBase = mainImage?.getAttribute('data-img') ?? '';
+	document.addEventListener('DOMContentLoaded', () => {
+		const quantityInput = document.getElementById(
+			'quantity',
+		) as HTMLInputElement | null;
+		const btnMinus = document.getElementById('btn-minus');
+		const btnPlus = document.getElementById('btn-plus');
+		const addToCartBtn = document.getElementById('addToCart');
+		const priceEl = document.getElementById('price');
+		const mainImage = document.getElementById(
+			'image',
+		) as HTMLImageElement | null;
+		const imgBase = mainImage?.getAttribute('data-img') ?? '';
 
-  // ✅ GESTION DES ONGLETS
-  const tabButtons = document.querySelectorAll('.tablinks');
-  const tabContents = document.querySelectorAll('.tabcontent');
+		// ✅ GESTION DES ONGLETS
+		const tabButtons = document.querySelectorAll('.tablinks');
+		const tabContents = document.querySelectorAll('.tabcontent');
 
-  tabButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      const targetTab = button.getAttribute('data-tab');
-      
-      // Masquer tous les contenus
-      tabContents.forEach(content => {
-        content.classList.add('hidden');
-      });
-      
-      // Retirer les styles actifs de tous les boutons
-      tabButtons.forEach(btn => {
-        btn.classList.remove('border-b-2', 'border-[#5C3F32]', 'text-[#5C3F32]');
-        btn.classList.add('text-gray-500');
-      });
-      
-      // Afficher le contenu ciblé
-      const targetContent = document.getElementById(targetTab!);
-      if (targetContent) {
-        targetContent.classList.remove('hidden');
-      }
-      
-      // Activer le bouton cliqué
-      button.classList.add('border-b-2', 'border-[#5C3F32]', 'text-[#5C3F32]');
-      button.classList.remove('text-gray-500');
-    });
-  });
+		tabButtons.forEach((button) => {
+			button.addEventListener('click', () => {
+				const targetTab = button.getAttribute('data-tab');
 
-  // ✅ GESTION DU CHANGEMENT D'IMAGE
-  const thumbButtons = document.querySelectorAll('.format-thumb');
-  
-  thumbButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      const imgNum = button.getAttribute('data-img-num');
-      if (mainImage && imgNum) {
-        mainImage.src = `${imgBase}-${imgNum}.png`;
-        console.log('🖼️ Image changée:', mainImage.src);
-      }
-    });
-  });
+				// Masquer tous les contenus
+				tabContents.forEach((content) => {
+					content.classList.add('hidden');
+				});
 
-  // ✅ Interface corrigée selon vos vrais noms de champs
-  interface Variant {
-    idVariant: string;
-    productId: string;
-    format: string;
-    price: number;
-  }
+				// Retirer les styles actifs de tous les boutons
+				tabButtons.forEach((btn) => {
+					btn.classList.remove(
+						'border-b-2',
+						'border-[#5C3F32]',
+						'text-[#5C3F32]',
+					);
+					btn.classList.add('text-gray-500');
+				});
 
-  const variants: Variant[] = addToCartBtn
-    ? JSON.parse(addToCartBtn.dataset.variants ?? '[]')
-    : [];
+				// Afficher le contenu ciblé
+				const targetContent = document.getElementById(targetTab!);
+				if (targetContent) {
+					targetContent.classList.remove('hidden');
+				}
 
-  console.log('🔍 Variants chargés:', variants);
+				// Activer le bouton cliqué
+				button.classList.add(
+					'border-b-2',
+					'border-[#5C3F32]',
+					'text-[#5C3F32]',
+				);
+				button.classList.remove('text-gray-500');
+			});
+		});
 
-  // ✅ Création des boutons dynamiques
-  const formatContainer = document.getElementById('formatButtons');
-  let selectedVariant: Variant = variants[0] || { 
-    idVariant: '', 
-    productId: '',
-    format: '', 
-    price: 0 
-  };
+		// ✅ GESTION DU CHANGEMENT D'IMAGE
+		const thumbButtons = document.querySelectorAll('.format-thumb');
 
-  variants.forEach((v, i) => {
-    const btn = document.createElement('button');
-    btn.textContent = v.format;
-    btn.className = `rounded-lg border-2 border-[#A47343] px-4 py-2 font-semibold transition sm:px-5 sm:py-2.5 ${
-      i === 0 ? 'bg-[#A47343] text-white' : 'text-[#A47343]'
-    }`;
-    btn.dataset.format = v.format;
-    btn.dataset.variantId = v.idVariant;
+		thumbButtons.forEach((button) => {
+			button.addEventListener('click', () => {
+				const imgNum = button.getAttribute('data-img-num');
+				if (mainImage && imgNum) {
+					mainImage.src = `${imgBase}-${imgNum}.png`;
+					console.log('🖼️ Image changée:', mainImage.src);
+				}
+			});
+		});
 
-    btn.addEventListener('click', () => {
-      selectedVariant = v;
-      console.log('✅ Variant sélectionné:', selectedVariant);
+		// ✅ Interface corrigée selon vos vrais noms de champs
+		interface Variant {
+			idVariant: string;
+			productId: string;
+			format: string;
+			price: number;
+		}
 
-      if (priceEl) priceEl.textContent = parseFloat(String(v.price)).toFixed(2) + '€';
+		const variants: Variant[] = addToCartBtn
+			? JSON.parse(addToCartBtn.dataset.variants ?? '[]')
+			: [];
 
-      formatContainer?.querySelectorAll('button').forEach(b => {
-        b.classList.remove('bg-[#A47343]','text-white');
-        b.classList.add('text-[#A47343]');
-      });
-      btn.classList.add('bg-[#A47343]','text-white');
-      btn.classList.remove('text-[#A47343]');
-    });
+		console.log('🔍 Variants chargés:', variants);
 
-    formatContainer?.appendChild(btn);
-  });
+		// ✅ Création des boutons dynamiques
+		const formatContainer = document.getElementById('formatButtons');
+		let selectedVariant: Variant = variants[0] || {
+			idVariant: '',
+			productId: '',
+			format: '',
+			price: 0,
+		};
 
-  // Gestion quantité
-  btnMinus?.addEventListener('click', () => {
-    if (quantityInput && parseInt(quantityInput.value) > 1) {
-      quantityInput.value = String(parseInt(quantityInput.value) - 1);
-    }
-  });
+		variants.forEach((v, i) => {
+			const btn = document.createElement('button');
+			btn.textContent = v.format;
+			btn.className = `rounded-lg border-2 border-[#A47343] px-4 py-2 font-semibold transition sm:px-5 sm:py-2.5 ${
+				i === 0 ? 'bg-[#A47343] text-white' : 'text-[#A47343]'
+			}`;
+			btn.dataset.format = v.format;
+			btn.dataset.variantId = v.idVariant;
 
-  btnPlus?.addEventListener('click', () => {
-    if (quantityInput) {
-      quantityInput.value = String(parseInt(quantityInput.value) + 1);
-    }
-  });
+			btn.addEventListener('click', () => {
+				selectedVariant = v;
+				console.log('✅ Variant sélectionné:', selectedVariant);
 
-  // ✅ Ajout au panier
-  addToCartBtn?.addEventListener('click', () => {
-    const quantityValue = parseInt(quantityInput?.value ?? '1');
+				if (priceEl)
+					priceEl.textContent =
+						parseFloat(String(v.price)).toFixed(2) + '€';
 
-    const product = {
-      id: addToCartBtn.dataset.productId,
-      name: addToCartBtn.dataset.productName,
-      price: parseFloat(String(selectedVariant.price)),
-      image: addToCartBtn.dataset.productImage,
-      quantity: quantityValue,
-      format: selectedVariant.format,
-      variantId: selectedVariant.idVariant
-    };
+				formatContainer?.querySelectorAll('button').forEach((b) => {
+					b.classList.remove('bg-[#A47343]', 'text-white');
+					b.classList.add('text-[#A47343]');
+				});
+				btn.classList.add('bg-[#A47343]', 'text-white');
+				btn.classList.remove('text-[#A47343]');
+			});
 
-    console.log('🛒 Produit final ajouté:', product);
+			formatContainer?.appendChild(btn);
+		});
 
-    if (typeof window.addToCart === 'function') {
-      window.addToCart(product);
-    }
+		// Gestion quantité
+		btnMinus?.addEventListener('click', () => {
+			if (quantityInput && parseInt(quantityInput.value) > 1) {
+				quantityInput.value = String(parseInt(quantityInput.value) - 1);
+			}
+		});
 
-    if (typeof window.dispatchAddToCartModal === 'function') {
-      window.dispatchAddToCartModal(product);
-    }
-  });
-});
+		btnPlus?.addEventListener('click', () => {
+			if (quantityInput) {
+				quantityInput.value = String(parseInt(quantityInput.value) + 1);
+			}
+		});
+
+		// ✅ Ajout au panier
+		addToCartBtn?.addEventListener('click', () => {
+			const quantityValue = parseInt(quantityInput?.value ?? '1');
+
+			const product = {
+				id: addToCartBtn.dataset.productId,
+				name: addToCartBtn.dataset.productName,
+				price: parseFloat(String(selectedVariant.price)),
+				image: addToCartBtn.dataset.productImage,
+				quantity: quantityValue,
+				format: selectedVariant.format,
+				variantId: selectedVariant.idVariant,
+			};
+
+			console.log('🛒 Produit final ajouté:', product);
+
+			if (typeof window.addToCart === 'function') {
+				window.addToCart(product);
+			}
+
+			if (typeof window.dispatchAddToCartModal === 'function') {
+				window.dispatchAddToCartModal(product);
+			}
+		});
+	});
 </script>
 
 <style>
-  .tabcontent.hidden { display: none; }
-  .tabcontent { display: block; }
+	.tabcontent.hidden {
+		display: none;
+	}
+	.tabcontent {
+		display: block;
+	}
 </style>
