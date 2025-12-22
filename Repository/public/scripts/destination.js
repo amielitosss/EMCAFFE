@@ -4,6 +4,16 @@ const STRIPE_PUBLIC_KEY =
 const API_BASE_URL = 'https://api-emcafe-3.onrender.com/api';
 
 document.addEventListener('DOMContentLoaded', () => {
+	const loader = document.getElementById('global-loader');
+
+	function showLoader() {
+		loader?.classList.remove('hidden');
+	}
+
+	function hideLoader() {
+		loader?.classList.add('hidden');
+	}
+
 	async function computeSendcloudDeliveryCost({
 		isRelay,
 		totalWeight,
@@ -595,7 +605,6 @@ document.addEventListener('DOMContentLoaded', () => {
 					return;
 				}
 
-
 				const paymentMethod = document.querySelector(
 					'input[name="payment"]:checked',
 				)?.value;
@@ -842,6 +851,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				async function createParcel(parcelData, token) {
 					const API_BASE = 'https://api-emcafe-3.onrender.com/api'; // ou import.meta.env.PUBLIC_API_URL si Astro
 
+					showLoader();
 					try {
 						const res = await fetch(
 							`${API_BASE}/sendcloud/parcels`,
@@ -870,6 +880,8 @@ document.addEventListener('DOMContentLoaded', () => {
 							err,
 						);
 						throw err;
+					} finally {
+						hideLoader(); // ✅ TOUJOURS exécuté
 					}
 				}
 
@@ -955,73 +967,87 @@ document.addEventListener('DOMContentLoaded', () => {
 				if (paymentMethod === 'bank_transfer') {
 					console.log('🏦 Traitement virement bancaire...');
 
-					const res = await fetch(
-						`${API_BASE_URL}/payments/bank-transfer`,
-						{
-							method: 'POST',
-							headers: {
-								'Content-Type': 'application/json',
-								Authorization: `Bearer ${token}`,
+					showLoader(); // ⏳ afficher le loader
+
+					try {
+						const res = await fetch(
+							`${API_BASE_URL}/payments/bank-transfer`,
+							{
+								method: 'POST',
+								headers: {
+									'Content-Type': 'application/json',
+									Authorization: `Bearer ${token}`,
+								},
+								body: JSON.stringify(paymentPayload),
 							},
-							body: JSON.stringify(paymentPayload),
-						},
-					);
+						);
 
-					const data = await res.json();
-					console.log('📥 Réponse serveur virement:', data);
+						const data = await res.json();
+						console.log('📥 Réponse serveur virement:', data);
 
-					if (!res.ok || !data.success) {
-						console.error('❌ Erreur virement bancaire:', data);
+						if (!res.ok || !data.success) {
+							console.error('❌ Erreur virement bancaire:', data);
 
-						if (data.errors) {
-							const errorDetails = data.errors
-								.map(
-									(err) =>
-										`${err.property}: ${Object.values(err.constraints || {}).join(', ')}`,
-								)
-								.join('\n');
+							if (data.errors) {
+								const errorDetails = data.errors
+									.map(
+										(err) =>
+											`${err.property}: ${Object.values(err.constraints || {}).join(', ')}`,
+									)
+									.join('\n');
+
+								throw new Error(
+									`Erreurs de validation:\n${errorDetails}`,
+								);
+							}
+
 							throw new Error(
-								`Erreurs de validation:\n${errorDetails}`,
+								data.message ||
+									'Erreur lors du traitement du virement bancaire',
 							);
 						}
 
-						throw new Error(
-							data.message ||
-								'Erreur lors du traitement du virement bancaire',
+						const orderId = data.orderId;
+						console.log('✅ Commande virement créée:', orderId);
+
+						// ✅ Confirmation commande
+						showOrderConfirmation({
+							orderId,
+							email: customerEmail,
+							items: cart,
+							total: paymentPayload.amount,
+							deliveryCost,
+							deliveryInfo,
+							paymentMethod: 'Virement bancaire',
+							isRelayDelivery: deliveryInfo.isRelayDelivery,
+						});
+
+						// 🧹 Nettoyage
+						localStorage.removeItem('cart');
+						sessionStorage.removeItem('cartTotal');
+						sessionStorage.removeItem('deliveryCost');
+
+						if (isGuestSession()) {
+							clearGuestSession();
+						}
+
+						return;
+					} catch (err) {
+						console.error('❌ Erreur virement bancaire:', err);
+						alert(
+							err.message ||
+								'Erreur lors du paiement par virement',
 						);
+					} finally {
+						hideLoader(); // ✅ TOUJOURS exécuté
 					}
-
-					const orderId = data.orderId; // ← récupère directement orderId
-					console.log('✅ Commande virement créée:', orderId);
-
-					// Afficher la confirmation
-					showOrderConfirmation({
-						orderId: orderId,
-						email: customerEmail,
-						items: cart,
-						total: paymentPayload.amount,
-						deliveryCost: deliveryCost,
-						deliveryInfo: deliveryInfo,
-						paymentMethod: 'Virement bancaire',
-						isRelayDelivery: deliveryInfo.isRelayDelivery,
-					});
-
-					// Nettoyer
-					localStorage.removeItem('cart');
-					sessionStorage.removeItem('cartTotal');
-					sessionStorage.removeItem('deliveryCost');
-
-					if (isGuestSession()) {
-						clearGuestSession();
-					}
-
-					return;
 				}
 
 				/* ---------------- PAIEMENT PAR CARTE ---------------- */
 				if (paymentMethod === 'card') {
 					console.log('💳 Traitement paiement carte...');
 
+                     showLoader();
 					// Vérifier Stripe
 					if (!stripeInstance || !cardElement) {
 						console.log('🔄 Initialisation Stripe...');
@@ -1169,6 +1195,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				console.error('❌ Erreur lors de la commande:', error);
 				alert(`Une erreur est survenue : ${error.message}`);
 			} finally {
+                hideLoader(); 
 				if (placeOrderBtn) {
 					placeOrderBtn.disabled = false;
 					placeOrderBtn.textContent = originalText;
@@ -1245,7 +1272,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; font-size: 1.2rem; font-weight: bold; border-top: 2px solid #333; margin-top: 0.5rem;">
           <span>Total</span>
-          <span>${(total).toFixed(2)} €</span>
+          <span>${total.toFixed(2)} €</span>
         </div>
       </div>
 
