@@ -19,6 +19,12 @@ function formatTextWithLineBreaks(text: string): string[] {
 // ✅ Trier les variants par prix croissant
 const sortedVariants = [...variants].sort((a, b) => a.price - b.price);
 const defaultVariant = sortedVariants[0];
+
+function parseBoldToHTML(text: string) {
+  return text.replace(/\*\*(.*?)\*\*/g, '<br><strong>$1</strong>');
+}
+
+
 ---
 
 <div class="m-5 -mt-24 md:m-10 md:mt-0">
@@ -29,16 +35,17 @@ const defaultVariant = sortedVariants[0];
 		>
 			<!-- Titre au-dessus de l'image (visible uniquement sur desktop) -->
 			<h2
-				class="mb-6 hidden px-4 text-center font-[Chalkduster] text-2xl font-bold leading-tight text-[#5C3F32] lg:block lg:text-3xl xl:text-4xl"
-			>
-				{productName}
-			</h2>
+  class="mb-6 hidden px-4 text-center font-[Chalkduster] text-2xl font-bold leading-tight text-[#5C3F32] lg:block lg:text-3xl xl:text-4xl"
+    set:html={parseBoldToHTML(productName)}
+>
+</h2>
 
 			<!-- Titre centré pour mobile -->
 			<h2
 				class="mx-auto mb-6 max-w-[950px] px-4 text-center font-[Chalkduster] text-2xl font-bold leading-tight text-[#5C3F32] sm:text-3xl lg:hidden"
+                  set:html={parseBoldToHTML(productName)}
 			>
-				{productName}
+				
 			</h2>
 
 			<!-- Container avec position relative pour le logo -->

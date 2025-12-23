@@ -11,6 +11,11 @@ const { title, img, details } = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+
+function parseBoldToHTML(text: string) {
+  return text.replace(/\*\*(.*?)\*\*/g, '<br><strong>$1</strong>');
+}
+
 ---
 
 <style>
@@ -41,10 +46,11 @@ const t = useTranslations(lang);
 		</a>
 	</div>
     <p
-     class="text-center font-[Chalkduster] text-xl font-semibold text-[#5C3F32] md:text-2xl opacity-0 translate-y-3 animate-fadeUp "
-    >
-       {title}
-    </p>
+  class="text-center font-[Chalkduster] text-xl font-semibold text-[#5C3F32] md:text-2xl opacity-0 translate-y-3 animate-fadeUp"
+    set:html={parseBoldToHTML(title)}
+>
+</p>
+
 
 	<a
 		href={details}

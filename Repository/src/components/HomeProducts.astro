@@ -26,6 +26,11 @@ const preparedProducts = products.map(product => {
     cheapestVariant,
   };
 });
+
+function parseBoldToHTML(text: string) {
+  return text.replace(/\*\*(.*?)\*\*/g, '<br><strong>$1</strong>');
+}
+
 ---
 
 <section class="flex flex-col items-center justify-center py-12">
@@ -51,9 +56,12 @@ const preparedProducts = products.map(product => {
             />
           </a>
 
-          <h3 class="mt-6 text-center font-[Chalkduster] text-lg font-bold leading-tight text-primary md:text-xl">
-            {product.name}
-          </h3>
+          <h3
+  class="mt-6 text-center font-[Chalkduster] text-lg font-bold leading-tight text-primary md:text-xl uppercase"
+   set:html={parseBoldToHTML(product.name)}
+>
+</h3>
+
 
           <p class="mt-6 rounded-full border border-gray-300 px-6 py-2 font-[Chalkduster] text-lg font-semibold text-black md:text-xl">
             {product.cheapestVariant?.price ?? product.price}€

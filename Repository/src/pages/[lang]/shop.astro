@@ -61,7 +61,7 @@ const productRows = chunkArray(products, 2);
     {products.length > 0 ? (
       <>
         {productRows.map((row) => (
-          <div class="flex w-full flex-col justify-around gap-y-8 md:flex-row md:gap-y-0">
+          <div class="flex w-full flex-col justify-around gap-y-8 md:flex-row md:gap-y-0 uppercase">
             {row.map((product) => (
               <ShopArticle
                 title={product.name ?? ''}
