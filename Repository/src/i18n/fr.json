@@ -12,7 +12,7 @@
 	"coffee.2.title": "Qualité d'excellence",
 	"coffee.2.description": "Pour une production pur arabica et une performance en tasse ronde de 82 à 86 points SCAA, avec un rendement de 71% à 74% et l'humidité de 12%.",
 	"coffee.3.title": "Harmonie planétaire",
-	"coffee.3.description": "Ses notes florales et fruitées chantent des grains cultivés dans la région Forêt Altitude de l'Amazonie Péruvienne, vous permettent de consommer un parfum café vivant au goût pur arabique, intense et naturel !",
+	"coffee.3.description": "Ses notes florales et fruitées chantent des grains cultivés dans la région Forêt Altitude de l'Amazonie Péruvienne, vous permettent de consommer un parfum café vivant au goût pur ARABICA, intense et naturel !",
 
 	"home-info.titre1": "SAVOIR FAIRE EMCAFFE",
 	"home-info.description1": "Chez Emca, porte-parole des producteurs des grains de café vert de la région amazonienne du Pérou, vous invite à découvrir l'arôme, la saveur et le rendement de notre café d'altitude \"forêt\" : bio et de spécialité dans votre tasse !",
@@ -36,8 +36,8 @@
 	"shop.details": "Détails",
 	"200-bio.title": "Grains crus de café vert non torréfiés pur ARABICA DE FORÊT D'ALTITUDE 100% BIO SANTÉ",
 	"300-bio.title": "Grains de café torréfiés pur ARABICA DE FORÊT D'ALTITUDE 100% BIO",
-	"200-spe.title": "Grains crus de café vert non torréfiés purs ARABIQUE DE FORÊT D'ALTITUDE 100% Spécialité",
-	"300-spe.title": "Grains de café torréfiés purs ARABIQUE DE FORÊT D'ALTITUDE 100% Spécialité",
+	"200-spe.title": "Grains crus de café vert non torréfiés purs ARABICA DE FORÊT D'ALTITUDE 100% Spécialité",
+	"300-spe.title": "Grains de café torréfiés purs ARABICA DE FORÊT D'ALTITUDE 100% Spécialité",
 	"200-bio.titlep": "Grains Crus de Café Vert 100% Bio",
 	"200-bio.description": "Ses notes florales aromatiques et fruitées chantent le bio des grains verts du café cultivés dans la haute nature de l’Amazonie. \n Café issu d’une récolte faite à la main à une altitude comprise entre 1300 et 1900 mètres, bénéficiant d’un suivi qualité d’excellence pour une production de pur arabica, qui délivre un parfum surprenant et harmonieux au goût de café intense et naturel.",
 	"200-bio.ingredient": "100% café arabica en grains issu de l’agriculture biologique du Pérou.\n Sucre naturel sans ajout, sans additif et sans gluten.\n ‎  \n Conserver dans un endroit frais et sec.",
@@ -462,7 +462,7 @@
 
 	"productHighlight": {
 		"title": "CAFÉS BIO",
-		"descriptionFront": "GRAINS DE CAFÉ TORRÉFIÉS <br /><strong>PURS ARABIQUE DE FORÊT D'ALTITUDE<br />100% BIO</strong>",
+		"descriptionFront": "GRAINS DE CAFÉ TORRÉFIÉS <br /><strong>PURS ARABICA DE FORÊT D'ALTITUDE<br />100% BIO</strong>",
 		"addToCart": "Ajouter au panier"
 	},
 
