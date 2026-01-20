@@ -516,7 +516,42 @@
   "back": "Retour aux recettes",
   "viewRecipe": "Voir la recette",
   "all": "Toutes"
-}
+},
+    "forgot": {
+      "title": "Mot de passe oublié ?",
+      "back": "Retour",
+      "description": "Entrez votre email pour recevoir un code de réinitialisation.",
+      "emailLabel": "Adresse email",
+      "emailPlaceholder": "votre@email.com",
+      "submit": "Envoyer le code",
+      "successMessage": "Code envoyé ! Vérifiez votre email.",
+      "sending": "Envoi...",
+      "errorDefault": "Erreur lors de l'envoi du code."
+    },
+    
+    "reset": {
+      "title": "Réinitialiser le mot de passe",
+      "back": "Retour",
+      "description": "Entrez le code reçu par email et votre nouveau mot de passe.",
+      "codeLabel": "Code de vérification",
+      "codePlaceholder": "Code à 6 chiffres",
+      "passwordLabel": "Nouveau mot de passe",
+      "passwordPlaceholder": "Min. 8 caractères",
+      "confirmLabel": "Confirmer le mot de passe",
+      "confirmPlaceholder": "Retapez votre mot de passe",
+      "submit": "Réinitialiser",
+      "resetting": "Réinitialisation...",
+      "successMessage": "Mot de passe réinitialisé ! Redirection...",
+      "errorDefault": "Erreur lors de la réinitialisation.",
+      "errorPasswordMismatch": "Les mots de passe ne correspondent pas.",
+      "errorPasswordTooShort": "Le mot de passe doit contenir au moins 8 caractères.",
+      "errorInvalidCode": "Code invalide ou expiré.",
+      "matchSuccess": "✓ Les mots de passe correspondent",
+      "matchError": "✗ Les mots de passe ne correspondent pas",
+      "showPassword": "Afficher",
+      "hidePassword": "Masquer"
+    }
+  
 
 
 }

@@ -519,25 +519,41 @@ const t = useTranslations(lang);
       </section>
 
       <!-- SUMMARY CARD -->
-      <aside
-        id="summaryCard"
-        class="bg-[#FEFBED] border border-[#5C3F32] rounded-lg p-6 shadow-md text-[#5C3F32] h-fit w-full md:w-[40%]"
-      >
-        <h3 class="text-lg font-semibold text-center mb-4">🛒 Your Order</h3>
-        <div id="summaryItems" class="space-y-4 mb-4"></div>
+   <aside
+  id="summaryCard"
+  class="bg-[#FEFBED] border border-[#5C3F32] rounded-lg p-6 shadow-md text-[#5C3F32] h-fit w-full md:w-[40%]"
+>
+  <h3 class="text-lg font-semibold text-center mb-4">🛒 Your Order</h3>
+  <div id="summaryItems" class="space-y-4 mb-4"></div>
 
-        <div class="w-full space-y-2 border-t border-[#A47343]/40 pt-2 text-sm">
-          <div class="flex justify-between">
-            <span>Delivery:</span>
-            <span id="summaryDelivery">0.00€</span>
-          </div>
-          <hr class="my-1 border-[#5C3F32]/40" />
-          <div class="flex justify-between font-semibold text-lg">
-            <span>TTC:</span>
-            <span id="summaryTotal">0.00€</span>
-          </div>
-        </div>
-      </aside>
+  <div class="w-full space-y-2 border-t border-[#A47343]/40 pt-2 text-sm">
+    <!-- Sous-total -->
+    <div class="flex justify-between">
+      <span>Subtotal:</span>
+      <span id="summarySubtotal">0.00€</span>
+    </div>
+    
+    <!-- Livraison -->
+    <div class="flex justify-between">
+      <span>Delivery:</span>
+      <span id="summaryDelivery">0.00€</span>
+    </div>
+    
+    <!-- Taxes (TVA 20%) -->
+    <div class="flex justify-between text-gray-600">
+      <span>Tax (TVA 20%):</span>
+      <span id="summaryTax">0.00€</span>
+    </div>
+    
+    <hr class="my-1 border-[#5C3F32]/40" />
+    
+    <!-- Total TTC -->
+    <div class="flex justify-between font-semibold text-lg">
+      <span>Total (incl. tax):</span>
+      <span id="summaryTotal">0.00€</span>
+    </div>
+  </div>
+</aside>
 
     </div>
 
@@ -629,32 +645,52 @@ const t = useTranslations(lang);
        MISE À JOUR DU RÉCAPITULATIF
     --------------------------------------------------------- */
     function updateSummary() {
-	// 🔥 Prix réel depuis SendCloud
-	const deliveryPrice = parseFloat(
-		sessionStorage.getItem('deliveryCost') || '0'
-	);
+  // 🔥 Prix de livraison depuis SendCloud
+  const deliveryPrice = parseFloat(
+    sessionStorage.getItem('deliveryCost') || '0'
+  );
 
-	const cartSubtotal = parseFloat(
-		sessionStorage.getItem('cartTotal') || '0'
-	);
+  // 🔥 Sous-total du panier
+  const cartSubtotal = parseFloat(
+    sessionStorage.getItem('cartTotal') || '0'
+  );
 
-	const total = cartSubtotal + deliveryPrice;
+  // 🔥 TAXE FIXE À 0,99€
+  const taxAmount = 0.99;
 
-	const summaryDelivery = document.getElementById('summaryDelivery');
-	const summaryTotal = document.getElementById('summaryTotal');
+  // 🔥 TOTAL TTC
+  const total = cartSubtotal + deliveryPrice + taxAmount;
 
-	if (summaryDelivery)
-		summaryDelivery.textContent = `${deliveryPrice.toFixed(2)}€`;
+  // 🔥 MISE À JOUR DE L'AFFICHAGE
+  const summarySubtotal = document.getElementById('summarySubtotal');
+  const summaryDelivery = document.getElementById('summaryDelivery');
+  const summaryTax = document.getElementById('summaryTax');
+  const summaryTotal = document.getElementById('summaryTotal');
 
-	if (summaryTotal)
-		summaryTotal.textContent = `${total.toFixed(2)}€`;
+  if (summarySubtotal)
+    summarySubtotal.textContent = `${cartSubtotal.toFixed(2)}€`;
 
-	console.log('📊 Summary mis à jour:', {
-		deliveryPrice,
-		cartSubtotal,
-		total,
-	});
+  if (summaryDelivery)
+    summaryDelivery.textContent = `${deliveryPrice.toFixed(2)}€`;
+
+  if (summaryTax)
+    summaryTax.textContent = `0.99€`; // Fixe
+
+  if (summaryTotal)
+    summaryTotal.textContent = `${total.toFixed(2)}€`;
+
+  console.log('📊 Summary mis à jour:', {
+    cartSubtotal,
+    deliveryPrice,
+    taxAmount: 0.99,
+    total,
+  });
+
+  // 🔥 Stocker le total pour Stripe/Payment
+  sessionStorage.setItem('orderTotal', total.toFixed(2));
 }
+
+
 async function refreshDeliveryPrice() {
       const isRelay = deliveryRelay?.checked ?? false;
   try {

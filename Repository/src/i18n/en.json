@@ -517,7 +517,40 @@
   "back": "Back to recipes",
   "viewRecipe": "View recipe",
   "all": "All"
-}
-
+},
+"forgot": {
+      "title": "Forgot Password?",
+      "back": "Back",
+      "description": "Enter your email to receive a reset code.",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "your@email.com",
+      "submit": "Send code",
+      "successMessage": "Code sent! Check your email.",
+      "sending": "Sending...",
+      "errorDefault": "Error sending code."
+    },
+    
+    "reset": {
+      "title": "Reset Password",
+      "back": "Back",
+      "description": "Enter the code received by email and your new password.",
+      "codeLabel": "Verification code",
+      "codePlaceholder": "6-digit code",
+      "passwordLabel": "New password",
+      "passwordPlaceholder": "Min. 8 characters",
+      "confirmLabel": "Confirm password",
+      "confirmPlaceholder": "Retype your password",
+      "submit": "Reset",
+      "resetting": "Resetting...",
+      "successMessage": "Password reset! Redirecting...",
+      "errorDefault": "Error during reset.",
+      "errorPasswordMismatch": "Passwords do not match.",
+      "errorPasswordTooShort": "Password must be at least 8 characters.",
+      "errorInvalidCode": "Invalid or expired code.",
+      "matchSuccess": "✓ Passwords match",
+      "matchError": "✗ Passwords do not match",
+      "showPassword": "Show",
+      "hidePassword": "Hide"
+    }
 
 }

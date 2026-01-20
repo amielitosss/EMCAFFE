@@ -285,7 +285,6 @@ export { getStaticPaths };
                     </form>
                 </section>
 
-               Voici le code complet pour afficher les commandes de l'utilisateur dans son profil :
 
 <!-- Section Commandes -->
 <section id="orders" class="rounded-2xl bg-white p-8 shadow-lg">
@@ -325,7 +324,7 @@ export { getStaticPaths };
             {t('account.noOrders') || 'Aucune commande pour le moment'}
         </p>
         <a
-            href={`/${lang}/products`}
+            href={`/${lang}/shop`}
             class="inline-block rounded-lg bg-[#5C3F32] px-6 py-3 text-white transition-colors hover:bg-[#8B4513]"
         >
             {t('account.startShopping') || 'Commencer mes achats'}
@@ -355,39 +354,7 @@ export { getStaticPaths };
                     </h2>
 
                     <div class="space-y-6">
-                        <!-- Changer mot de passe -->
-                        <div class="border-b border-gray-200 pb-6">
-                            <h3 class="mb-4 text-lg font-semibold text-[#5C3F32]">
-                                {t('account.changePassword') || 'Modifier le mot de passe'}
-                            </h3>
-                            <form id="password-form" class="space-y-4">
-                                <input
-                                    type="password"
-                                    name="currentPassword"
-                                    placeholder={t('account.currentPassword') || 'Mot de passe actuel'}
-                                    class="w-full rounded-lg border-2 border-gray-300 px-4 py-3"
-                                />
-                                <input
-                                    type="password"
-                                    name="newPassword"
-                                    placeholder={t('account.newPassword') || 'Nouveau mot de passe'}
-                                    class="w-full rounded-lg border-2 border-gray-300 px-4 py-3"
-                                />
-                                <input
-                                    type="password"
-                                    name="confirmPassword"
-                                    placeholder={t('account.confirmNewPassword') || 'Confirmer le mot de passe'}
-                                    class="w-full rounded-lg border-2 border-gray-300 px-4 py-3"
-                                />
-                                <button
-                                    type="submit"
-                                    class="rounded-lg bg-[#5C3F32] px-6 py-3 text-white transition-colors hover:bg-[#8B4513]"
-                                >
-                                    {t('account.updatePassword') || 'Mettre à jour'}
-                                </button>
-                            </form>
-                        </div>
-
+                       
                         <!-- Préférences de notification -->
                         <div class="border-b border-gray-200 pb-6">
                             <h3 class="mb-4 text-lg font-semibold text-[#5C3F32]">

@@ -96,6 +96,62 @@ export const userService = {
     console.log('✅ Déconnexion');
   },
 
+  // ==================== RÉINITIALISATION MOT DE PASSE 🆕 ====================
+
+  /**
+   * Demander un code de réinitialisation de mot de passe
+   * @param email - Email de l'utilisateur
+   */
+  async requestPasswordReset(email: string): Promise<{ message: string }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/request-password-reset`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erreur lors de la demande de réinitialisation');
+      }
+
+      const result = await response.json();
+      console.log('✅ Code de réinitialisation envoyé');
+      return result;
+    } catch (error) {
+      console.error('❌ Erreur requestPasswordReset:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Réinitialiser le mot de passe avec le code reçu
+   * @param token - Code à 6 chiffres reçu par email
+   * @param newPassword - Nouveau mot de passe
+   */
+  async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, newPassword }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erreur lors de la réinitialisation');
+      }
+
+      const result = await response.json();
+      console.log('✅ Mot de passe réinitialisé');
+      return result;
+    } catch (error) {
+      console.error('❌ Erreur resetPassword:', error);
+      throw error;
+    }
+  },
+
+
   // ==================== PROFIL UTILISATEUR ====================
 
   /**

@@ -514,7 +514,40 @@
   "back": "Retour aux recettes",
   "viewRecipe": "Voir la recette",
   "all": "Toutes"
-}
-
+},
+ "forgot": {
+      "title": "¿Olvidaste tu contraseña?",
+      "back": "Volver",
+      "description": "Ingresa tu email para recibir un código de restablecimiento.",
+      "emailLabel": "Dirección de email",
+      "emailPlaceholder": "tu@email.com",
+      "submit": "Enviar código",
+      "successMessage": "¡Código enviado! Verifica tu email.",
+      "sending": "Enviando...",
+      "errorDefault": "Error al enviar el código."
+    },
+    
+    "reset": {
+      "title": "Restablecer contraseña",
+      "back": "Volver",
+      "description": "Ingresa el código recibido por email y tu nueva contraseña.",
+      "codeLabel": "Código de verificación",
+      "codePlaceholder": "Código de 6 dígitos",
+      "passwordLabel": "Nueva contraseña",
+      "passwordPlaceholder": "Mín. 8 caracteres",
+      "confirmLabel": "Confirmar contraseña",
+      "confirmPlaceholder": "Vuelve a escribir tu contraseña",
+      "submit": "Restablecer",
+      "resetting": "Restableciendo...",
+      "successMessage": "¡Contraseña restablecida! Redirigiendo...",
+      "errorDefault": "Error al restablecer.",
+      "errorPasswordMismatch": "Las contraseñas no coinciden.",
+      "errorPasswordTooShort": "La contraseña debe tener al menos 8 caracteres.",
+      "errorInvalidCode": "Código inválido o expirado.",
+      "matchSuccess": "✓ Las contraseñas coinciden",
+      "matchError": "✗ Las contraseñas no coinciden",
+      "showPassword": "Mostrar",
+      "hidePassword": "Ocultar"
+    }
 
 }
